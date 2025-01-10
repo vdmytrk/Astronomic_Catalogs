@@ -19,7 +19,7 @@ stages:
   jobs:
   - job: Build
     pool:
-      name: SelfHostedPool20250103
+      name: SelfHostedPool20250103 # Використання self-hosted агента
     steps:
     - task: NuGetToolInstaller@1
     - task: NuGetCommand@2
@@ -46,7 +46,7 @@ stages:
   jobs:
   - deployment: DeployWebApp
     pool:
-      vmImage: 'windows-latest'
+      vmImage: SelfHostedPool20250103  # Переключення на self-hosted агента для деплою
     environment: 'production'
     strategy:
       runOnce:
