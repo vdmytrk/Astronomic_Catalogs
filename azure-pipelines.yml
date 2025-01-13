@@ -19,22 +19,17 @@ stages:
   jobs:
   - job: Build
     pool:
-      name: SelfHostedPool20250103 # Використання self-hosted агента
+      name: SelfHostedPool20250103
     steps:
     - task: NuGetToolInstaller@1
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
-    - task: VSBuild@1
+    - task: DotNetCoreCLI@2
       inputs:
-        solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(Build.ArtifactStagingDirectory)"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-    - task: VSTest@2
-      inputs:
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
+        command: 'publish'
+        projects: '**/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -46,7 +41,7 @@ stages:
   jobs:
   - deployment: DeployWebApp
     pool:
-      name: SelfHostedPool20250103  # Переключення на self-hosted агента для деплою
+      name: SelfHostedPool20250103
     environment: 'production'
     strategy:
       runOnce:
