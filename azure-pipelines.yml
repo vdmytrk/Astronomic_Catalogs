@@ -46,7 +46,7 @@ stages:
   jobs:
   - deployment: DeployWebApp
     pool:
-      vmImage: SelfHostedPool20250103  # Переключення на self-hosted агента для деплою
+      name: SelfHostedPool20250103  # Переключення на self-hosted агента для деплою
     environment: 'production'
     strategy:
       runOnce:
