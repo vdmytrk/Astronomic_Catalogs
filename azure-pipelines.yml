@@ -36,9 +36,9 @@ stages:
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
-        includeRootFolder: false
+        includeRootFolder: true
         archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Astronomic Catalogs.zip'
+        archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs.zip"
         replaceExistingArchive: true
     - task: PublishBuildArtifacts@1
       inputs:
@@ -62,4 +62,4 @@ stages:
               azureSubscription: 'Azure subscription for voldmytc'
               appType: 'webApp'
               appName: 'NewAstroCatalogs'
-              package: '$(Pipeline.Workspace)/drop/Astronomic Catalogs.zip'
+              package: "$(Pipeline.Workspace)/drop/Astronomic Catalogs.zip"
