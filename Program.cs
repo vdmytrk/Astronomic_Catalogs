@@ -35,6 +35,7 @@ namespace Astronomic_Catalogs
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();
