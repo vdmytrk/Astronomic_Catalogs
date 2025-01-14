@@ -1,6 +1,7 @@
 using Astronomic_Catalogs.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace Astronomic_Catalogs
 {
@@ -21,6 +22,13 @@ namespace Astronomic_Catalogs
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            // For solve exeption 'You do not have permission to view this directory or page.' Directory Browsing''
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+                RequestPath = "/browse"
+            });
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
