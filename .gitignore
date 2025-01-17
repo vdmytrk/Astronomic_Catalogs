@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# appsettings
+appsettings.Development.json
+appsettings.AzureDevelopment.json
