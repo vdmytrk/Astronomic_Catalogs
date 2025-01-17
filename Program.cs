@@ -23,7 +23,12 @@ namespace Astronomic_Catalogs
             builder.Services.AddDbContext<ApplicationDbContext>(options =>            
                 options.UseSqlServer(connectionString));
 
+            // For solve exeption 'You do not have permission to view this directory or page. 'Directory Browsing''
             Console.WriteLine($"Using connection string: {connectionString}");
+            var logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Program>();
+            logger.LogInformation($"Using connection string: {connectionString}");
+            builder.Logging.AddConsole();
+
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
