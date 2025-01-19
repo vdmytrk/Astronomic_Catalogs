@@ -62,4 +62,4 @@ stages:
               azureSubscription: 'Azure subscription for voldmytc'
               appType: 'webApp'
               appName: 'NewAstroCatalogs'
-              package: "$(Pipeline.Workspace)/drop/Astronomic Catalogs.zip"
+              package: "$(Pipeline.Workspace)/drop"
