@@ -15,19 +15,26 @@ namespace Astronomic_Catalogs
             builder.Configuration
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
-
             builder.Configuration.AddEnvironmentVariables();
+            // For solve exeption 'You do not have permission to view this directory or page. 'Directory Browsing''
+            Console.WriteLine($"\n\n  USING ENVIROMENT NAME: {builder.Environment.EnvironmentName}");
+
+            string connectionString;
+            var azureConnectionString = Environment.GetEnvironmentVariable("DefaultConnectionAzure");
+            if (!string.IsNullOrEmpty(azureConnectionString))
+            {
+                connectionString = azureConnectionString;
+            }
+            else
+            {
+                connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            }
 
             // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>            
-                options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
             // For solve exeption 'You do not have permission to view this directory or page. 'Directory Browsing''
-            Console.WriteLine($"Using connection string: {connectionString}");
-            var logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Program>();
-            logger.LogInformation($"Using connection string: {connectionString}");
-            builder.Logging.AddConsole();
+            Console.WriteLine($"\n\n  USING CONNECTION STRING: {connectionString} \n\n");
 
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
