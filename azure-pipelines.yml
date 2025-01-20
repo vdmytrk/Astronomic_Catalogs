@@ -27,13 +27,13 @@ stages:
     - task: NuGetToolInstaller@1
     - task: NuGetCommand@2
       inputs:
-        restoreSolution: '$(solution)' 
+        restoreSolution: '$(solution)'
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
         publishWebProjects: false
         projects: '**/*.csproj'
-        arguments: '--no-clean -o $(Build.ArtifactStagingDirectory)'
+        arguments: '-o $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
         modifyOutputPath: true
     - task: ArchiveFiles@2
@@ -43,11 +43,6 @@ stages:
         archiveType: 'zip'
         archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs New.zip"
         replaceExistingArchive: true
-    # - task: CopyFiles@2
-    #   inputs:
-    #     SourceFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\a'
-    #     Contents: '**'
-    #     TargetFolder: 'C:C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\SavedArtifacts'
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
