@@ -43,11 +43,11 @@ stages:
         archiveType: 'zip'
         archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs New.zip"
         replaceExistingArchive: true
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\a'
-        Contents: '**'
-        TargetFolder: 'C:C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\SavedArtifacts'
+    # - task: CopyFiles@2
+    #   inputs:
+    #     SourceFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\a'
+    #     Contents: '**'
+    #     TargetFolder: 'C:C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\SavedArtifacts'
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
