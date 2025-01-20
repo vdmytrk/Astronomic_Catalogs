@@ -31,14 +31,17 @@ stages:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
+        publishWebProjects: false
         projects: '**/*.csproj'
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --self-contained false /p:UseAppHost=false'
+        arguments: '-o $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: true
+        modifyOutputPath: true
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
         includeRootFolder: true
         archiveType: 'zip'
-        archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs.zip"
+        archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs New.zip"
         replaceExistingArchive: true
     - task: PublishBuildArtifacts@1
       inputs:
@@ -62,4 +65,4 @@ stages:
               azureSubscription: 'Azure subscription for voldmytc'
               appType: 'webApp'
               appName: 'NewAstroCatalogs'
-              package: "$(Pipeline.Workspace)/drop"
+              package: "$(Pipeline.Workspace)/drop/Astronomic Catalogs New.zip"
