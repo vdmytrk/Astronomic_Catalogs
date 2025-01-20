@@ -28,12 +28,18 @@ stages:
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
+    
+    # Download the new version of .NET SDK
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '5.x' 
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
         publishWebProjects: false
         projects: '**/*.csproj'
-        arguments: '-o $(Build.ArtifactStagingDirectory)'
+        arguments: '--no-clean -o $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
         modifyOutputPath: true
     - task: ArchiveFiles@2
@@ -43,6 +49,11 @@ stages:
         archiveType: 'zip'
         archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs New.zip"
         replaceExistingArchive: true
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\a'
+        Contents: '**'
+        TargetFolder: 'C:C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\SavedArtifacts'
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
