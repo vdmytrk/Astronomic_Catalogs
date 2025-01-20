@@ -36,6 +36,11 @@ stages:
         arguments: '-o $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
         modifyOutputPath: true
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\b'
+        Contents: '**'
+        TargetFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\SavedBuilds'
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
