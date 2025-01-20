@@ -29,11 +29,11 @@ stages:
       inputs:
         restoreSolution: '$(solution)'
     
-    # Download the new version of .NET SDK
-    - task: UseDotNet@2
-      inputs:
-        packageType: 'sdk'
-        version: '5.x' 
+    # # Download the new version of .NET SDK
+    # - task: UseDotNet@2
+    #   inputs:
+    #     packageType: 'sdk'
+    #     version: '5.x' 
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
