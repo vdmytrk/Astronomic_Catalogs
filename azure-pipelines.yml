@@ -28,27 +28,13 @@ stages:
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: '$(Build.SourcesDirectory)'
-        Contents: '**'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
         publishWebProjects: true
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: true
-        modifyOutputPath: true
     - script: dir $(Build.ArtifactStagingDirectory) /s
       displayName: 'List files in staging directory'
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs.zip"
-        replaceExistingArchive: true
     - task: CopyFiles@2
       inputs:
         SourceFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\a'
@@ -76,4 +62,4 @@ stages:
               azureSubscription: 'Azure subscription for voldmytc'
               appType: 'webApp'
               appName: 'NewAstroCatalogs'
-              package: "$(Pipeline.Workspace)/drop/Astronomic Catalogs.zip"
+              package: "$(Pipeline.Workspace)/drop"
