@@ -77,7 +77,7 @@ namespace Astronomic_Catalogs
             app.MapRazorPages();
 
             app.Run();
-            // Just build
+            // Just build v.0.1
         }
     }
 }
