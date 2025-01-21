@@ -37,7 +37,8 @@ stages:
       inputs:
         command: 'publish'
         publishWebProjects: true
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        projects: '**/*.csproj'
+        arguments: '-o $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
         modifyOutputPath: true
     - script: dir $(Build.ArtifactStagingDirectory) /s
