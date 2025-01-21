@@ -28,25 +28,26 @@ stages:
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: '**'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
-        publishWebProjects: false
-        projects: '**/*.csproj'
-        arguments: '-o $(Build.ArtifactStagingDirectory)'
-        zipAfterPublish: true
+        publishWebProjects: true
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: false
         modifyOutputPath: true
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\b'
-        Contents: '**'
-        TargetFolder: 'C:\AzureAgent\vsts-agent-win-x64-4.248.0\_work\1\SavedBuilds'
+    - script: dir $(Build.ArtifactStagingDirectory) /s
+      displayName: 'List files in staging directory'
     - task: ArchiveFiles@2
       inputs:
         rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
         includeRootFolder: true
         archiveType: 'zip'
-        archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs New.zip"
+        archiveFile: "$(Build.ArtifactStagingDirectory)/Astronomic Catalogs.zip"
         replaceExistingArchive: true
     - task: CopyFiles@2
       inputs:
