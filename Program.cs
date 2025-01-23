@@ -16,8 +16,6 @@ namespace Astronomic_Catalogs
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
             builder.Configuration.AddEnvironmentVariables();
-            // For solve exeption 'You do not have permission to view this directory or page. 'Directory Browsing''
-            Console.WriteLine($"\n\n  USING ENVIROMENT NAME: {builder.Environment.EnvironmentName}");
 
             string connectionString;
             var azureConnectionString = Environment.GetEnvironmentVariable("DefaultConnectionAzure");
@@ -33,9 +31,10 @@ namespace Astronomic_Catalogs
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
-            // For solve exeption 'You do not have permission to view this directory or page. 'Directory Browsing''
+#if (DEBUG)
+            Console.WriteLine($"\n\n  USING ENVIROMENT NAME: {builder.Environment.EnvironmentName}");
             Console.WriteLine($"\n\n  USING CONNECTION STRING: {connectionString} \n\n");
-
+#endif
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -44,13 +43,6 @@ namespace Astronomic_Catalogs
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
-
-            // For solve exeption 'You do not have permission to view this directory or page. 'Directory Browsing''
-            app.UseDirectoryBrowser(new DirectoryBrowserOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-                RequestPath = "/browse"
-            });
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -77,7 +69,6 @@ namespace Astronomic_Catalogs
             app.MapRazorPages();
 
             app.Run();
-            // Just build v.0.1
         }
     }
 }
