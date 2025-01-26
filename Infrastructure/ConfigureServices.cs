@@ -15,6 +15,8 @@ public static class ConfigureServices
         services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+        AddNLogProvider(services);
+
         services.AddControllersWithViews();
     }
 
@@ -30,6 +32,18 @@ public static class ConfigureServices
 #if DEBUG
             LogEnvironmentDetails(environment, connectionStringProvider.ConnectionString);
 #endif
+        });
+    }
+
+    private static void AddNLogProvider(IServiceCollection services)
+    {
+        services.AddSingleton<NLogService>();
+        services.AddSingleton(provider =>
+        {
+            var connectionStringProvider = provider.GetRequiredService<ConnectionStringProvider>();
+            var nlogService = provider.GetRequiredService<NLogService>();
+            nlogService.UpdateNLogDatabaseConnectionString(connectionStringProvider.ConnectionString);
+            return nlogService;
         });
     }
 
