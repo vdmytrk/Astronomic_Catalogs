@@ -12,6 +12,16 @@ public class Program
             .LoadConfigurationFromFile("NLog.config.json", optional: false)
             .GetCurrentClassLogger();
 
+        if (LogManager.Configuration == null)
+        {
+            Console.WriteLine("NLog configuration not loaded.");
+        }
+        else
+        {
+            Console.WriteLine("NLog configuration loaded successfully.");
+            Console.WriteLine($"IsErrorEnabled: {logger.IsErrorEnabled}");
+        }
+
         try
         {
             var builder = WebApplication.CreateBuilder(args);

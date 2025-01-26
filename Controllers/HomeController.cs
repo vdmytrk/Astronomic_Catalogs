@@ -9,17 +9,9 @@ namespace Astronomic_Catalogs.Controllers
     {
         private static readonly NLog.ILogger Logger = LogManager.GetCurrentClassLogger();
 
-        //private readonly ILogger<HomeController> _logger;
-
-        //public HomeController(ILogger<HomeController> logger)
-        public HomeController()
-        {
-            //_logger = logger;
-        }
-
         public IActionResult Index()
         {
-            Logger.Info("Index action invoked");
+            Logger.Error("Index action invoked");
             return View();
         }
 

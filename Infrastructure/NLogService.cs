@@ -8,12 +8,12 @@ public class NLogService
     // Set the actual connection string in the NLog.config.json file
     public void UpdateNLogDatabaseConnectionString(string connectionString)
     {
-        var config = LogManager.Configuration;
+        var config = LogManager.Configuration ?? throw new InvalidOperationException("NLog configuration not loaded.");
         var databaseTarget = config.FindTargetByName<DatabaseTarget>("database");
         if (databaseTarget != null)
         {
             databaseTarget.ConnectionString = connectionString;
-            LogManager.ReconfigExistingLoggers();
         }
+        LogManager.ReconfigExistingLoggers();
     }
 }
