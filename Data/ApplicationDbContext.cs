@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Astronomic_Catalogs.Infrastructure;
+using Astronomic_Catalogs.Models.Logging;
 
 namespace Astronomic_Catalogs.Data;
 
@@ -12,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext
     {
     }
 
+    public DbSet<NLogLogging> Products { get; set; }
 }
 
 public class DbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
