@@ -4,9 +4,9 @@
     "throwConfigExceptions": true,
     "targets": {
       "database": {
-        "type": "Database",
+        "type": "database",
         "connectionString": "",
-        "commandText": "INSERT INTO Logs (Timestamp, Level, Logger, Message, Exception) VALUES (@timestamp, @level, @logger, @message, @exception)",
+        "commandText": "INSERT INTO NLogs (Timestamp, Level, Logger, Message, Exception) VALUES (@timestamp, @level, @logger, @message, @exception)",
         "parameters": [
           {
             "name": "@timestamp",
