@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Astronomic_Catalogs.Models.Logging;
 
+
 public class NLogLogging
 {
     [Key]

@@ -1,6 +1,7 @@
 using System.Data;
 using System.Diagnostics;
 using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -11,29 +12,23 @@ namespace Astronomic_Catalogs.Controllers;
 
 public class HomeController : Controller
 {
+    private readonly ApplicationDbContext _context;
     private static readonly NLog.ILogger Logger = LogManager.GetCurrentClassLogger();
-    public IConfigurationRoot Configuration { get; set; } = null!;
-    public IConfiguration Configuration_2 { get; }
+    public ConnectionStringProvider Configuration { get; set; } = null!;
     private string connectionString = null!;
 
-    public HomeController(ApplicationDbContext context, IConfiguration config)
+    public HomeController(ApplicationDbContext context, ConnectionStringProvider connectionStringProvider)
     {
-
-        Configuration = new ConfigurationBuilder()
-            .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-            .AddJsonFile("appsettings.json")
-            .Build();
-        connectionString = Configuration.GetConnectionString("DefaultConnection")
+        _context = context;
+        connectionString = connectionStringProvider.ConnectionString
             ?? throw new NullReferenceException("Connecction string is empty!");
 
-        Configuration_2 = config;
-        connectionString = Configuration_2.GetConnectionString("DefaultConnection")
-            ?? throw new NullReferenceException("Connecction string is empty!"); ;
     }
-    public IActionResult Index()
+
+    // GET: ActualDates
+    public async Task<IActionResult> Index()
     {
-        Logger.Error("Index action invoked");
-        return View();
+        return View(await _context.ActualDates.ToListAsync());
     }
 
     public IActionResult Privacy()
@@ -63,5 +58,18 @@ public class HomeController : Controller
             string date = dateRequest.ToString() ?? "Data absence.";
             return date;
         }
+    }
+
+    // Довго спілкувався з ChatGPT, пробував різні коди, дійшли висновуку що за допомогою Entity Framewok тут 
+    //   нічого не зробиш! :(
+    public string GetDateFromProcedureEF()
+    {
+        //using (_context)
+        //{
+        var dateRequest0 = _context.ActualDates.FromSqlRaw("EXEC GETACTUALDATE").AsEnumerable().SingleOrDefault();
+        string? dateRequest = dateRequest0.ToString();
+        string date = dateRequest ?? "Data absence.";
+        return date;
+        //}
     }
 }
