@@ -6,7 +6,7 @@ namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 
 public class NLogConfiguration : INLogConfiguration
 {
-    public void ConfigureLogger(string configFilePath)
+    public void ConfigureNLog(string configFilePath)
     {
         LogManager.Setup()
                   .SetupExtensions(ext => ext.RegisterNLogWeb())

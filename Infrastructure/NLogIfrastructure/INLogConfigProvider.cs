@@ -2,6 +2,5 @@
 
 public interface INLogConfigProvider
 {
-    void ConfigureNLog();
-    void UpdateNLogDatabaseConnectionString(string connectionString);
+    void ConfigureLogger();
 }

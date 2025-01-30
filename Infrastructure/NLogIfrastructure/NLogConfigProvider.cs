@@ -7,15 +7,15 @@ namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 
 public class NLogConfigProvider : INLogConfigProvider
 {
-    private readonly INLogConfiguration _configurationStrategy;
+    private readonly INLogConfiguration _nlogConfiguration;
     private readonly ConnectionStringProvider _connectionStringProvider;
     private readonly string _nlogConfigFile;
 
-    public NLogConfigProvider(INLogConfiguration configurationStrategy,
+    public NLogConfigProvider(INLogConfiguration nlogConfiguration,
                        ConnectionStringProvider connectionStringProvider,
                        IWebHostEnvironment environment)
     {
-        _configurationStrategy = configurationStrategy;
+        _nlogConfiguration = nlogConfiguration;
         _connectionStringProvider = connectionStringProvider;
 
         _nlogConfigFile = environment.IsDevelopment()
@@ -23,13 +23,13 @@ public class NLogConfigProvider : INLogConfigProvider
             : "NLog.config.Release.xml";
     }
 
-    public void ConfigureNLog()
+    public void ConfigureLogger()
     {
-        _configurationStrategy.ConfigureLogger(_nlogConfigFile);
+        _nlogConfiguration.ConfigureNLog(_nlogConfigFile);
         UpdateNLogDatabaseConnectionString(_connectionStringProvider.ConnectionString);
     }
 
-    public void UpdateNLogDatabaseConnectionString(string connectionString)
+    private void UpdateNLogDatabaseConnectionString(string connectionString)
     {
         var config = LogManager.Configuration ?? throw new InvalidOperationException("NLog configuration not loaded.");
         var databaseTarget = config.FindTargetByName<DatabaseTarget>("database");

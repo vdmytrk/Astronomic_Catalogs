@@ -2,6 +2,6 @@
 {
     public interface INLogConfiguration
     {
-        void ConfigureLogger(string configFilePath);
+        void ConfigureNLog(string configFilePath);
     }
 }

@@ -52,7 +52,7 @@ public class Program
         using (var scope = app.Services.CreateScope())
         {
             var nlogService = scope.ServiceProvider.GetRequiredService<NLogConfigProvider>();
-            nlogService.ConfigureNLog();
+            nlogService.ConfigureLogger();
         }
 #if (DEBUG)
         if ("Development" == builder.Environment.EnvironmentName)
