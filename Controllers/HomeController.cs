@@ -1,12 +1,15 @@
 using System.Diagnostics;
 using Astronomic_Catalogs.Models;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 
 namespace Astronomic_Catalogs.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private static readonly NLog.ILogger Logger = LogManager.GetCurrentClassLogger();
+
+        private readonly Microsoft.Extensions.Logging.ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger)
         {
@@ -15,11 +18,13 @@ namespace Astronomic_Catalogs.Controllers
 
         public IActionResult Index()
         {
+            Logger.Info("Index action invoked");
             return View();
         }
 
         public IActionResult Privacy()
         {
+            Logger.Info("About action invoked");
             return View();
         }
 

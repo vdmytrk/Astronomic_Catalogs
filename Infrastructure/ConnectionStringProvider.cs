@@ -1,8 +1,4 @@
-﻿using Astronomic_Catalogs.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Dynamic;
-using System.Net.NetworkInformation;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Astronomic_Catalogs.Infrastructure;
 
