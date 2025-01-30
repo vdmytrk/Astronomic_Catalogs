@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      autoReload="true"
+      internalLogLevel="Trace"
+      throwConfigExceptions="true">
+
+	<targets>
+		<target name="database" xsi:type="Database"
+				connectionString=""
+				commandText="INSERT INTO NLogs (Timestamp, Level, Logger, Message, Exception) VALUES (@timestamp, @level, @logger, @message, @exception)">
+			<parameter name="@timestamp" layout="${longdate}" />
+			<parameter name="@level" layout="${level}" />
+			<parameter name="@logger" layout="${logger}" />
+			<parameter name="@message" layout="${message}" />
+			<parameter name="@exception" layout="${exception:format=tostring}" />
+		</target>
+	</targets>
+
+	<rules>
+		<logger name="*" minlevel="Trace" writeTo="database" />
+	</rules>
+</nlog>

@@ -8,7 +8,19 @@ public static class ConfigureServices
 {
     public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
-        AddConnectionStringProvider(services, environment);
+        services.AddSingleton<ConnectionStringProvider>();
+
+        services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+        {
+            var connectionStringProvider = serviceProvider.GetRequiredService<ConnectionStringProvider>();
+            var connectionString = connectionStringProvider.ConnectionString;
+            options.UseSqlServer(connectionString);
+
+#if DEBUG
+            Console.WriteLine($"\n\n  USING ENVIRONMENT NAME: {environment.EnvironmentName}");
+            Console.WriteLine($"\n\n  USING CONNECTION STRING: {connectionString} \n\n");
+#endif
+        });
 
         services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -17,27 +29,5 @@ public static class ConfigureServices
 
         services.AddControllersWithViews();
     }
-
-    private static void AddConnectionStringProvider(IServiceCollection services, IWebHostEnvironment environment)
-    {
-        services.AddSingleton<ConnectionStringProvider>();
-
-        services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
-        {
-            var connectionStringProvider = serviceProvider.GetRequiredService<ConnectionStringProvider>();
-            var connectionString = connectionStringProvider.ConnectionString;
-            options.UseSqlServer(connectionString);
-#if DEBUG
-            LogEnvironmentDetails(environment, connectionStringProvider.ConnectionString);
-#endif
-        });
-    }
-
-    private static void LogEnvironmentDetails(IWebHostEnvironment environment, string connectionString)
-    {
-        Console.WriteLine($"\n\n  USING ENVIRONMENT NAME: {environment.EnvironmentName}");
-        Console.WriteLine($"\n\n  USING CONNECTION STRING: {connectionString} \n\n");
-    }
 }
-
 
