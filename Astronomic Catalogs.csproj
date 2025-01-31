@@ -22,14 +22,20 @@
     <PackageReference Include="NLog.Database" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15" />
     <PackageReference Include="NLog.Schema" Version="5.3.4" />
-    <PackageReference Include="NLog.Web" Version="5.3.15" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="NLog.config.json">
+    <None Update="NLog.config.Debug.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Update="NLog.config.Release.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Infrastructure\NLogIfrastructure\Configurations\" />
   </ItemGroup>
 
 </Project>
