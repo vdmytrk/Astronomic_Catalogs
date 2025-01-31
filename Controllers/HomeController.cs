@@ -62,14 +62,17 @@ public class HomeController : Controller
 
     // Довго спілкувався з ChatGPT, пробував різні коди, дійшли висновуку що за допомогою Entity Framewok тут 
     //   нічого не зробиш! :(
+    // The database connection has been established.
     public string GetDateFromProcedureEF()
     {
-        //using (_context)
-        //{
-        var dateRequest0 = _context.ActualDates.FromSqlRaw("EXEC GETACTUALDATE").AsEnumerable().SingleOrDefault();
-        string? dateRequest = dateRequest0.ToString();
-        string date = dateRequest ?? "Data absence.";
-        return date;
-        //}
+        using (_context)
+        {
+            var dateRequest = _context.ActualDates
+                .FromSqlRaw("EXEC GETACTUALDATE")
+                .AsEnumerable()  // Переводимо в пам'ять
+                .FirstOrDefault();
+
+            return dateRequest?.ActualDateProperty.ToString() ?? "Data absence.";
+        }
     }
 }

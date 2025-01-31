@@ -9,7 +9,7 @@
 		<target name="database" xsi:type="Database"
 				connectionString=""
 				commandText="INSERT INTO NLogs (Timestamp, Level, Logger, Message, Exception) VALUES (@timestamp, @level, @logger, @message, @exception)">
-			<parameter name="@timestamp" layout="${longdate}" />
+			<parameter name="@timestamp" layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff}" />
 			<parameter name="@level" layout="${level}" />
 			<parameter name="@logger" layout="${logger}" />
 			<parameter name="@message" layout="${message}" />

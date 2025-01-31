@@ -6,26 +6,26 @@
 
 function CallStoreProcedureADO() {
     $.ajax({
-        url: '/ActualDates/GetDateFromProcedureADO',
+        url: '/Home/GetDateFromProcedureADO',
         type: 'GET'
     }).done(function (data) {
         alert(data);
     }).fail(function (data) {
-        alert("ADO. НА СЕРВЕРІ ЯКІСЬ ПРОБЛЕМИ! :( ");
+        alert("ADO. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
         console.log(data);
     }).always(function () {
-        console.log("Виконання запиту завершено!");
+        console.log("Request execution completed!");
     });
 }
 
 function CallStoreProcedureEF() {
     $.ajax({
-        url: '/ActualDates/GetDateFromProcedureEF',
+        url: '/Home/GetDateFromProcedureEF',
         type: 'GET'
     }).done(function (data) {
         alert(data);
     }).fail(function (data) {
-        alert("ЗА ДОПОМОГОЮ Entity Framework ДАНІ НЕ ВИТЯГНЕШ. ДЕТАЛЬНІШЕ ДИВИСЯ КОМЕНТАР ДО МЕТОДУ GetDateFromProcedureEF КОНТРОЛЛЕРА DateTables! ");
+        alert("USING Entity Framework, DATA CANNOT BE RETRIEVED. FOR MORE DETAILS, SEE THE COMMENT FOR THE GetDateFromProcedureEF METHOD IN THE DateTables CONTROLLER! ");
         console.log(data);
     });
 }
