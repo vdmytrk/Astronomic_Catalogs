@@ -3,4 +3,5 @@
 public interface INLogConfigProvider
 {
     void ConfigureLogger();
+    void UpdateNLogDatabaseConnectionString(string connectionString);
 }

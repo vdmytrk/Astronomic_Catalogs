@@ -29,7 +29,7 @@ public class NLogConfigProvider : INLogConfigProvider
         UpdateNLogDatabaseConnectionString(_connectionStringProvider.ConnectionString);
     }
 
-    private void UpdateNLogDatabaseConnectionString(string connectionString)
+    public void UpdateNLogDatabaseConnectionString(string connectionString)
     {
         var config = LogManager.Configuration ?? throw new InvalidOperationException("NLog configuration not loaded.");
         var databaseTarget = config.FindTargetByName<DatabaseTarget>("database");
