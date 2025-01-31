@@ -365,3 +365,8 @@ FodyWeavers.xsd
 # appsettings
 appsettings.Development.json
 appsettings.AzureDevelopment.json
+
+# NLog local files
+nlog-internal*.xml
+NLog.config.Debug.xml
+NLogLocalConfigurations.cs
