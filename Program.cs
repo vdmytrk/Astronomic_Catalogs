@@ -47,7 +47,7 @@ public class Program
 
 
 
-            var app = builder.Build();
+        var app = builder.Build();
 
         using (var scope = app.Services.CreateScope())
         {
@@ -109,8 +109,8 @@ public class Program
     private static void TestConfigurationUpoaded()
     {
         var config = LogManager.Configuration;
-        Console.WriteLine($"\n\nTargets loaded: {config.AllTargets.Count}"); // Кількість завантажених таргетів = 0
-        Console.WriteLine($"Logging rules count: {config.LoggingRules.Count}\n"); // Кількість правил логування = 0
+        Console.WriteLine($"\n\nTargets loaded: {config.AllTargets.Count}"); 
+        Console.WriteLine($"Logging rules count: {config.LoggingRules.Count}\n"); 
         foreach (var target in config.AllTargets)
         {
             Console.WriteLine($"Target name: {target.Name}, type: {target.GetType()}");
