@@ -1,3 +1,4 @@
+using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Microsoft.AspNetCore.Identity;
