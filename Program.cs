@@ -24,7 +24,7 @@ public class Program
             TestNLogFileCreating();
 #endif
         builder.Host.UseNLog();
-        // Add services to the container. TEST COMMIT 2025.02.03 8:19
+        // Add services to the container. TEST COMMIT 2025.02.03 11:52 При підключенні до Astronomic Project\AstronomicSolution\AstronomicSolution.sln
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
