@@ -22,7 +22,7 @@ namespace Astronomic_Catalogs.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Astronomic_Catalogs.Models.Logging.ActualDate", b =>
+            modelBuilder.Entity("Astronomic_Catalogs.Models.Connection.ActualDate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,7 @@ namespace Astronomic_Catalogs.Data.Migrations
                     b.ToTable("DateTable", (string)null);
                 });
 
-            modelBuilder.Entity("Astronomic_Catalogs.Models.Logging.NLogLogging", b =>
+            modelBuilder.Entity("Astronomic_Catalogs.Models.Connection.NLogLogging", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -68,7 +68,7 @@ namespace Astronomic_Catalogs.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NLogs", (string)null);
+                    b.ToTable("TestConnectionForNLog", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

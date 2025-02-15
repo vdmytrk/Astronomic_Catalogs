@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Astronomic_Catalogs.Infrastructure;
+using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Models.Configuration;
+using Astronomic_Catalogs.Models.Configuration.Connection;
+using Astronomic_Catalogs.Models.Connection;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Astronomic_Catalogs.Infrastructure;
-using Astronomic_Catalogs.Models.Logging;
-using Microsoft.AspNetCore.Identity;
 
 namespace Astronomic_Catalogs.Data;
 
@@ -12,19 +14,44 @@ public class ApplicationDbContext : IdentityDbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
+
     }
 
-    public DbSet<NLogLogging> Products { get; set; }
     public DbSet<ActualDate> ActualDates { get; set; } = null!;
+    public DbSet<SourceType> SourceTypes { get; set; } = null!;    
+    public DbSet<NameObject> NameObjects { get; set; } = null!;
+    public DbSet<Constellation> Constellations { get; set; } = null!;
+    public DbSet<CollinderCatalog> CollinderCatalog { get; set; } = null!;
+    public DbSet<NGCICOpendatasoft> NGCIC_Catalog { get; set; } = null!;
+    public DbSet<NGCICOpendatasoftExtension> NGCICOpendatasoft_E { get; set; } = null!;
+    public DbSet<LogProcFunc> LogProcFuncs { get; set; } = null!;
+    public DbSet<TestConnectionForNLog> TestConnectionForNLogs { get; set; } = null!;
+    public DbSet<NLogApplicationCode> NLogApplicationCodes { get; set; } = null!;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
-
-        modelBuilder.Entity<NLogLogging>().ToTable("NLogs");
         modelBuilder.Entity<ActualDate>().ToTable("DateTable");
+        modelBuilder.Entity<NameObject>(entity =>
+            entity.HasNoKey()
+        );
+        modelBuilder.Entity<SourceType>(entity =>
+            entity.HasNoKey()
+        );
+
+        modelBuilder.ApplyConfiguration(new CollinderCatalogConfiguration());
+        modelBuilder.ApplyConfiguration(new ConstellationConfiguration());
+        modelBuilder.ApplyConfiguration(new NameObjectConfiguration());
+        modelBuilder.ApplyConfiguration(new NGCICOpendatasoftConfiguration());
+        modelBuilder.ApplyConfiguration(new NGCICOpendatasoftExtensionConfiguration());
+        modelBuilder.ApplyConfiguration(new NASAExoplanetCatalogConfiguration());
+        modelBuilder.ApplyConfiguration(new SourceTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new LogProcFuncConfiguration());
+        modelBuilder.ApplyConfiguration(new NLogApplicationCodeConfiguration());
+        modelBuilder.ApplyConfiguration(new TestConnectionForNLogConfiguration());
+
     }
 }
 

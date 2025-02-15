@@ -2,22 +2,31 @@
 <nlog xmlns="http://www.nlog-project.org/schemas/NLog.xsd"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       autoReload="true"
-      internalLogLevel="Trace"
+      internalLogLevel="Error"
       throwConfigExceptions="true">
 
 	<targets>
 		<target name="database" xsi:type="Database"
 				connectionString=""
-				commandText="INSERT INTO NLogs (Timestamp, Level, Logger, Message, Exception) VALUES (@timestamp, @level, @logger, @message, @exception)">
-			<parameter name="@timestamp" layout="${date:format=yyyy-MM-dd HH\:mm\:ss.fff}" />
-			<parameter name="@level" layout="${level}" />
+			    commandType="StoredProcedure"
+			    commandText="[dbo].[NLogAddLogApplicationCode]">
+			<parameter name="@logged" layout="${longdate:universalTime=true}" />
+			<parameter name="@level" layout="${level:uppercase=true}" />
+			<parameter name="@ip" layout="${aspnet-Request-IP}" />
+			<parameter name="@machineName" layout="${machinename}" />
+			<parameter name="@sessionId" layout="${aspnet-sessionid}" />
 			<parameter name="@logger" layout="${logger}" />
+			<parameter name="@controller" layout="${aspnet-MVC-Controller}" />
+			<parameter name="@action" layout="${aspnet-MVC-Action}" />
+			<parameter name="@method" layout="${event-properties:item=method}" />
+			<parameter name="@exception" layout="${exception:tostring}" />
 			<parameter name="@message" layout="${message}" />
-			<parameter name="@exception" layout="${exception:format=tostring}" />
+			<parameter name="@activityId" layout="${activityid}" />
+			<parameter name="@scope" layout="${ndlc}" />
 		</target>
 	</targets>
 
 	<rules>
-		<logger name="*" minlevel="Trace" writeTo="database" />
+		<logger name="*" minlevel="Info" writeTo="database" />
 	</rules>
 </nlog>

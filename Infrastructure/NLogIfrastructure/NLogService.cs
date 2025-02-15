@@ -1,7 +1,7 @@
 ﻿using NLog;
 using NLog.Targets;
 
-namespace Astronomic_Catalogs.Infrastructure;
+namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 
 public class NLogService
 {

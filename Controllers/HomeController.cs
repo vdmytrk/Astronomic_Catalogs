@@ -14,7 +14,6 @@ public class HomeController : Controller
 {
     private readonly ApplicationDbContext _context;
     private static readonly NLog.ILogger Logger = LogManager.GetCurrentClassLogger();
-    public ConnectionStringProvider Configuration { get; set; } = null!;
     private string connectionString = null!;
 
     public HomeController(ApplicationDbContext context, ConnectionStringProvider connectionStringProvider)
@@ -60,16 +59,13 @@ public class HomeController : Controller
         }
     }
 
-    // Довго спілкувався з ChatGPT, пробував різні коди, дійшли висновуку що за допомогою Entity Framewok тут 
-    //   нічого не зробиш! :(
-    // The database connection has been established.
     public string GetDateFromProcedureEF()
     {
         using (_context)
         {
             var dateRequest = _context.ActualDates
                 .FromSqlRaw("EXEC GETACTUALDATE")
-                .AsEnumerable()  // Переводимо в пам'ять
+                .AsEnumerable()
                 .FirstOrDefault();
 
             return dateRequest?.ActualDateProperty.ToString() ?? "Data absence.";

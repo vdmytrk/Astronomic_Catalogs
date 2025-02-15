@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Astronomic_Catalogs.Models.Logging;
+namespace Astronomic_Catalogs.Models.Connection;
 
 
 public class ActualDate
