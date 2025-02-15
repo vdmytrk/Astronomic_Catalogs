@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Models.Logging;
+using Microsoft.AspNetCore.Identity;
 
 namespace Astronomic_Catalogs.Data;
 
@@ -14,6 +15,17 @@ public class ApplicationDbContext : IdentityDbContext
     }
 
     public DbSet<NLogLogging> Products { get; set; }
+    public DbSet<ActualDate> ActualDates { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<IdentityUserLogin<string>>().HasKey(l => new { l.LoginProvider, l.ProviderKey });
+
+        modelBuilder.Entity<NLogLogging>().ToTable("NLogs");
+        modelBuilder.Entity<ActualDate>().ToTable("DateTable");
+    }
 }
 
 public class DbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
