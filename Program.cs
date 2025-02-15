@@ -24,7 +24,7 @@ public class Program
             TestNLogFileCreating();
 #endif
         builder.Host.UseNLog();
-        // Add services to the container.
+        // Add services to the container. Test
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>

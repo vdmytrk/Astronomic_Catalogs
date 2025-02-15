@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Infrastructure\NLogIfrastructure\Configurations\**" />
+    <Content Remove="Infrastructure\NLogIfrastructure\Configurations\**" />
+    <EmbeddedResource Remove="Infrastructure\NLogIfrastructure\Configurations\**" />
+    <None Remove="Infrastructure\NLogIfrastructure\Configurations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Aspire.Azure.Security.KeyVault" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.1" />
@@ -32,10 +39,6 @@
     <None Update="NLog.config.Release.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Infrastructure\NLogIfrastructure\Configurations\" />
   </ItemGroup>
 
 </Project>

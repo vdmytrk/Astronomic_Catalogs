@@ -7,15 +7,15 @@ namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 
 public class NLogConfigProvider : INLogConfigProvider
 {
-    private readonly INLogConfiguration _configurationStrategy;
+    private readonly INLogConfiguration _nlogConfiguration;
     private readonly ConnectionStringProvider _connectionStringProvider;
     private readonly string _nlogConfigFile;
 
-    public NLogConfigProvider(INLogConfiguration configurationStrategy,
+    public NLogConfigProvider(INLogConfiguration nlogConfiguration,
                        ConnectionStringProvider connectionStringProvider,
                        IWebHostEnvironment environment)
     {
-        _configurationStrategy = configurationStrategy;
+        _nlogConfiguration = nlogConfiguration;
         _connectionStringProvider = connectionStringProvider;
 
         _nlogConfigFile = environment.IsDevelopment()
@@ -25,7 +25,7 @@ public class NLogConfigProvider : INLogConfigProvider
 
     public void ConfigureLogger()
     {
-        _configurationStrategy.ConfigureNLog(_nlogConfigFile);
+        _nlogConfiguration.ConfigureNLog(_nlogConfigFile);
         UpdateNLogDatabaseConnectionString(_connectionStringProvider.ConnectionString);
     }
 
