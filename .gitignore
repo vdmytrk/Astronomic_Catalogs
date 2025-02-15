@@ -370,3 +370,7 @@ appsettings.AzureDevelopment.json
 nlog-internal*.xml
 NLog.config.Debug.xml
 NLogLocalConfigurations.cs
+
+# C#
+DatabaseInitializer_extended.cs
+Database Scripts/Data
