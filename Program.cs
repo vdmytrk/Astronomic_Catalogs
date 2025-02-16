@@ -3,6 +3,7 @@ using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using NLog;
 using NLog.Web;
 
@@ -10,7 +11,7 @@ namespace Astronomic_Catalogs;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         string connectionString = "";
@@ -24,9 +25,11 @@ public class Program
             TestNLogFileCreating();
 #endif
         builder.Host.UseNLog();
-        // Add services to the container. TEST COMMIT 2025.02.03 11:52 При підключенні до Astronomic Project\AstronomicSolution\AstronomicSolution.sln
+
+        // Add services to the container. 
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();
+        builder.Services.AddScoped<DatabaseInitializer>();
         builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
             var connectionStringProvider = serviceProvider.GetRequiredService<ConnectionStringProvider>();
@@ -59,6 +62,12 @@ public class Program
             TestConfigurationUpoaded();
 #endif
 
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+            await dbInitializer.InitializeDatabaseAsync();
+        }
+
         if (app.Environment.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
@@ -69,19 +78,19 @@ public class Program
             app.UseHsts();
         }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        app.UseRouting();
 
-            app.UseAuthorization();
+        app.UseAuthorization();
 
-            app.MapStaticAssets();
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-            app.MapRazorPages();
+        app.MapStaticAssets();
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+        app.MapRazorPages();
 
-        app.Run();
+        await app.RunAsync();
     }
 
     private static void LogEnvironmentDetails(IWebHostEnvironment environment, string connectionString)
@@ -93,7 +102,7 @@ public class Program
     // TODO: Make test
     private static void TestNLogFileCreating()
     {
-        var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "nlog-internal_xml.log");
+        var logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "nlog-internal.log");
         try
         {
             File.WriteAllText(logFilePath, "\n\n Log file created.\n\n");
@@ -109,8 +118,8 @@ public class Program
     private static void TestConfigurationUpoaded()
     {
         var config = LogManager.Configuration;
-        Console.WriteLine($"\n\nTargets loaded: {config.AllTargets.Count}"); 
-        Console.WriteLine($"Logging rules count: {config.LoggingRules.Count}\n"); 
+        Console.WriteLine($"\n\nTargets loaded: {config.AllTargets.Count}");
+        Console.WriteLine($"Connection rules count: {config.LoggingRules.Count}\n");
         foreach (var target in config.AllTargets)
         {
             Console.WriteLine($"Target name: {target.Name}, type: {target.GetType()}");
