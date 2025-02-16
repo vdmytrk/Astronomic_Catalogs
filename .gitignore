@@ -374,3 +374,4 @@ NLogLocalConfigurations.cs
 # C#
 DatabaseInitializer_extended.cs
 Database Scripts/Data
+Areas/Admin/Models

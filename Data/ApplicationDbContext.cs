@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Astronomic_Catalogs.Areas.Admin.Models;
 
 namespace Astronomic_Catalogs.Data;
 
@@ -54,6 +55,20 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.ApplyConfiguration(new TestConnectionForNLogConfiguration());
 
     }
+
+public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetRole> AspNetRole { get; set; } = default!;
+
+public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetRoleClaim> AspNetRoleClaim { get; set; } = default!;
+
+public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUser> AspNetUser { get; set; } = default!;
+
+public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserClaim> AspNetUserClaim { get; set; } = default!;
+
+public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserLogin> AspNetUserLogin { get; set; } = default!;
+
+public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserRole> AspNetUserRole { get; set; } = default!;
+
+public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserToken> AspNetUserToken { get; set; } = default!;
 }
 
 public class DbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
