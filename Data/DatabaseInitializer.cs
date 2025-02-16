@@ -18,7 +18,7 @@ public class DatabaseInitializer(
 #else
         private readonly string _scriptsDirectory = "Database Scripts";
 #endif
-    }
+    
 
     
 

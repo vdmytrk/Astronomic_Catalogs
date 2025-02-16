@@ -3,6 +3,7 @@ using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Configuration;
 using Astronomic_Catalogs.Models.Configuration.Connection;
 using Astronomic_Catalogs.Models.Connection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
