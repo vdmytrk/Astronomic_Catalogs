@@ -26,14 +26,6 @@ public class NGCICOpendatasoftConfiguration : IEntityTypeConfiguration<NGCICOpen
         builder.Property(e => e.ObjectTypeFull).HasColumnName("Object_type").HasMaxLength(60);
         builder.Property(e => e.SourceType).HasColumnName("Source_Type").HasMaxLength(5);
 
-        builder.Property(e => e.ObjectTypeFull)
-            .HasColumnName("Object_type")
-            .HasMaxLength(60);
-
-        builder.Property(e => e.SourceType)
-            .HasColumnName("Source_Type")
-            .HasMaxLength(5);
-
 
 
         builder.Property(e => e.RA).HasMaxLength(30);
@@ -49,14 +41,6 @@ public class NGCICOpendatasoftConfiguration : IEntityTypeConfiguration<NGCICOpen
         builder.Property(e => e.RightAscensionH).HasColumnName("Right_ascension_H").HasDefaultValue(0);
         builder.Property(e => e.RightAscensionM).HasColumnName("Right_ascension_M").HasDefaultValue(0);
         builder.Property(e => e.RightAscensionS).HasColumnName("Right_ascension_S").HasDefaultValue(0.0);
-
-        builder.Property(e => e.RightAscensionM)
-            .HasColumnName("Right_ascension_M")
-            .HasDefaultValue(0);
-
-        builder.Property(e => e.RightAscensionS)
-            .HasColumnName("Right_ascension_S")
-            .HasDefaultValue(0.0);
 
 
 
@@ -92,9 +76,6 @@ public class NGCICOpendatasoftConfiguration : IEntityTypeConfiguration<NGCICOpen
         builder.Property(e => e.HMag).HasColumnName("h_mag").HasDefaultValue(0.0);
         builder.Property(e => e.KMag).HasColumnName("k_mag").HasDefaultValue(0.0);
 
-        builder.Property(e => e.CstarNames)
-            .HasColumnName("Cstar_Names")
-            .HasMaxLength(21);
 
         builder.Property(e => e.SurfaceBrightness).HasColumnName("Surface_Brigthness").HasDefaultValue(0.0);
         builder.Property(e => e.HubbleOnlyGalaxies).HasColumnName("Hubble_OnlyGalaxies").HasMaxLength(14);

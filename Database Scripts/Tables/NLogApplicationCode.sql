@@ -39,4 +39,3 @@ BEGIN
 	ALTER TABLE [NLogApplicationCode] 
 		ADD CONSTRAINT [DF_NLog_createdOn]  DEFAULT (getutcdate()) FOR [createdOn];
 END
-GO

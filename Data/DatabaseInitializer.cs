@@ -6,26 +6,21 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Astronomic_Catalogs.Data;
 
-public class DatabaseInitializer
-{
-    private readonly ApplicationDbContext _context;
-    private readonly ILogger<DatabaseInitializer> _logger;
-    private readonly string _scriptsDirectory;
-
-    public DatabaseInitializer(
-        ApplicationDbContext context, 
+public class DatabaseInitializer(
+        ApplicationDbContext context,
         ILogger<DatabaseInitializer> logger)
-    {
-        _context = context;
-        _logger = logger;
+{
+    private readonly ApplicationDbContext _context = context;
+    private readonly ILogger<DatabaseInitializer> _logger = logger;
+
 #if !DEBUG
-        _scriptsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database Scripts");
+        private readonly string _scriptsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database Scripts");
 #else
-        _scriptsDirectory = "Database Scripts";
+        private readonly string _scriptsDirectory = "Database Scripts";
 #endif
     }
 
-
+    
 
     /// <summary>
     ///                ATTENTION!!!
