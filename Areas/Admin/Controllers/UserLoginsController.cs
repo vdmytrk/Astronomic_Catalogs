@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Areas.Admin.Models;
 using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers
 {
@@ -23,8 +23,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         // GET: Admin/UserLogins
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.AspNetUserLogin.Include(a => a.User);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _context.UserLogins.ToListAsync());
         }
 
         // GET: Admin/UserLogins/Details/5
@@ -35,8 +34,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserLogin = await _context.AspNetUserLogin
-                .Include(a => a.User)
+            var aspNetUserLogin = await _context.UserLogins
                 .FirstOrDefaultAsync(m => m.LoginProvider == id);
             if (aspNetUserLogin == null)
             {
@@ -49,7 +47,6 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         // GET: Admin/UserLogins/Create
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id");
             return View();
         }
 
@@ -66,7 +63,6 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserLogin.UserId);
             return View(aspNetUserLogin);
         }
 
@@ -78,12 +74,11 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserLogin = await _context.AspNetUserLogin.FindAsync(id);
+            var aspNetUserLogin = await _context.UserLogins.FindAsync(id);
             if (aspNetUserLogin == null)
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserLogin.UserId);
             return View(aspNetUserLogin);
         }
 
@@ -119,7 +114,6 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserLogin.UserId);
             return View(aspNetUserLogin);
         }
 
@@ -131,8 +125,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserLogin = await _context.AspNetUserLogin
-                .Include(a => a.User)
+            var aspNetUserLogin = await _context.UserLogins
                 .FirstOrDefaultAsync(m => m.LoginProvider == id);
             if (aspNetUserLogin == null)
             {
@@ -147,10 +140,10 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var aspNetUserLogin = await _context.AspNetUserLogin.FindAsync(id);
+            var aspNetUserLogin = await _context.UserLogins.FindAsync(id);
             if (aspNetUserLogin != null)
             {
-                _context.AspNetUserLogin.Remove(aspNetUserLogin);
+                _context.UserLogins.Remove(aspNetUserLogin);
             }
 
             await _context.SaveChangesAsync();
@@ -159,7 +152,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
 
         private bool AspNetUserLoginExists(string id)
         {
-            return _context.AspNetUserLogin.Any(e => e.LoginProvider == id);
+            return _context.UserLogins.Any(e => e.LoginProvider == id);
         }
     }
 }

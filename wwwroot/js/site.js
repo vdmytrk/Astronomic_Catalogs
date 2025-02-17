@@ -6,7 +6,7 @@
 
 function CallStoreProcedureADO() {
     $.ajax({
-        url: '/Home/GetDateFromProcedureADO',
+        url: '/Admin/HomeAdmin/GetDateFromProcedureADO',
         type: 'GET'
     }).done(function (data) {
         alert(data);
@@ -20,12 +20,12 @@ function CallStoreProcedureADO() {
 
 function CallStoreProcedureEF() {
     $.ajax({
-        url: '/Home/GetDateFromProcedureEF',
+        url: '/Admin/HomeAdmin/GetDateFromProcedureEF',
         type: 'GET'
     }).done(function (data) {
         alert(data);
     }).fail(function (data) {
-        alert("USING Entity Framework, DATA CANNOT BE RETRIEVED. FOR MORE DETAILS, SEE THE COMMENT FOR THE GetDateFromProcedureEF METHOD IN THE DateTables CONTROLLER! ");
+        alert("EF. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
         console.log(data);
     });
 }

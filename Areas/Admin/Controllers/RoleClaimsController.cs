@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Areas.Admin.Models;
 using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers
 {
@@ -23,7 +23,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         // GET: Admin/RoleClaims
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.AspNetRoleClaim.Include(a => a.Role);
+            var applicationDbContext = _context.RoleClaims.Include(a => a.Role);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,7 +35,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetRoleClaim = await _context.AspNetRoleClaim
+            var aspNetRoleClaim = await _context.RoleClaims
                 .Include(a => a.Role)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (aspNetRoleClaim == null)
@@ -49,7 +49,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         // GET: Admin/RoleClaims/Create
         public IActionResult Create()
         {
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id");
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id");
             return View();
         }
 
@@ -66,7 +66,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id", aspNetRoleClaim.RoleId);
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", aspNetRoleClaim.RoleId);
             return View(aspNetRoleClaim);
         }
 
@@ -78,12 +78,12 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetRoleClaim = await _context.AspNetRoleClaim.FindAsync(id);
+            var aspNetRoleClaim = await _context.RoleClaims.FindAsync(id);
             if (aspNetRoleClaim == null)
             {
                 return NotFound();
             }
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id", aspNetRoleClaim.RoleId);
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", aspNetRoleClaim.RoleId);
             return View(aspNetRoleClaim);
         }
 
@@ -119,7 +119,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id", aspNetRoleClaim.RoleId);
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", aspNetRoleClaim.RoleId);
             return View(aspNetRoleClaim);
         }
 
@@ -131,7 +131,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetRoleClaim = await _context.AspNetRoleClaim
+            var aspNetRoleClaim = await _context.RoleClaims
                 .Include(a => a.Role)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (aspNetRoleClaim == null)
@@ -147,10 +147,10 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var aspNetRoleClaim = await _context.AspNetRoleClaim.FindAsync(id);
+            var aspNetRoleClaim = await _context.RoleClaims.FindAsync(id);
             if (aspNetRoleClaim != null)
             {
-                _context.AspNetRoleClaim.Remove(aspNetRoleClaim);
+                _context.RoleClaims.Remove(aspNetRoleClaim);
             }
 
             await _context.SaveChangesAsync();
@@ -159,7 +159,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
 
         private bool AspNetRoleClaimExists(int id)
         {
-            return _context.AspNetRoleClaim.Any(e => e.Id == id);
+            return _context.RoleClaims.Any(e => e.Id == id);
         }
     }
 }

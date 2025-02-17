@@ -7,17 +7,27 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Astronomic_Catalogs.Areas.Admin.Models;
+//using Astronomic_Catalogs.Areas.Admin.Models;
 
 namespace Astronomic_Catalogs.Data;
 
 public class ApplicationDbContext : IdentityDbContext
+    <
+    Models.AspNetUser,
+    Models.AspNetRole,
+    string, // Type of key           
+    Models.AspNetUserClaim,
+    Models.AspNetUserRole,
+    Models.AspNetUserLogin,
+    Models.AspNetRoleClaim,
+    Models.AspNetUserToken>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
 
     }
+
 
     public DbSet<ActualDate> ActualDates { get; set; } = null!;
     public DbSet<SourceType> SourceTypes { get; set; } = null!;    
@@ -30,6 +40,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<TestConnectionForNLog> TestConnectionForNLogs { get; set; } = null!;
     public DbSet<NLogApplicationCode> NLogApplicationCodes { get; set; } = null!;
 
+    //public DbSet<AspNetUser> Users { get; set; } // For create controller
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,6 +54,44 @@ public class ApplicationDbContext : IdentityDbContext
             entity.HasNoKey()
         );
 
+        #region Identity
+        modelBuilder.Entity<Models.AspNetRole>()
+            .HasMany(r => r.RoleClaims)
+            .WithOne(rc => rc.Role)
+            .HasForeignKey(rc => rc.RoleId);
+
+        modelBuilder.Entity<Models.AspNetRole>()
+            .HasMany(r => r.UserRoles)
+            .WithOne(ur => ur.Role)
+            .HasForeignKey(ur => ur.RoleId);
+
+
+
+        modelBuilder.Entity<Models.AspNetUser>()
+            .HasMany(r => r.UserClaims)
+            .WithOne(rc => rc.User)
+            .HasForeignKey(rc => rc.UserId);
+
+        modelBuilder.Entity<Models.AspNetUser>()
+            .HasMany(r => r.UserRoles)
+            .WithOne(ur => ur.User)
+            .HasForeignKey(ur => ur.UserId);
+
+        modelBuilder.Entity<Models.AspNetUser>()
+            .HasMany(r => r.UserLogins)
+            .WithOne(rc => rc.User)
+            .HasForeignKey(rc => rc.UserId);
+
+        modelBuilder.Entity<Models.AspNetUser>()
+            .HasMany(r => r.UserTokens)
+            .WithOne(ur => ur.User)
+            .HasForeignKey(ur => ur.UserId);
+
+        // Вимкнення стандартних таблиць Identity
+        //modelBuilder.Entity<IdentityUser>().ToTable(null); // Це допомагає EF не плутати з вашою таблицею
+        #endregion
+
+
         modelBuilder.ApplyConfiguration(new CollinderCatalogConfiguration());
         modelBuilder.ApplyConfiguration(new ConstellationConfiguration());
         modelBuilder.ApplyConfiguration(new NameObjectConfiguration());
@@ -55,20 +104,6 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.ApplyConfiguration(new TestConnectionForNLogConfiguration());
 
     }
-
-public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetRole> AspNetRole { get; set; } = default!;
-
-public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetRoleClaim> AspNetRoleClaim { get; set; } = default!;
-
-public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUser> AspNetUser { get; set; } = default!;
-
-public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserClaim> AspNetUserClaim { get; set; } = default!;
-
-public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserLogin> AspNetUserLogin { get; set; } = default!;
-
-public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserRole> AspNetUserRole { get; set; } = default!;
-
-public DbSet<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserToken> AspNetUserToken { get; set; } = default!;
 }
 
 public class DbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>

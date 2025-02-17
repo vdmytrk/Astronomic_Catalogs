@@ -1,8 +1,8 @@
-﻿@model IEnumerable<Astronomic_Catalogs.Areas.Admin.Models.AspNetUserLogin>
+﻿@model IEnumerable<Astronomic_Catalogs.Models.AspNetUserLogin>
 
 @{
     ViewData["Title"] = "Index";
-    Layout = "~/Areas/Admin/Views/_ViewStart.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Index</h1>
@@ -16,9 +16,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.ProviderDisplayName)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -27,9 +24,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.ProviderDisplayName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |

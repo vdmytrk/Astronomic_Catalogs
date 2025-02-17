@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Areas.Admin.Models;
 using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers
 {
@@ -23,7 +23,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         // GET: Admin/UserRoles
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.AspNetUserRole.Include(a => a.Role).Include(a => a.User);
+            var applicationDbContext = _context.UserRoles.Include(a => a.Role);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -35,9 +35,8 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserRole = await _context.AspNetUserRole
+            var aspNetUserRole = await _context.UserRoles
                 .Include(a => a.Role)
-                .Include(a => a.User)
                 .FirstOrDefaultAsync(m => m.UserId == id);
             if (aspNetUserRole == null)
             {
@@ -50,8 +49,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         // GET: Admin/UserRoles/Create
         public IActionResult Create()
         {
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id");
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id");
             return View();
         }
 
@@ -68,8 +66,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id", aspNetUserRole.RoleId);
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserRole.UserId);
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", aspNetUserRole.RoleId);
             return View(aspNetUserRole);
         }
 
@@ -81,13 +78,12 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserRole = await _context.AspNetUserRole.FindAsync(id);
+            var aspNetUserRole = await _context.UserRoles.FindAsync(id);
             if (aspNetUserRole == null)
             {
                 return NotFound();
             }
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id", aspNetUserRole.RoleId);
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserRole.UserId);
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", aspNetUserRole.RoleId);
             return View(aspNetUserRole);
         }
 
@@ -123,8 +119,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RoleId"] = new SelectList(_context.AspNetRole, "Id", "Id", aspNetUserRole.RoleId);
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserRole.UserId);
+            ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Id", aspNetUserRole.RoleId);
             return View(aspNetUserRole);
         }
 
@@ -136,9 +131,8 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserRole = await _context.AspNetUserRole
+            var aspNetUserRole = await _context.UserRoles
                 .Include(a => a.Role)
-                .Include(a => a.User)
                 .FirstOrDefaultAsync(m => m.UserId == id);
             if (aspNetUserRole == null)
             {
@@ -153,10 +147,10 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var aspNetUserRole = await _context.AspNetUserRole.FindAsync(id);
+            var aspNetUserRole = await _context.UserRoles.FindAsync(id);
             if (aspNetUserRole != null)
             {
-                _context.AspNetUserRole.Remove(aspNetUserRole);
+                _context.UserRoles.Remove(aspNetUserRole);
             }
 
             await _context.SaveChangesAsync();
@@ -165,7 +159,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
 
         private bool AspNetUserRoleExists(string id)
         {
-            return _context.AspNetUserRole.Any(e => e.UserId == id);
+            return _context.UserRoles.Any(e => e.UserId == id);
         }
     }
 }

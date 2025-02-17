@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Areas.Admin.Models;
 using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers
 {
@@ -20,14 +20,13 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Admin/AspNetUserTokens
+        // GET: Admin/UserTokens
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.AspNetUserToken.Include(a => a.User);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _context.UserTokens.ToListAsync());
         }
 
-        // GET: Admin/AspNetUserTokens/Details/5
+        // GET: Admin/UserTokens/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -35,8 +34,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserToken = await _context.AspNetUserToken
-                .Include(a => a.User)
+            var aspNetUserToken = await _context.UserTokens
                 .FirstOrDefaultAsync(m => m.UserId == id);
             if (aspNetUserToken == null)
             {
@@ -46,14 +44,13 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
             return View(aspNetUserToken);
         }
 
-        // GET: Admin/AspNetUserTokens/Create
+        // GET: Admin/UserTokens/Create
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id");
             return View();
         }
 
-        // POST: Admin/AspNetUserTokens/Create
+        // POST: Admin/UserTokens/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -66,11 +63,10 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserToken.UserId);
             return View(aspNetUserToken);
         }
 
-        // GET: Admin/AspNetUserTokens/Edit/5
+        // GET: Admin/UserTokens/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -78,16 +74,15 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserToken = await _context.AspNetUserToken.FindAsync(id);
+            var aspNetUserToken = await _context.UserTokens.FindAsync(id);
             if (aspNetUserToken == null)
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserToken.UserId);
             return View(aspNetUserToken);
         }
 
-        // POST: Admin/AspNetUserTokens/Edit/5
+        // POST: Admin/UserTokens/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -119,11 +114,10 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.AspNetUser, "Id", "Id", aspNetUserToken.UserId);
             return View(aspNetUserToken);
         }
 
-        // GET: Admin/AspNetUserTokens/Delete/5
+        // GET: Admin/UserTokens/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -131,8 +125,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var aspNetUserToken = await _context.AspNetUserToken
-                .Include(a => a.User)
+            var aspNetUserToken = await _context.UserTokens
                 .FirstOrDefaultAsync(m => m.UserId == id);
             if (aspNetUserToken == null)
             {
@@ -142,15 +135,15 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
             return View(aspNetUserToken);
         }
 
-        // POST: Admin/AspNetUserTokens/Delete/5
+        // POST: Admin/UserTokens/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var aspNetUserToken = await _context.AspNetUserToken.FindAsync(id);
+            var aspNetUserToken = await _context.UserTokens.FindAsync(id);
             if (aspNetUserToken != null)
             {
-                _context.AspNetUserToken.Remove(aspNetUserToken);
+                _context.UserTokens.Remove(aspNetUserToken);
             }
 
             await _context.SaveChangesAsync();
@@ -159,7 +152,7 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers
 
         private bool AspNetUserTokenExists(string id)
         {
-            return _context.AspNetUserToken.Any(e => e.UserId == id);
+            return _context.UserTokens.Any(e => e.UserId == id);
         }
     }
 }
