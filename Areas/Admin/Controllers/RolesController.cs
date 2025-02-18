@@ -27,6 +27,7 @@ public class RolesController : Controller
         var roles = await _context.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
+                .ThenInclude(ur => ur.User)
             .ToListAsync();
         return View(roles);
     }
@@ -44,7 +45,7 @@ public class RolesController : Controller
         var aspNetRole = await _context.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
-            .ThenInclude(ur => ur.User)
+                .ThenInclude(ur => ur.User)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (aspNetRole == null)
@@ -68,7 +69,6 @@ public class RolesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Create([Bind("Id,Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole)
     public async Task<IActionResult> Create([Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, 
                                             string[] selectedClaims, string[] selectedUsers)
     {        
@@ -112,7 +112,6 @@ public class RolesController : Controller
             return NotFound();
         }
 
-        //var aspNetRole = await _context.Roles.FindAsync(id);
         var aspNetRole = await _context.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
@@ -135,7 +134,6 @@ public class RolesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Edit(string id, [Bind("Id,Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole)
     public async Task<IActionResult> Edit(string id, [Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, 
                                           string[] selectedClaims, string[] selectedUsers)
     {
@@ -186,7 +184,6 @@ public class RolesController : Controller
 
             try
             {
-                //_context.Update(aspNetRole);
                 _context.Update(existingRole);
                 await _context.SaveChangesAsync();
             }
@@ -217,8 +214,6 @@ public class RolesController : Controller
             return NotFound();
         }
 
-        //var aspNetRole = await _context.Roles
-        //    .FirstOrDefaultAsync(m => m.Id == id);
         var aspNetRole = await _context.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)

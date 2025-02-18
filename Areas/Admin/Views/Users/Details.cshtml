@@ -1,0 +1,130 @@
+﻿@model Astronomic_Catalogs.Models.AspNetUser
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>User Information</h4>
+    <table class="table table-bordered">
+        <tbody>
+            <tr><th>Id</th><td>@Model.Id</td></tr>
+            <tr><th>User Name</th><td>@Model.UserName</td></tr>
+            <tr><th>Normalized User Name</th><td>@Model.NormalizedUserName</td></tr>
+            <tr><th>Email</th><td>@Model.Email</td></tr>
+            <tr><th>Normalized Email</th><td>@Model.NormalizedEmail</td></tr>
+            <tr><th>Email Confirmed</th><td>@Model.EmailConfirmed</td></tr>
+            <tr><th>Phone Number</th><td>@Model.PhoneNumber</td></tr>
+            <tr><th>Phone Number Confirmed</th><td>@Model.PhoneNumberConfirmed</td></tr>
+            <tr><th>Two-Factor Enabled</th><td>@Model.TwoFactorEnabled</td></tr>
+            <tr><th>Lockout End</th><td>@Model.LockoutEnd</td></tr>
+            <tr><th>Lockout Enabled</th><td>@Model.LockoutEnabled</td></tr>
+            <tr><th>Access Failed Count</th><td>@Model.AccessFailedCount</td></tr>
+            <tr><th>Security Stamp</th><td>@Model.SecurityStamp</td></tr>
+            <tr><th>Concurrency Stamp</th><td>@Model.ConcurrencyStamp</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Roles Section -->
+@if (Model.UserRoles.Any())
+{
+    <h4>User Roles</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr><th>Role</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model.UserRoles)
+            {
+                <tr><td>@role.Role.Name</td></tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p><strong>No Roles Assigned</strong></p>
+}
+
+<!-- Claims Section -->
+@if (Model.UserClaims.Any())
+{
+    <h4>User Claims</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr><th>Type</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in Model.UserClaims)
+            {
+                <tr>
+                    <td>@claim.ClaimType</td>
+                    <td>@claim.ClaimValue</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p><strong>No Claims</strong></p>
+}
+
+<!-- Logins Section -->
+@if (Model.UserLogins.Any())
+{
+    <h4>User Logins</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr><th>Provider</th><th>Display Name</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var login in Model.UserLogins)
+            {
+                <tr>
+                    <td>@login.LoginProvider</td>
+                    <td>@login.ProviderDisplayName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p><strong>No Logins</strong></p>
+}
+
+<!-- Tokens Section -->
+@if (Model.UserTokens.Any())
+{
+    <h4>User Tokens</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr><th>Name</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var token in Model.UserTokens)
+            {
+                <tr>
+                    <td>@token.Name</td>
+                    <td>@token.Value</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p><strong>No Tokens</strong></p>
+}
+
+<!-- Action Buttons -->
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+</div>

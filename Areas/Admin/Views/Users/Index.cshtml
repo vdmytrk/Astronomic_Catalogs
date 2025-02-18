@@ -28,33 +28,79 @@
             <th>@Html.DisplayNameFor(model => model.LockoutEnd)</th>
             <th>@Html.DisplayNameFor(model => model.LockoutEnabled)</th>
             <th>@Html.DisplayNameFor(model => model.AccessFailedCount)</th>
+            <th>Roles</th>
+            <th>Claims</th>
+            <th>Logins</th>
+            <th>Tokens</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>@Html.DisplayFor(modelItem => item.Id)</td>
-            <td>@Html.DisplayFor(modelItem => item.UserName)</td>
-            <td>@Html.DisplayFor(modelItem => item.NormalizedUserName)</td>
-            <td>@Html.DisplayFor(modelItem => item.Email)</td>
-            <td>@Html.DisplayFor(modelItem => item.NormalizedEmail)</td>
-            <td>@Html.DisplayFor(modelItem => item.EmailConfirmed)</td>
-            <td>@Html.DisplayFor(modelItem => item.PasswordHash)</td>
-            <td>@Html.DisplayFor(modelItem => item.SecurityStamp)</td>
-            <td>@Html.DisplayFor(modelItem => item.ConcurrencyStamp)</td>
-            <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
-            <td>@Html.DisplayFor(modelItem => item.PhoneNumberConfirmed)</td>
-            <td>@Html.DisplayFor(modelItem => item.TwoFactorEnabled)</td>
-            <td>@Html.DisplayFor(modelItem => item.LockoutEnd)</td>
-            <td>@Html.DisplayFor(modelItem => item.LockoutEnabled)</td>
-            <td>@Html.DisplayFor(modelItem => item.AccessFailedCount)</td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.UserName)</td>
+                <td>@Html.DisplayFor(modelItem => item.NormalizedUserName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                <td>@Html.DisplayFor(modelItem => item.NormalizedEmail)</td>
+                <td>@Html.DisplayFor(modelItem => item.EmailConfirmed)</td>
+                <td>@Html.DisplayFor(modelItem => item.PasswordHash)</td>
+                <td>@Html.DisplayFor(modelItem => item.SecurityStamp)</td>
+                <td>@Html.DisplayFor(modelItem => item.ConcurrencyStamp)</td>
+                <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.PhoneNumberConfirmed)</td>
+                <td>@Html.DisplayFor(modelItem => item.TwoFactorEnabled)</td>
+                <td>@Html.DisplayFor(modelItem => item.LockoutEnd)</td>
+                <td>@Html.DisplayFor(modelItem => item.LockoutEnabled)</td>
+                <td>@Html.DisplayFor(modelItem => item.AccessFailedCount)</td>
+
+                <td>
+                    @if (item.UserRoles.Any())
+                    {
+                        @string.Join(", ", item.UserRoles.Select(ur => ur.Role.Name))
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Roles</span>
+                    }
+                </td>
+                <td>
+                    @if (item.UserClaims.Any())
+                    {
+                        @string.Join(", ", item.UserClaims.Select(uc => $"{uc.ClaimType}: {uc.ClaimValue}"))
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Claims</span>
+                    }
+                </td>
+                <td>
+                    @if (item.UserLogins.Any())
+                    {
+                        @string.Join(", ", item.UserLogins.Select(ul => ul.ProviderDisplayName))
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Logins</span>
+                    }
+                </td>
+                <td>
+                    @if (item.UserTokens.Any())
+                    {
+                        @string.Join(", ", item.UserTokens.Select(ut => ut.Name))
+                    }
+                    else
+                    {
+                        <span class="text-muted">No Tokens</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
