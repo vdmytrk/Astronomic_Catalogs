@@ -30,14 +30,29 @@
                 <span asp-validation-for="ConcurrencyStamp" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label class="control-label">Role Claims</label>
+                <select name="selectedClaims" class="form-control" multiple>
+                    @foreach (var claim in ViewBag.Claims as SelectList ?? new SelectList(new List<AspNetRoleClaim>()))
+                    {
+                        <option value="@claim.Value" selected="@ViewBag.SelectedClaims.Contains(claim.Value)">@claim.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Users in Role</label>
+                <select name="selectedUsers" class="form-control" multiple>
+                    @foreach (var user in ViewBag.Users as SelectList ?? new SelectList(new List<AspNetUserRole>()))
+                    {
+                        <option value="@user.Value" selected="@ViewBag.SelectedUsers.Contains(user.Value)">@user.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

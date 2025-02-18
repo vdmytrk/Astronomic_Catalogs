@@ -50,7 +50,7 @@ public class UsersController : Controller
     // POST: Admin/Users/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser)
+    public async Task<IActionResult> Create([Bind("UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser)
     {
         if (ModelState.IsValid)
         {
@@ -80,7 +80,7 @@ public class UsersController : Controller
     // POST: Admin/Users/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("Id,UserName,Email,PhoneNumber,NormalizedUserName,NormalizedEmail,EmailConfirmed,PhoneNumberConfirmed,LockoutEnd,LockoutEnabled,AccessFailedCount,TwoFactorEnabled,PasswordHash,SecurityStamp,ConcurrencyStamp")] AspNetUser aspNetUser)
+    public async Task<IActionResult> Edit(string id, [Bind("UserName,Email,PhoneNumber,NormalizedUserName,NormalizedEmail,EmailConfirmed,PhoneNumberConfirmed,LockoutEnd,LockoutEnabled,AccessFailedCount,TwoFactorEnabled,PasswordHash,SecurityStamp,ConcurrencyStamp")] AspNetUser aspNetUser)
     {
         if (id != aspNetUser.Id)
         {

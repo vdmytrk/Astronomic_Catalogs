@@ -40,7 +40,14 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<TestConnectionForNLog> TestConnectionForNLogs { get; set; } = null!;
     public DbSet<NLogApplicationCode> NLogApplicationCodes { get; set; } = null!;
 
-    //public DbSet<AspNetUser> Users { get; set; } // For create controller
+    
+    //public DbSet<AspNetUserRole> UserRoles { get; set; } 
+    public DbSet<AspNetRole> Roles { get; set; } 
+    public DbSet<AspNetRoleClaim> RoleClaims { get; set; } 
+    public DbSet<AspNetUser> Users { get; set; } 
+    public DbSet<AspNetUserClaim> UserClaims { get; set; } 
+    public DbSet<AspNetUserLogin> UserLogins { get; set; } 
+    public DbSet<AspNetUserToken> UserTokens { get; set; } 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -55,6 +62,11 @@ public class ApplicationDbContext : IdentityDbContext
         );
 
         #region Identity
+        modelBuilder.Entity<AspNetUserRole>()
+            .HasKey(ur => new { ur.UserId, ur.RoleId });
+
+
+
         modelBuilder.Entity<Models.AspNetRole>()
             .HasMany(r => r.RoleClaims)
             .WithOne(rc => rc.Role)
@@ -87,8 +99,6 @@ public class ApplicationDbContext : IdentityDbContext
             .WithOne(ur => ur.User)
             .HasForeignKey(ur => ur.UserId);
 
-        // Вимкнення стандартних таблиць Identity
-        //modelBuilder.Entity<IdentityUser>().ToTable(null); // Це допомагає EF не плутати з вашою таблицею
         #endregion
 
 
