@@ -58,7 +58,7 @@
         <dd class="col-sm-10">@Html.DisplayFor(model => model.AccessFailedCount)</dd>
     </dl>
 
-    <!-- Roles Section -->
+
     @if (Model.UserRoles.Any())
     {
         <h4>User Roles</h4>
@@ -79,7 +79,7 @@
         <p><strong>No Roles Assigned</strong></p>
     }
 
-    <!-- Claims Section -->
+
     @if (Model.UserClaims.Any())
     {
         <h4>User Claims</h4>
@@ -103,7 +103,7 @@
         <p><strong>No Claims</strong></p>
     }
 
-    <!-- Logins Section -->
+    
     @if (Model.UserLogins.Any())
     {
         <h4>User Logins</h4>
@@ -127,7 +127,7 @@
         <p><strong>No Logins</strong></p>
     }
 
-    <!-- Tokens Section -->
+    
     @if (Model.UserTokens.Any())
     {
         <h4>User Tokens</h4>
@@ -150,6 +150,7 @@
     {
         <p><strong>No Tokens</strong></p>
     }
+
 
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />

@@ -30,7 +30,6 @@ public class UsersController : Controller
             .Include(u => u.UserLogins)
             .Include(u => u.UserTokens)
             .ToListAsync();
-        //return View(await _context.Users.ToListAsync());
         return View(aspNetUser);
     }
 
@@ -42,8 +41,6 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        //var aspNetUser = await _context.Users
-        //    .FirstOrDefaultAsync(m => m.Id == id);
         var aspNetUser = await _context.Users
             .Include(u => u.UserClaims)
             .Include(u => u.UserRoles)
@@ -139,7 +136,6 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        //var aspNetUser = await _context.Users.FindAsync(id);
         var aspNetUser = await _context.Users
             .Include(u => u.UserClaims)
             .Include(u => u.UserRoles)
@@ -190,7 +186,6 @@ public class UsersController : Controller
                 return NotFound();
             }
 
-            // Оновлюємо загальні дані
             existingUser.UserName = aspNetUser.UserName;
             existingUser.NormalizedUserName = aspNetUser.UserName?.ToUpper(); 
 
@@ -264,7 +259,7 @@ public class UsersController : Controller
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Users.Any(u => u.Id == aspNetUser.Id))
+                if (!AspNetUserExists(aspNetUser.Id))
                 {
                     return NotFound();
                 }
@@ -324,19 +319,4 @@ public class UsersController : Controller
     }
 }
 
-
-// UserName,
-// NormalizedUserName,
-// Email,
-// NormalizedEmail,
-// EmailConfirmed,
-// PasswordHash,
-// SecurityStamp,
-// ConcurrencyStamp,
-// PhoneNumber,
-// PhoneNumberConfirmed,
-// TwoFactorEnabled,
-// LockoutEnd,
-// LockoutEnabled,
-// AccessFailedCount
 
