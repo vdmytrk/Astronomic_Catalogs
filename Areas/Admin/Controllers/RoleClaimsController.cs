@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
-using Microsoft.Extensions.Azure;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 

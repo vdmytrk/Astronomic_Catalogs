@@ -29,100 +29,102 @@
     </table>
 </div>
 
-<!-- Roles Section -->
-@if (Model.UserRoles.Any())
-{
-    <h4>User Roles</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr><th>Role</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var role in Model.UserRoles)
-            {
-                <tr><td>@role.Role.Name</td></tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p><strong>No Roles Assigned</strong></p>
-}
+<div>
+    @if (Model.UserRoles.Any())
+    {
+        <h4>User Roles</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr><th>Role</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var role in Model.UserRoles)
+                {
+                    <tr><td>@role.Role.Name</td></tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p><strong>No Roles Assigned</strong></p>
+    }
 
-<!-- Claims Section -->
-@if (Model.UserClaims.Any())
-{
-    <h4>User Claims</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr><th>Type</th><th>Value</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var claim in Model.UserClaims)
-            {
-                <tr>
-                    <td>@claim.ClaimType</td>
-                    <td>@claim.ClaimValue</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p><strong>No Claims</strong></p>
-}
+    
+    @if (Model.UserClaims.Any())
+    {
+        <h4>User Claims</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr><th>Type</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.UserClaims)
+                {
+                    <tr>
+                        <td>@claim.ClaimType</td>
+                        <td>@claim.ClaimValue</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p><strong>No Claims</strong></p>
+    }
 
-<!-- Logins Section -->
-@if (Model.UserLogins.Any())
-{
-    <h4>User Logins</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr><th>Provider</th><th>Display Name</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var login in Model.UserLogins)
-            {
-                <tr>
-                    <td>@login.LoginProvider</td>
-                    <td>@login.ProviderDisplayName</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p><strong>No Logins</strong></p>
-}
 
-<!-- Tokens Section -->
-@if (Model.UserTokens.Any())
-{
-    <h4>User Tokens</h4>
-    <table class="table table-bordered">
-        <thead>
-            <tr><th>Name</th><th>Value</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var token in Model.UserTokens)
-            {
-                <tr>
-                    <td>@token.Name</td>
-                    <td>@token.Value</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p><strong>No Tokens</strong></p>
-}
+    @if (Model.UserLogins.Any())
+    {
+        <h4>User Logins</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr><th>Provider</th><th>Display Name</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var login in Model.UserLogins)
+                {
+                    <tr>
+                        <td>@login.LoginProvider</td>
+                        <td>@login.ProviderDisplayName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p><strong>No Logins</strong></p>
+    }
 
-<!-- Action Buttons -->
+    
+    @if (Model.UserTokens.Any())
+    {
+        <h4>User Tokens</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr><th>Name</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var token in Model.UserTokens)
+                {
+                    <tr>
+                        <td>@token.Name</td>
+                        <td>@token.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p><strong>No Tokens</strong></p>
+    }
+
+</div>
+
+
 <div class="mt-3">
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>

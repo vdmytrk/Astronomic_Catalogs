@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-
-
+using NuGet.Protocol.Plugins;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
@@ -71,7 +71,7 @@ public class UsersController : Controller
     // POST: Admin/Users/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("UserName,NormalizedUserName,Email,NormalizedEmail,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+    public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                             string[] selectedClaims,
                                             string[] selectedRoles,
                                             string[] selectedLogins,
@@ -79,42 +79,8 @@ public class UsersController : Controller
     {
         if (ModelState.IsValid)
         {
-            // Add Claims
-            foreach (var claim in selectedClaims)
-            {
-                aspNetUser.UserClaims.Add(new AspNetUserClaim { ClaimType = claim, UserId = aspNetUser.Id });
-            }
-
-            // Add Roles
-            foreach (var roleId in selectedRoles)
-            {
-                aspNetUser.UserRoles.Add(new AspNetUserRole { RoleId = roleId, UserId = aspNetUser.Id });
-            }
-
-            // Update Logins
-            //var existingLogins = _context.UserLogins.Where(l => l.UserId == aspNetUser.Id).ToList();
-            //_context.UserLogins.RemoveRange(existingLogins);
-            //foreach (var login in userLogins)
-            //{
-            //    aspNetUser.UserLogins.Add(login);
-            //}
-            foreach (var loginProvider in selectedLogins)
-            {
-                aspNetUser.UserLogins.Add(new AspNetUserLogin { LoginProvider = loginProvider, UserId = aspNetUser.Id });
-            }
-
-            // Update Tokens
-            //var existingTokens = _context.UserTokens.Where(t => t.UserId == aspNetUser.Id).ToList();
-            //_context.UserTokens.RemoveRange(existingTokens);
-            //foreach (var token in userTokens)
-            //{
-            //    aspNetUser.UserTokens.Add(token);
-            //}
-            foreach (var tokenName in selectedTokens)
-            {
-                aspNetUser.UserTokens.Add(new AspNetUserToken { Name = tokenName, UserId = aspNetUser.Id });
-            }
-
+            aspNetUser = ValidateInputData(aspNetUser, selectedClaims, selectedRoles, selectedLogins, selectedTokens);
+            
             _context.Add(aspNetUser);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -160,7 +126,7 @@ public class UsersController : Controller
     // POST: Admin/Users/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("UserName,Email,PhoneNumber,NormalizedUserName,NormalizedEmail,EmailConfirmed,PhoneNumberConfirmed,LockoutEnd,LockoutEnabled,AccessFailedCount,TwoFactorEnabled,PasswordHash,SecurityStamp,ConcurrencyStamp")] AspNetUser aspNetUser,
+    public async Task<IActionResult> Edit(string id, [Bind("UserName,Email,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                           string[] selectedClaims,
                                           string[] selectedRoles,
                                           string[] selectedLogins,
@@ -186,71 +152,7 @@ public class UsersController : Controller
                 return NotFound();
             }
 
-            existingUser.UserName = aspNetUser.UserName;
-            existingUser.NormalizedUserName = aspNetUser.UserName?.ToUpper(); 
-
-            existingUser.Email = aspNetUser.Email;
-            existingUser.NormalizedEmail = aspNetUser.Email?.ToUpper(); 
-            existingUser.EmailConfirmed = aspNetUser.EmailConfirmed;
-
-            // Поля безпечності
-            if (!string.IsNullOrWhiteSpace(aspNetUser.PasswordHash))
-            {
-                existingUser.PasswordHash = aspNetUser.PasswordHash; 
-            }
-            ///
-            /// Отримати старий пароль користувача.
-            /// Захешувати новий пароль через PasswordHasher.
-            /// Присвоїти хеш у PasswordHash.
-            ///
-            //if (!string.IsNullOrWhiteSpace(newPassword))
-            //{
-            //    var passwordHasher = new PasswordHasher<AspNetUser>();
-            //    existingUser.PasswordHash = passwordHasher.HashPassword(existingUser, newPassword);
-            //    existingUser.SecurityStamp = Guid.NewGuid().ToString(); // Оновлюємо SecurityStamp
-            //}
-
-            // Оновлюємо SecurityStamp, якщо змінюємо критичні дані (пароль, email)
-            if (existingUser.Email != aspNetUser.Email ||
-                existingUser.PasswordHash != aspNetUser.PasswordHash)
-            {
-                existingUser.SecurityStamp = Guid.NewGuid().ToString(); // Генеруємо новий SecurityStamp
-            }
-
-            // Оновлюємо ConcurrencyStamp для вирішення конфліктів оновлення
-            existingUser.ConcurrencyStamp = Guid.NewGuid().ToString();
-
-            existingUser.PhoneNumber = aspNetUser.PhoneNumber;
-            existingUser.PhoneNumberConfirmed = aspNetUser.PhoneNumberConfirmed;
-
-            existingUser.TwoFactorEnabled = aspNetUser.TwoFactorEnabled;
-            existingUser.LockoutEnd = aspNetUser.LockoutEnd;
-            existingUser.LockoutEnabled = aspNetUser.LockoutEnabled;
-            existingUser.AccessFailedCount = aspNetUser.AccessFailedCount;
-
-
-
-
-            existingUser.UserClaims.Clear();
-            foreach (var claim in selectedClaims)
-            {
-                existingUser.UserClaims.Add(new AspNetUserClaim { ClaimType = claim, UserId = aspNetUser.Id });
-            }
-            existingUser.UserRoles.Clear();
-            foreach (var roleId in selectedRoles)
-            {
-                existingUser.UserRoles.Add(new AspNetUserRole { RoleId = roleId, UserId = aspNetUser.Id });
-            }
-            existingUser.UserLogins.Clear();
-            foreach (var login in selectedLogins)
-            {
-                existingUser.UserLogins.Add(new AspNetUserLogin { ProviderDisplayName = login, UserId = aspNetUser.Id });
-            }
-            existingUser.UserTokens.Clear();
-            foreach (var token in selectedTokens)
-            {
-                existingUser.UserTokens.Add(new AspNetUserToken { Name = token, UserId = aspNetUser.Id });
-            }
+            existingUser = ValidateInputData(aspNetUser, selectedClaims, selectedRoles, selectedLogins, selectedTokens);
 
             try
             {
@@ -317,6 +219,78 @@ public class UsersController : Controller
     {
         return _context.Users.Any(e => e.Id == id);
     }
+
+    private AspNetUser ValidateInputData(AspNetUser aspNetUser, string[] selectedClaims, string[] selectedRoles,
+                                         string[] selectedLogins, string[] selectedTokens)
+    {
+        aspNetUser.UserName = aspNetUser.UserName;
+        aspNetUser.NormalizedUserName = aspNetUser.UserName?.ToUpper();
+
+        aspNetUser.Email = aspNetUser.Email;
+        aspNetUser.NormalizedEmail = aspNetUser.Email?.ToUpper();
+        aspNetUser.EmailConfirmed = aspNetUser.EmailConfirmed;
+
+        // Поля безпечності
+        if (!string.IsNullOrWhiteSpace(aspNetUser.PasswordHash))
+        {
+            aspNetUser.PasswordHash = aspNetUser.PasswordHash;
+        }
+        ///
+        /// Отримати старий пароль користувача.
+        /// Захешувати новий пароль через PasswordHasher.
+        /// Присвоїти хеш у PasswordHash.
+        ///
+        //if (!string.IsNullOrWhiteSpace(newPassword))
+        //{
+        //    var passwordHasher = new PasswordHasher<AspNetUser>();
+        //    aspNetUser.PasswordHash = passwordHasher.HashPassword(aspNetUser, newPassword);
+        //    aspNetUser.SecurityStamp = Guid.NewGuid().ToString(); // Оновлюємо SecurityStamp
+        //}
+
+        // Оновлюємо SecurityStamp, якщо змінюємо критичні дані (пароль, email)
+        if (aspNetUser.Email != aspNetUser.Email ||
+            aspNetUser.PasswordHash != aspNetUser.PasswordHash)
+        {
+            aspNetUser.SecurityStamp = Guid.NewGuid().ToString(); // Генеруємо новий SecurityStamp
+        }
+
+        // Оновлюємо ConcurrencyStamp для вирішення конфліктів оновлення
+        aspNetUser.ConcurrencyStamp = Guid.NewGuid().ToString();
+
+        aspNetUser.PhoneNumber = aspNetUser.PhoneNumber;
+        aspNetUser.PhoneNumberConfirmed = aspNetUser.PhoneNumberConfirmed;
+
+        aspNetUser.TwoFactorEnabled = aspNetUser.TwoFactorEnabled;
+        aspNetUser.LockoutEnd = aspNetUser.LockoutEnd;
+        aspNetUser.LockoutEnabled = aspNetUser.LockoutEnabled;
+        aspNetUser.AccessFailedCount = aspNetUser.AccessFailedCount;
+
+        
+        foreach (var claim in selectedClaims)
+        {
+            aspNetUser.UserClaims.Add(new AspNetUserClaim { ClaimType = claim, UserId = aspNetUser.Id });
+        }
+        foreach (var roleId in selectedRoles)
+        {
+            aspNetUser.UserRoles.Add(new AspNetUserRole { RoleId = roleId, UserId = aspNetUser.Id });
+        }
+        foreach (var loginProvider in selectedLogins)
+        {
+            aspNetUser.UserLogins.Add(new AspNetUserLogin
+            {
+                LoginProvider = loginProvider,       // LoginProvider + UserId
+                ProviderDisplayName = loginProvider, // ProviderDisplayName is just a text field for display
+                UserId = aspNetUser.Id
+            });
+        }
+        foreach (var tokenName in selectedTokens)
+        {
+            aspNetUser.UserTokens.Add(new AspNetUserToken { Name = tokenName, UserId = aspNetUser.Id });
+        }
+
+        return aspNetUser;
+    }
+
 }
 
 
