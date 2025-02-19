@@ -76,7 +76,7 @@ hr />
                 <select name="selectedRoles" class="form-select" multiple>
                     @foreach (var role in ViewBag.Roles as SelectList ?? new SelectList(new List<AspNetUserRole>()))
                     {
-                        <option value="@role.Value" selected="@Model.UserRoles.Any(r => r.RoleId == role.Value)">@role.Text</option>
+                        <option value="@role.Value" selected="@(Model.UserRoles != null && Model.UserRoles.Any(r => r.RoleId == role.Value))">@role.Text</option>
                     }
                 </select>
             </div>
@@ -85,7 +85,7 @@ hr />
                 <select name="selectedClaims" class="form-select" multiple>
                     @foreach (var claim in ViewBag.Claims as SelectList ?? new SelectList(new List<AspNetUserClaim>()))
                     {
-                        <option value="@claim.Value" selected="@Model.UserClaims.Any(c => c.ClaimType == claim.Value)">@claim.Text</option>
+                        <option value="@claim.Value" selected="@(Model.UserClaims != null && Model.UserClaims.Any(c => c.ClaimType == claim.Value))">@claim.Text</option>
                     }
                 </select>
             </div>
@@ -94,13 +94,13 @@ hr />
                 <select name="selectedLogins" class="form-select" multiple>
                     @foreach (var login in ViewBag.Logins as SelectList ?? new SelectList(new List<AspNetUserLogin>()))
                     {
-                        <option value="@login.Value" selected="@Model.UserLogins.Any(l => l.ProviderDisplayName == login.Value)">@login.Text</option>
+                        <option value="@login.Value" selected="@(Model.UserLogins != null && Model.UserLogins.Any(l => l.ProviderDisplayName == login.Value))">@login.Text</option>
                     }
                 </select>
                 <select name="selectedLogins" class="form-control" multiple>
                     @foreach (var login in ViewBag.Logins as SelectList ?? new SelectList(new List<AspNetUserLogin>()))
                     {
-                        <option value="@login.Value" selected="@Model.UserLogins.Any(l => l.LoginProvider == login.Value)">@login.Text</option>
+                        <option value="@login.Value" selected="@(Model.UserLogins != null && Model.UserLogins.Any(l => l.LoginProvider == login.Value))">@login.Text</option>
                     }
                 </select>
             </div>
@@ -109,7 +109,7 @@ hr />
                 <select name="selectedTokens" class="form-select" multiple>
                     @foreach (var token in ViewBag.Tokens as SelectList ?? new SelectList(new List<AspNetUserToken>()))
                     {
-                        <option value="@token.Value" selected="@Model.UserTokens.Any(t => t.Name == token.Value)">@token.Text</option>
+                        <option value="@token.Value" selected="@(Model.UserTokens != null && Model.UserTokens.Any(t => t.Name == token.Value))">@token.Text</option>
                     }
                 </select>
             </div>

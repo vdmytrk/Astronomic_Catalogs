@@ -23,8 +23,8 @@ public class RoleClaimsController : Controller
     // GET: Admin/RoleClaims
     public async Task<IActionResult> Index()
     {
-        var applicationDbContext = _context.RoleClaims.Include(a => a.Role);
-        return View(await applicationDbContext.ToListAsync());
+        var aspNetRoleClaim = _context.RoleClaims.Include(a => a.Role).OrderBy(rc => rc.Id);
+        return View(await aspNetRoleClaim.ToListAsync());
     }
 
     // GET: Admin/RoleClaims/Details/5
@@ -67,6 +67,7 @@ public class RoleClaimsController : Controller
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }     
+
         ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Name", aspNetRoleClaim.RoleId);
         return View(aspNetRoleClaim);
     }
@@ -93,13 +94,14 @@ public class RoleClaimsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("RoleId,ClaimType,ClaimValue")] AspNetRoleClaim aspNetRoleClaim)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,RoleId,ClaimType,ClaimValue")] AspNetRoleClaim aspNetRoleClaim)
     {
         if (id != aspNetRoleClaim.Id)
         {
             return NotFound();
         }
 
+        ModelState.Remove("Role");
         if (ModelState.IsValid)
         {
             try
@@ -120,6 +122,7 @@ public class RoleClaimsController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+
         ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "Name", aspNetRoleClaim.RoleId);
         return View(aspNetRoleClaim);
     }

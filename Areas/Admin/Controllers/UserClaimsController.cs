@@ -23,7 +23,8 @@ public class UserClaimsController : Controller
     // GET: Admin/UserClaims
     public async Task<IActionResult> Index()
     {
-        return View(await _context.UserClaims.ToListAsync());
+        var aspNetUserClaim = _context.UserClaims.Include(a => a.User).OrderBy(uc => uc.Id);
+        return View(await aspNetUserClaim.ToListAsync());
     }
 
     // GET: Admin/UserClaims/Details/5
@@ -47,6 +48,7 @@ public class UserClaimsController : Controller
     // GET: Admin/UserClaims/Create
     public IActionResult Create()
     {
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName");
         return View();
     }
 
@@ -57,12 +59,15 @@ public class UserClaimsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,UserId,ClaimType,ClaimValue")] AspNetUserClaim aspNetUserClaim)
     {
+        ModelState.Remove("User");
         if (ModelState.IsValid)
         {
             _context.Add(aspNetUserClaim);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", aspNetUserClaim.UserId);
         return View(aspNetUserClaim);
     }
 
@@ -79,6 +84,8 @@ public class UserClaimsController : Controller
         {
             return NotFound();
         }
+
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", aspNetUserClaim.UserId);
         return View(aspNetUserClaim);
     }
 
@@ -94,6 +101,7 @@ public class UserClaimsController : Controller
             return NotFound();
         }
 
+        ModelState.Remove("User");
         if (ModelState.IsValid)
         {
             try
@@ -114,6 +122,8 @@ public class UserClaimsController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", aspNetUserClaim.UserId);
         return View(aspNetUserClaim);
     }
 

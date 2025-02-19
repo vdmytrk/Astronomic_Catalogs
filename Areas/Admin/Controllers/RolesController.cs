@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
@@ -23,13 +24,12 @@ public class RolesController : Controller
     // GET: Admin/Roles
     public async Task<IActionResult> Index()
     {
-        //return View(await _context.Roles.ToListAsync());
-        var roles = await _context.Roles
+        var aspNetRole = await _context.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
                 .ThenInclude(ur => ur.User)
             .ToListAsync();
-        return View(roles);
+        return View(aspNetRole.OrderBy(r => r.Name));
     }
 
     // GET: Admin/Roles/Details/5
@@ -40,8 +40,6 @@ public class RolesController : Controller
             return NotFound();
         }
 
-        //var aspNetRole = await _context.Roles
-        //    .FirstOrDefaultAsync(m => m.Id == id);
         var aspNetRole = await _context.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
@@ -71,30 +69,12 @@ public class RolesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, 
                                             string[] selectedClaims, string[] selectedUsers)
-    {        
+    {
+        await SetDataAsync(aspNetRole, aspNetRole, selectedClaims, selectedUsers);
+
         if (ModelState.IsValid)
         {
             _context.Add(aspNetRole);
-
-            foreach (var claimId in selectedClaims)
-            {
-                var claim = await _context.RoleClaims.FindAsync(int.Parse(claimId));
-                if (claim != null)
-                {
-                    aspNetRole.RoleClaims.Add(claim);
-                }
-            }
-
-            foreach (var userId in selectedUsers)
-            {
-                var userRole = new AspNetUserRole
-                {
-                    RoleId = aspNetRole.Id,
-                    UserId = userId
-                };
-                aspNetRole.UserRoles.Add(userRole);
-            }
-
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -134,7 +114,7 @@ public class RolesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, 
+    public async Task<IActionResult> Edit(string id, [Bind("Id,Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, 
                                           string[] selectedClaims, string[] selectedUsers)
     {
         if (id != aspNetRole.Id)
@@ -142,46 +122,21 @@ public class RolesController : Controller
             return NotFound();
         }
 
+        var existingRole = await _context.Roles
+            .Include(r => r.RoleClaims)
+            .Include(r => r.UserRoles)
+                .ThenInclude(ur => ur.User)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (existingRole == null)
+        {
+            return NotFound();
+        }
+
+        await SetDataAsync(existingRole, aspNetRole, selectedClaims, selectedUsers);
+
         if (ModelState.IsValid)
         {
-            var existingRole = await _context.Roles
-                .Include(r => r.RoleClaims)
-                .Include(r => r.UserRoles)
-                    .ThenInclude(ur => ur.User)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            if (existingRole == null)
-            {
-                return NotFound();
-            }
-
-            existingRole.Name = aspNetRole.Name;
-            existingRole.NormalizedName = aspNetRole.NormalizedName;
-            existingRole.ConcurrencyStamp = aspNetRole.ConcurrencyStamp;
-
-            
-            existingRole.RoleClaims.Clear();
-            existingRole.UserRoles.Clear();
-                        
-            foreach (var claimId in selectedClaims)
-            {
-                var claim = await _context.RoleClaims.FindAsync(int.Parse(claimId));
-                if (claim != null)
-                {
-                    existingRole.RoleClaims.Add(claim);
-                }
-            }
-
-            foreach (var userId in selectedUsers)
-            {
-                var userRole = new AspNetUserRole
-                {
-                    RoleId = existingRole.Id,
-                    UserId = userId
-                };
-                existingRole.UserRoles.Add(userRole);
-            }
-
             try
             {
                 _context.Update(existingRole);
@@ -189,7 +144,7 @@ public class RolesController : Controller
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AspNetRoleExists(aspNetRole.Id))
+                if (!AspNetRoleExists(existingRole.Id))
                 {
                     return NotFound();
                 }
@@ -246,5 +201,54 @@ public class RolesController : Controller
     private bool AspNetRoleExists(string id)
     {
         return _context.Roles.Any(e => e.Id == id);
+    }
+
+    /// <summary>
+    /// TODO: Check input values.
+    /// </summary>
+    private async Task SetDataAsync(AspNetRole existingRole, AspNetRole inputRole, string[] selectedClaims, string[] selectedUsers)
+    {
+        existingRole.Name = inputRole.Name;
+        existingRole.NormalizedName = inputRole.NormalizedName;
+        existingRole.ConcurrencyStamp = inputRole.ConcurrencyStamp;
+
+        // Оновлення клеймів ролі
+        var currentClaimIds = existingRole.RoleClaims.Select(rc => rc.Id.ToString()).ToList();
+        var claimsToRemove = existingRole.RoleClaims.Where(rc => !selectedClaims.Contains(rc.Id.ToString())).ToList();
+        foreach (var claim in claimsToRemove)
+        {
+            existingRole.RoleClaims.Remove(claim);
+        }
+        foreach (var claimId in selectedClaims)
+        {
+            if (!currentClaimIds.Contains(claimId))
+            {
+                var claim = await _context.RoleClaims.FindAsync(int.Parse(claimId));
+                if (claim != null)
+                {
+                    existingRole.RoleClaims.Add(claim);
+                }
+            }
+        }
+
+        // Оновлення користувачів у ролі
+        var currentUserIds = existingRole.UserRoles.Select(ur => ur.UserId).ToList();
+        var usersToRemove = existingRole.UserRoles.Where(ur => !selectedUsers.Contains(ur.UserId)).ToList();
+        foreach (var userRole in usersToRemove)
+        {
+            existingRole.UserRoles.Remove(userRole);
+        }
+        foreach (var userId in selectedUsers)
+        {
+            if (!currentUserIds.Contains(userId))
+            {
+                existingRole.UserRoles.Add(new AspNetUserRole
+                {
+                    RoleId = existingRole.Id,
+                    UserId = userId
+                });
+            }
+        }
+
     }
 }

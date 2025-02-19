@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Astronomic_Catalogs.Models;
 
 [Table("AspNetUserTokens")]
+//[PrimaryKey(nameof(UserId), nameof(LoginProvider), nameof(Name))]
 public class AspNetUserToken : IdentityUserToken<string>
 {
     // The inherited property is commented out.

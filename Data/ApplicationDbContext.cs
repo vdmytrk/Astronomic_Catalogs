@@ -41,13 +41,12 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<NLogApplicationCode> NLogApplicationCodes { get; set; } = null!;
 
     
-    //public DbSet<AspNetUserRole> UserRoles { get; set; } 
-    public DbSet<AspNetRole> Roles { get; set; } 
-    public DbSet<AspNetRoleClaim> RoleClaims { get; set; } 
-    public DbSet<AspNetUser> Users { get; set; } 
-    public DbSet<AspNetUserClaim> UserClaims { get; set; } 
-    public DbSet<AspNetUserLogin> UserLogins { get; set; } 
-    public DbSet<AspNetUserToken> UserTokens { get; set; } 
+    public DbSet<AspNetRole> Roles { get; set; } = null!;
+    public DbSet<AspNetRoleClaim> RoleClaims { get; set; } = null!;
+    public DbSet<AspNetUser> Users { get; set; } = null!;
+    public DbSet<AspNetUserClaim> UserClaims { get; set; } = null!;
+    public DbSet<AspNetUserLogin> UserLogins { get; set; } = null!;
+    public DbSet<AspNetUserToken> UserTokens { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -65,40 +64,31 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<AspNetUserRole>()
             .HasKey(ur => new { ur.UserId, ur.RoleId });
 
-
-
         modelBuilder.Entity<Models.AspNetRole>()
             .HasMany(r => r.RoleClaims)
             .WithOne(rc => rc.Role)
             .HasForeignKey(rc => rc.RoleId);
-
         modelBuilder.Entity<Models.AspNetRole>()
             .HasMany(r => r.UserRoles)
             .WithOne(ur => ur.Role)
             .HasForeignKey(ur => ur.RoleId);
 
-
-
         modelBuilder.Entity<Models.AspNetUser>()
             .HasMany(r => r.UserClaims)
             .WithOne(rc => rc.User)
             .HasForeignKey(rc => rc.UserId);
-
         modelBuilder.Entity<Models.AspNetUser>()
             .HasMany(r => r.UserRoles)
             .WithOne(ur => ur.User)
             .HasForeignKey(ur => ur.UserId);
-
         modelBuilder.Entity<Models.AspNetUser>()
             .HasMany(r => r.UserLogins)
             .WithOne(rc => rc.User)
             .HasForeignKey(rc => rc.UserId);
-
         modelBuilder.Entity<Models.AspNetUser>()
             .HasMany(r => r.UserTokens)
             .WithOne(ur => ur.User)
             .HasForeignKey(ur => ur.UserId);
-
         #endregion
 
 

@@ -23,19 +23,21 @@ public class UserLoginsController : Controller
     // GET: Admin/UserLogins
     public async Task<IActionResult> Index()
     {
-        return View(await _context.UserLogins.ToListAsync());
+        var aspNetUserLogin = _context.UserLogins.Include(a => a.User).OrderBy(ul => ul.LoginProvider);
+        return View(await aspNetUserLogin.ToListAsync());
     }
 
     // GET: Admin/UserLogins/Details/5
-    public async Task<IActionResult> Details(string id)
+    public async Task<IActionResult> Details(string loginProvider, string providerKey)
     {
-        if (id == null)
+        if (loginProvider == null || providerKey == null)
         {
             return NotFound();
         }
 
         var aspNetUserLogin = await _context.UserLogins
-            .FirstOrDefaultAsync(m => m.LoginProvider == id);
+            .FirstOrDefaultAsync(m => m.LoginProvider == loginProvider && m.ProviderKey == providerKey);
+
         if (aspNetUserLogin == null)
         {
             return NotFound();
@@ -47,6 +49,7 @@ public class UserLoginsController : Controller
     // GET: Admin/UserLogins/Create
     public IActionResult Create()
     {
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName");
         return View();
     }
 
@@ -57,28 +60,36 @@ public class UserLoginsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("LoginProvider,ProviderKey,ProviderDisplayName,UserId")] AspNetUserLogin aspNetUserLogin)
     {
+        ModelState.Remove("User");
         if (ModelState.IsValid)
         {
             _context.Add(aspNetUserLogin);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", aspNetUserLogin.UserId);
         return View(aspNetUserLogin);
     }
 
     // GET: Admin/UserLogins/Edit/5
-    public async Task<IActionResult> Edit(string id)
+    public async Task<IActionResult> Edit(string loginProvider, string providerKey)
     {
-        if (id == null)
+        if (loginProvider == null || providerKey == null)
         {
             return NotFound();
         }
 
-        var aspNetUserLogin = await _context.UserLogins.FindAsync(id);
+        var aspNetUserLogin = await _context.UserLogins
+            .FirstOrDefaultAsync(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
+
+
         if (aspNetUserLogin == null)
         {
             return NotFound();
         }
+
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", aspNetUserLogin.UserId);
         return View(aspNetUserLogin);
     }
 
@@ -87,13 +98,14 @@ public class UserLoginsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("LoginProvider,ProviderKey,ProviderDisplayName,UserId")] AspNetUserLogin aspNetUserLogin)
+    public async Task<IActionResult> Edit(string loginProvider, string providerKey, [Bind("LoginProvider,ProviderKey,ProviderDisplayName,UserId")] AspNetUserLogin aspNetUserLogin)
     {
-        if (id != aspNetUserLogin.LoginProvider)
+        if (loginProvider != aspNetUserLogin.LoginProvider || providerKey != aspNetUserLogin.ProviderKey)
         {
             return NotFound();
         }
 
+        ModelState.Remove("User");
         if (ModelState.IsValid)
         {
             try
@@ -103,7 +115,7 @@ public class UserLoginsController : Controller
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AspNetUserLoginExists(aspNetUserLogin.LoginProvider))
+                if (!AspNetUserLoginExists(aspNetUserLogin.LoginProvider, aspNetUserLogin.ProviderKey))
                 {
                     return NotFound();
                 }
@@ -114,19 +126,22 @@ public class UserLoginsController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+
+        ViewData["UserId"] = new SelectList(_context.Users, "Id", "UserName", aspNetUserLogin.UserId);
         return View(aspNetUserLogin);
     }
 
     // GET: Admin/UserLogins/Delete/5
-    public async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(string loginProvider, string providerKey)
     {
-        if (id == null)
+        if (loginProvider == null || providerKey == null)
         {
             return NotFound();
         }
 
         var aspNetUserLogin = await _context.UserLogins
-            .FirstOrDefaultAsync(m => m.LoginProvider == id);
+            .FirstOrDefaultAsync(m => m.LoginProvider == loginProvider && m.ProviderKey == providerKey);
+
         if (aspNetUserLogin == null)
         {
             return NotFound();
@@ -138,20 +153,22 @@ public class UserLoginsController : Controller
     // POST: Admin/UserLogins/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(string id)
+    public async Task<IActionResult> DeleteConfirmed(string loginProvider, string providerKey)
     {
-        var aspNetUserLogin = await _context.UserLogins.FindAsync(id);
+        var aspNetUserLogin = await _context.UserLogins
+            .FirstOrDefaultAsync(m => m.LoginProvider == loginProvider && m.ProviderKey == providerKey);
+
         if (aspNetUserLogin != null)
         {
             _context.UserLogins.Remove(aspNetUserLogin);
+            await _context.SaveChangesAsync();
         }
 
-        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 
-    private bool AspNetUserLoginExists(string id)
+    private bool AspNetUserLoginExists(string loginProvider, string providerKey)
     {
-        return _context.UserLogins.Any(e => e.LoginProvider == id);
+        return _context.UserLogins.Any(e => e.LoginProvider == loginProvider && e.ProviderKey == providerKey);
     }
 }

@@ -14,23 +14,42 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ProviderDisplayName)
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LoginProvider)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProviderKey)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProviderDisplayName) 
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProviderDisplayName)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LoginProvider)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProviderKey)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProviderDisplayName)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-loginProvider="@item.LoginProvider" asp-route-providerKey="@item.ProviderKey">Edit</a> |
+                    <a asp-action="Details" asp-route-loginProvider="@item.LoginProvider" asp-route-providerKey="@item.ProviderKey">Details</a> |
+                    <a asp-action="Delete" asp-route-loginProvider="@item.LoginProvider" asp-route-providerKey="@item.ProviderKey">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
