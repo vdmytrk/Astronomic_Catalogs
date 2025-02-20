@@ -1,0 +1,61 @@
+﻿@light-bg: white;
+@light-text: black;
+@light-border: #dee2e6;
+@light-highlight: #258cfb; // Основний колір підсвічування
+
+@dark-bg: #121212;
+@dark-text: red;
+@dark-border: red;
+@dark-highlight: white;
+
+body {
+    background-color: @light-bg;
+    color: @light-text;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar, .footer {
+    background-color: @light-bg;
+    color: @light-text;
+    border-color: @light-border;
+}
+
+a, .btn {
+    color: @light-highlight;
+}
+
+a:hover, .btn:hover {
+    color: darken(@light-highlight, 10%);
+}
+
+.custom-container {
+    padding-left: 5em;
+    padding-right: 5em;
+    box-sizing: border-box;
+}
+
+// Темна тема
+.dark-theme {
+    body {
+        background-color: @dark-bg;
+        color: @dark-text;
+    }
+
+    .navbar, .footer {
+        background-color: @dark-bg;
+        color: @dark-text;
+        border-color: @dark-border;
+    }
+
+    a, .btn {
+        color: @dark-highlight;
+    }
+
+    a:hover, .btn:hover {
+        color: darken(@dark-highlight, 10%);
+    }
+
+    .custom-container {
+        border-color: @dark-border;
+    }
+}

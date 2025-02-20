@@ -1,0 +1,45 @@
+﻿body {
+  background-color: white;
+  color: black;
+  transition: background-color 0.3s, color 0.3s;
+}
+.navbar,
+.footer {
+  background-color: white;
+  color: black;
+  border-color: #dee2e6;
+}
+a,
+.btn {
+  color: #258cfb;
+}
+a:hover,
+.btn:hover {
+  color: #0472e9;
+}
+.custom-container {
+  padding-left: 5em;
+  padding-right: 5em;
+  box-sizing: border-box;
+}
+.dark-theme body {
+  background-color: #121212;
+  color: red;
+}
+.dark-theme .navbar,
+.dark-theme .footer {
+  background-color: #121212;
+  color: red;
+  border-color: red;
+}
+.dark-theme a,
+.dark-theme .btn {
+  color: white;
+}
+.dark-theme a:hover,
+.dark-theme .btn:hover {
+  color: #e6e6e6;
+}
+.dark-theme .custom-container {
+  border-color: red;
+}
