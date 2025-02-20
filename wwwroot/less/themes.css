@@ -1,0 +1,90 @@
+﻿#theme-toggle {
+  width: 2em;
+  height: 2em;
+}
+body {
+  background-color: white;
+  color: black;
+  transition: background-color 0.3s, color 0.3s;
+}
+header,
+.navbar,
+.footer {
+  background-color: white;
+  color: black;
+  border-color: #dee2e6;
+}
+a,
+.btn {
+  color: #258cfb;
+}
+a:hover,
+.btn:hover {
+  color: #0472e9;
+}
+.custom-container {
+  padding-left: 5em;
+  padding-right: 5em;
+  box-sizing: border-box;
+}
+.dark-theme {
+  background-color: #121212 !important;
+  color: red;
+}
+.dark-theme header,
+.dark-theme .navbar,
+.dark-theme .footer {
+  background-color: #121212;
+  color: red;
+  border-color: red;
+}
+.dark-theme a,
+.dark-theme .btn {
+  color: #FF3E3E;
+}
+.dark-theme a:hover,
+.dark-theme .btn:hover {
+  color: #d70000;
+}
+.dark-theme .custom-container {
+  border-color: red;
+}
+.dark-theme header nav div ul li a {
+  color: red !important;
+}
+.dark-theme footer {
+  color: red !important;
+}
+.dark-theme .text-dark {
+  color: inherit !important;
+}
+.dark-theme .text-muted {
+  color: inherit !important;
+}
+.dark-theme .btn-primary {
+  --bs-btn-color: inherit;
+  --bs-btn-bg: inherit;
+  --bs-btn-border-color: red !important;
+  --bs-btn-hover-color: inherit;
+  --bs-btn-hover-bg: inherit;
+  --bs-btn-hover-border-color: inherit;
+  --bs-btn-active-color: inherit;
+  --bs-btn-active-bg: inherit;
+  --bs-btn-active-border-color: inherit;
+  /*--bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);*/
+  --bs-btn-disabled-color: inherit;
+  --bs-btn-disabled-bg: inherit;
+  --bs-btn-disabled-border-color: inherit;
+}
+.dark-theme .btn:focus,
+.dark-theme .btn:active:focus,
+.dark-theme .btn-link.nav-link:focus,
+.dark-theme .form-control:focus,
+.dark-theme .form-check-input:focus {
+  box-shadow: #121212;
+}
+.dark-theme .table {
+  --bs-table-color: inherit;
+  --bs-table-bg: inherit;
+  --bs-table-border-color: inherit;
+}

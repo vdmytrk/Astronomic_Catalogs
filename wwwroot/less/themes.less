@@ -7,6 +7,15 @@
 @dark-text: red;
 @dark-border: red;
 @dark-highlight: white;
+//@dark-highlight-a: #ffc107; // Yelow
+@dark-highlight-a: #FF3E3E; // Light red
+//@dark-highlight-a: #CD0000; // Dark red
+
+
+#theme-toggle {
+    width: 2em;
+    height: 2em;
+}
 
 body {
     background-color: @light-bg;
@@ -14,7 +23,7 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-.navbar, .footer {
+header, .navbar, .footer {
     background-color: @light-bg;
     color: @light-text;
     border-color: @light-border;
@@ -36,26 +45,66 @@ a:hover, .btn:hover {
 
 // Темна тема
 .dark-theme {
-    body {
-        background-color: @dark-bg;
-        color: @dark-text;
-    }
+    background-color: @dark-bg !important;
+    color: @dark-text;
 
-    .navbar, .footer {
+    header, .navbar, .footer {
         background-color: @dark-bg;
         color: @dark-text;
         border-color: @dark-border;
     }
 
     a, .btn {
-        color: @dark-highlight;
+        color: @dark-highlight-a;
     }
 
     a:hover, .btn:hover {
-        color: darken(@dark-highlight, 10%);
+        color: darken(@dark-highlight-a, 20%);
     }
 
     .custom-container {
         border-color: @dark-border;
+    }
+    // Changing inherited stiles from an external library
+    header nav div ul li a {
+        color: @dark-text !important; // Зміна кольору тексту в навігації
+    }
+
+    footer {
+        color: @dark-text !important;
+    }
+    // Видаляємо Bootstrap-класи через перевизначення
+    .text-dark {
+        color: inherit !important;
+    }
+
+    .text-muted {
+        color: inherit !important;
+    }
+
+    .btn-primary {
+        --bs-btn-color: inherit;
+        --bs-btn-bg: inherit;
+        --bs-btn-border-color: red !important;
+        --bs-btn-hover-color: inherit;
+        --bs-btn-hover-bg: inherit;
+        --bs-btn-hover-border-color: inherit;
+        --bs-btn-active-color: inherit;
+        --bs-btn-active-bg: inherit;
+        --bs-btn-active-border-color: inherit;
+        /*--bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);*/
+        --bs-btn-disabled-color: inherit;
+        --bs-btn-disabled-bg: inherit;
+        --bs-btn-disabled-border-color: inherit;
+    }
+
+    .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+        box-shadow: @dark-bg;
+    }
+
+    .table {
+        --bs-table-color: inherit;
+        --bs-table-bg: inherit;
+        --bs-table-border-color: inherit;
     }
 }
