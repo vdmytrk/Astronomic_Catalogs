@@ -1,13 +1,8 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using NuGet.Protocol.Plugins;
-using System;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
@@ -31,7 +26,7 @@ public class UsersController : Controller
             .Include(u => u.UserLogins)
             .Include(u => u.UserTokens)
             .ToListAsync();
-        return View(aspNetUser.OrderBy(u => u.Id));
+        return View(aspNetUser.OrderBy(u => u.RegistrationDate).OrderBy(u => u.UserName));
     }
 
     // GET: Admin/Users/Details/5
@@ -61,10 +56,17 @@ public class UsersController : Controller
     // GET: Admin/Users/Create
     public IActionResult Create()
     {
-        ViewData["Claims"] = new SelectList(_context.UserClaims.Select(c => c.ClaimType).Distinct());
-        ViewData["Roles"] = new SelectList(_context.Roles, "Id", "Name");
-        ViewData["Logins"] = new SelectList(_context.UserLogins.Select(l => l.ProviderDisplayName).Distinct());
-        ViewData["Tokens"] = new SelectList(_context.UserTokens.Select(t => t.Name).Distinct());
+        // ОСКІЛЬКИ ЙДЕ СТВОРЕННЯ ОБ'ЄКТУ, ТОМУ ОБ'ЄКТИ ЯКІ   Б У Д У Т Ь   ЗВ'ЯЗАНІ З User ЗВ'ЯЗКОМ О-д-Б НЕ ПОТРІБНО СТВОРЮВАТИ
+        // ПРИ СТВОРЕННІ User-А!!! АДЖЕ, НАПРИКЛАД, ОДИН Claims НЕ МОЖЕ БУТИ В ДЕКІЛЬКОХ User-ІВ, ТО І ВИБИРАТИ НІЧОГО!!!
+        // А ОТ Role ОДИН User МОЖЕ МАТИ БАГАТО!!!
+        ViewData["Roles"] = new SelectList(_context.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
+        //ViewData["Claims"] = new SelectList(_context.UserClaims.Select(c => new { c.Id, c.ClaimType }), "Id", "ClaimType");
+        //ViewData["Logins"] = new SelectList(
+        //    _context.UserLogins.Select(l => new { Id = l.LoginProvider + "|" + l.ProviderKey, Name = l.ProviderDisplayName }), "Id", "Name"
+        //);
+        //ViewData["Tokens"] = new SelectList(
+        //    _context.UserTokens.Select(t => new { Id = t.UserId + "|" + t.LoginProvider + "|" + t.Name, t.Name }), "Id", "Name"
+        //);
 
         return View();
     }
@@ -73,25 +75,26 @@ public class UsersController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
-                                            string[] selectedClaims,
-                                            string[] selectedRoles,
-                                            string[] selectedLogins,
-                                            string[] selectedTokens)
+                                            string[] selectedRoles)
     {
-        SetData(aspNetUser, aspNetUser, selectedClaims, selectedRoles, selectedLogins, selectedTokens);
+        SetData(aspNetUser, selectedRoles);
 
         if (ModelState.IsValid)
         {
-            
+
             _context.Add(aspNetUser);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Claims"] = new SelectList(_context.UserClaims.Select(c => c.ClaimType).Distinct(), selectedClaims);
-        ViewData["Roles"] = new SelectList(_context.Roles, "Id", "Name", selectedRoles);
-        ViewData["Logins"] = new SelectList(_context.UserLogins.Select(l => l.ProviderDisplayName).Distinct(), selectedLogins);
-        ViewData["Tokens"] = new SelectList(_context.UserTokens.Select(t => t.Name).Distinct(), selectedTokens);
+        ViewData["Roles"] = new SelectList(_context.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name"); 
+        //ViewData["Claims"] = new SelectList(_context.UserClaims.Select(c => new { c.Id, c.ClaimType }), "Id", "ClaimType");
+        //ViewData["Logins"] = new SelectList(
+        //    _context.UserLogins.Select(l => new { Id = l.LoginProvider + "|" + l.ProviderKey, Name = l.ProviderDisplayName }), "Id", "Name"
+        //);
+        //ViewData["Tokens"] = new SelectList(
+        //    _context.UserTokens.Select(t => new { Id = t.UserId + "|" + t.LoginProvider + "|" + t.Name, t.Name }), "Id", "Name"
+        //);
 
         return View(aspNetUser);
     }
@@ -117,10 +120,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        ViewData["Claims"] = new SelectList(_context.UserClaims.Select(c => c.ClaimType).Distinct());
-        ViewData["Roles"] = new SelectList(_context.Roles, "Id", "Name");
-        ViewData["Logins"] = new SelectList(_context.UserLogins.Select(l => l.ProviderDisplayName).Distinct());
-        ViewData["Tokens"] = new SelectList(_context.UserTokens.Select(t => t.Name).Distinct());
+        ViewData["Roles"] = new SelectList(_context.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
 
         return View(aspNetUser);
     }
@@ -128,12 +128,13 @@ public class UsersController : Controller
     // POST: Admin/Users/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, 
+    public async Task<IActionResult> Edit(string id,
                                           [Bind("Id,UserName,Email,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
-                                          string[] selectedClaims,
-                                          string[] selectedRoles,
-                                          string[] selectedLogins,
-                                          string[] selectedTokens)
+                                          string[] selectedRoles
+                                          //string[] selectedClaims,
+                                          //string[] selectedLogins,
+                                          //string[] selectedTokens
+        )
     {
         if (id != aspNetUser.Id)
         {
@@ -153,7 +154,8 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        SetData(existingUser, aspNetUser, selectedClaims, selectedRoles, selectedLogins, selectedTokens);
+        SetData(aspNetUser, selectedRoles, existingUser);
+
 
         if (ModelState.IsValid)
         {
@@ -177,10 +179,10 @@ public class UsersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Claims"] = new SelectList(_context.UserClaims.Select(c => c.ClaimType).Distinct(), selectedClaims);
+        //ViewData["Claims"] = new SelectList(_context.UserClaims.Select(c => c.ClaimType).Distinct(), selectedClaims);
         ViewData["Roles"] = new SelectList(_context.Roles, "Id", "Name", selectedRoles);
-        ViewData["Logins"] = new SelectList(_context.UserLogins.Select(l => l.ProviderDisplayName).Distinct(), selectedLogins);
-        ViewData["Tokens"] = new SelectList(_context.UserTokens.Select(t => t.Name).Distinct(), selectedTokens);
+        //ViewData["Logins"] = new SelectList(_context.UserLogins.Select(l => l.ProviderDisplayName).Distinct(), selectedLogins);
+        //ViewData["Tokens"] = new SelectList(_context.UserTokens.Select(t => t.Name).Distinct(), selectedTokens);
 
         return View(existingUser);
     }
@@ -194,7 +196,13 @@ public class UsersController : Controller
         }
 
         var aspNetUser = await _context.Users
+            .Include(u => u.UserClaims)
+            .Include(u => u.UserRoles)
+                .ThenInclude(r => r.Role)
+            .Include(u => u.UserLogins)
+            .Include(u => u.UserTokens)
             .FirstOrDefaultAsync(m => m.Id == id);
+
         if (aspNetUser == null)
         {
             return NotFound();
@@ -227,114 +235,146 @@ public class UsersController : Controller
     /// <summary>
     /// TODO: Check input values.
     /// </summary>
-    private void SetData(AspNetUser existingUser, AspNetUser inputUser, string[] selectedClaims, string[] selectedRoles,
-                                         string[] selectedLogins, string[] selectedTokens)
+    private void SetData(AspNetUser inputUser, string[] selectedRoles, AspNetUser? existingUser = null
+        //string[]? selectedClaims = null, string[]? selectedLogins = null, string[]? selectedTokens = null, 
+        )
     {
-        existingUser.UserName = inputUser.UserName;
-        existingUser.NormalizedUserName = inputUser.UserName?.ToUpper();
-        existingUser.Email = inputUser.Email;
-        existingUser.NormalizedEmail = inputUser.Email?.ToUpper();
-        existingUser.EmailConfirmed = inputUser.EmailConfirmed;
+        var targetUser = existingUser ?? inputUser; // Використовуємо existingUser, якщо він переданий, інакше inputUser
+
+        targetUser.UserName = inputUser.UserName;
+        targetUser.NormalizedUserName = inputUser.UserName?.ToUpper();
+        targetUser.Email = inputUser.Email;
+        targetUser.NormalizedEmail = inputUser.Email?.ToUpper();
+        targetUser.EmailConfirmed = inputUser.EmailConfirmed;
 
         // Поля безпечності
         if (!string.IsNullOrWhiteSpace(inputUser.PasswordHash))
         {
-            existingUser.PasswordHash = inputUser.PasswordHash;
+            targetUser.PasswordHash = inputUser.PasswordHash;
         }
         ///
         /// Отримати старий пароль користувача.
         /// Захешувати новий пароль через PasswordHasher.
         /// Присвоїти хеш у PasswordHash.
         ///
-        //if (!string.IsNullOrWhiteSpace(newPassword))
-        //{
-        //    var passwordHasher = new PasswordHasher<AspNetUser>();
-        //    aspNetUser.PasswordHash = passwordHasher.HashPassword(aspNetUser, newPassword);
-        //    aspNetUser.SecurityStamp = Guid.NewGuid().ToString(); // Оновлюємо SecurityStamp
-        //}
+        ///if (!string.IsNullOrWhiteSpace(newPassword))
+        ///{
+        ///    var passwordHasher = new PasswordHasher<AspNetUser>();
+        ///    aspNetUser.PasswordHash = passwordHasher.HashPassword(aspNetUser, newPassword);
+        ///    aspNetUser.SecurityStamp = Guid.NewGuid().ToString(); // Оновлюємо SecurityStamp
+        ///}
 
         // Оновлюємо SecurityStamp, якщо змінюємо критичні дані (пароль, email)
-        if (existingUser.Email != inputUser.Email || existingUser.PasswordHash != inputUser.PasswordHash)
+        if (targetUser.Email != inputUser.Email || targetUser.PasswordHash != inputUser.PasswordHash)
         {
-            existingUser.SecurityStamp = Guid.NewGuid().ToString(); // Генеруємо новий SecurityStamp
+            targetUser.SecurityStamp = Guid.NewGuid().ToString();
         }
 
         // Оновлюємо ConcurrencyStamp для вирішення конфліктів оновлення
-        existingUser.ConcurrencyStamp = Guid.NewGuid().ToString();
+        targetUser.ConcurrencyStamp = Guid.NewGuid().ToString();
 
-        existingUser.PhoneNumber = inputUser.PhoneNumber;
-        existingUser.PhoneNumberConfirmed = inputUser.PhoneNumberConfirmed;
+        targetUser.PhoneNumber = inputUser.PhoneNumber;
+        targetUser.PhoneNumberConfirmed = inputUser.PhoneNumberConfirmed;
 
-        existingUser.TwoFactorEnabled = inputUser.TwoFactorEnabled;
-        existingUser.LockoutEnd = inputUser.LockoutEnd;
-        existingUser.LockoutEnabled = inputUser.LockoutEnabled;
-        existingUser.AccessFailedCount = inputUser.AccessFailedCount;
+        targetUser.TwoFactorEnabled = inputUser.TwoFactorEnabled;
+        targetUser.LockoutEnd = inputUser.LockoutEnd;
+        targetUser.LockoutEnabled = inputUser.LockoutEnabled;
+        targetUser.AccessFailedCount = inputUser.AccessFailedCount;
 
-        //aspNetUser.UserClaims.Clear();
-        var currentClaims = existingUser.UserClaims.Select(uc => uc.ClaimType).ToList();
-        var claimsToRemove = existingUser.UserClaims.Where(uc => !selectedClaims.Contains(uc.ClaimType)).ToList();
-        foreach (var claim in claimsToRemove)
-        {
-            existingUser.UserClaims.Remove(claim);
-        }
-        foreach (var claim in selectedClaims)
-        {
-            if (!currentClaims.Contains(claim))
-            {
-                existingUser.UserClaims.Add(new AspNetUserClaim { ClaimType = claim, UserId = inputUser.Id });
-            }
-        }
-
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // === Обробка Roles ===
         //aspNetUser.UserRoles.Clear();
         // Оновлення ролей. Видаляємо ролі, яких більше немає у selectedRoles
-        var currentRoleIds = existingUser.UserRoles.Select(ur => ur.RoleId).ToList();
-        var rolesToRemove = existingUser.UserRoles.Where(ur => !selectedRoles.Contains(ur.RoleId)).ToList();
+        var currentRoleIds = targetUser.UserRoles.Select(ur => ur.RoleId).ToList();
+        var rolesToRemove = targetUser.UserRoles.Where(ur => !selectedRoles.Contains(ur.RoleId)).ToList();
         foreach (var role in rolesToRemove)
         {
-            existingUser.UserRoles.Remove(role);
+            targetUser.UserRoles.Remove(role);
         }
         foreach (var roleId in selectedRoles)
         {
             if (!currentRoleIds.Contains(roleId))
             {
-                existingUser.UserRoles.Add(new AspNetUserRole { RoleId = roleId, UserId = inputUser.Id });
+                targetUser.UserRoles.Add(new AspNetUserRole { RoleId = roleId, UserId = inputUser.Id });
             }
         }
+        #region Not usable
+        //selectedClaims ??= Array.Empty<string>();
+        //selectedLogins ??= Array.Empty<string>();
+        //selectedTokens ??= Array.Empty<string>();
+        ////---------------------------------------------------------------------------------------------------------------
+        //// === Обробка Claims ===
+        ////aspNetUser.UserClaims.Clear();
+        //var currentClaims = targetUser.UserClaims.Select(uc => uc.ClaimType).ToList();
+        //var claimsToRemove = targetUser.UserClaims.Where(uc => !selectedClaims.Contains(uc.ClaimType)).ToList();
+        //foreach (var claim in claimsToRemove)
+        //{
+        //    targetUser.UserClaims.Remove(claim);
+        //}
+        //foreach (var claim in selectedClaims)
+        //{
+        //    if (!currentClaims.Contains(claim))
+        //    {
+        //        targetUser.UserClaims.Add(new AspNetUserClaim { ClaimType = claim, UserId = inputUser.Id });
+        //    }
+        //}
+        ////---------------------------------------------------------------------------------------------------------------
+        //// === Обробка Logins ===
+        ////aspNetUser.UserLogins.Clear();
+        //var currentLogins = targetUser.UserLogins.Select(ul => ul.LoginProvider + "|" + ul.ProviderKey).ToList();
+        //var loginsToRemove = targetUser.UserLogins.Where(ul => !selectedLogins.Contains(ul.LoginProvider + "|" + ul.ProviderKey)).ToList();
+        //foreach (var login in loginsToRemove)
+        //{
+        //    targetUser.UserLogins.Remove(login);
+        //}
+        //foreach (var loginKey in selectedLogins)
+        //{
+        //    var loginParts = loginKey.Split('|');
+        //    if (loginParts.Length == 2)
+        //    {
+        //        var loginProvider = loginParts[0];
+        //        var providerKey = loginParts[1];
 
-        //aspNetUser.UserLogins.Clear();
-        var currentLogins = existingUser.UserLogins.Select(ul => ul.LoginProvider).ToList();
-        var loginsToRemove = existingUser.UserLogins.Where(ul => !selectedLogins.Contains(ul.LoginProvider)).ToList();
-        foreach (var login in loginsToRemove)
-        {
-            existingUser.UserLogins.Remove(login);
-        }
-        foreach (var loginProvider in selectedLogins)
-        {
-            if (!currentLogins.Contains(loginProvider))
-            {
-                existingUser.UserLogins.Add(new AspNetUserLogin
-                {
-                    LoginProvider = loginProvider,       // LoginProvider + UserId
-                    ProviderDisplayName = loginProvider, // ProviderDisplayName is just a text field for display
-                    UserId = inputUser.Id
-                });
-            }
-        }
+        //        if (!currentLogins.Contains(loginKey))
+        //        {
+        //            targetUser.UserLogins.Add(new AspNetUserLogin
+        //            {
+        //                LoginProvider = loginProvider,
+        //                ProviderKey = providerKey,
+        //                UserId = inputUser.Id // Foreign key
+        //            });
+        //        }
+        //    }
+        //}
+        ////---------------------------------------------------------------------------------------------------------------
+        //// === Обробка Tokens ===
+        ////aspNetUser.UserTokens.Clear();
+        //var currentTokens = targetUser.UserTokens.Select(ut => ut.UserId + "|" + ut.LoginProvider + "|" + ut.Name).ToList();
+        //var tokensToRemove = targetUser.UserTokens.Where(ut => !selectedTokens.Contains(ut.UserId + "|" + ut.LoginProvider + "|" + ut.Name)).ToList();
+        //foreach (var token in tokensToRemove)
+        //{
+        //    targetUser.UserTokens.Remove(token);
+        //}
+        //foreach (var tokenKey in selectedTokens)
+        //{
+        //    var tokenParts = tokenKey.Split('|');
+        //    if (tokenParts.Length == 3)
+        //    {
+        //        var loginProvider = tokenParts[1];
+        //        var name = tokenParts[2];
 
-        //aspNetUser.UserTokens.Clear();
-        var currentTokens = existingUser.UserTokens.Select(ut => ut.Name).ToList();
-        var tokensToRemove = existingUser.UserTokens.Where(ut => !selectedTokens.Contains(ut.Name)).ToList();
-        foreach (var token in tokensToRemove)
-        {
-            existingUser.UserTokens.Remove(token);
-        }
-        foreach (var tokenName in selectedTokens)
-        {
-            if (!currentTokens.Contains(tokenName))
-            {
-                existingUser.UserTokens.Add(new AspNetUserToken { Name = tokenName, UserId = inputUser.Id });
-            }
-        }
+        //        if (!currentTokens.Contains(tokenKey))
+        //        {
+        //            targetUser.UserTokens.Add(new AspNetUserToken
+        //            {
+        //                UserId = inputUser.Id,
+        //                LoginProvider = loginProvider,
+        //                Name = name 
+        //            });
+        //        }
+        //    }
+        //}
+        #endregion
     }
 
 }

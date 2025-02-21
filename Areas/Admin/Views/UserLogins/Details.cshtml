@@ -44,6 +44,7 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-loginProvider="@Model?.LoginProvider" asp-route-providerKey="@Model?.ProviderKey">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" class="btn btn-warning" asp-route-loginProvider="@Model?.LoginProvider" asp-route-providerKey="@Model?.ProviderKey">Edit</a> |
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Delete" class="btn btn-danger" asp-route-loginProvider="@Model?.LoginProvider" asp-route-providerKey="@Model?.ProviderKey">Edit</a> |
 </div>

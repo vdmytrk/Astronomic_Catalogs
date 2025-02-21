@@ -74,21 +74,24 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey(ur => ur.RoleId);
 
         modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(r => r.UserClaims)
+            .HasMany(u => u.UserClaims)
             .WithOne(rc => rc.User)
             .HasForeignKey(rc => rc.UserId);
         modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(r => r.UserRoles)
+            .HasMany(u => u.UserRoles)
             .WithOne(ur => ur.User)
             .HasForeignKey(ur => ur.UserId);
         modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(r => r.UserLogins)
+            .HasMany(u => u.UserLogins)
             .WithOne(rc => rc.User)
             .HasForeignKey(rc => rc.UserId);
         modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(r => r.UserTokens)
+            .HasMany(u => u.UserTokens)
             .WithOne(ur => ur.User)
             .HasForeignKey(ur => ur.UserId);
+
+        modelBuilder.Entity<Models.AspNetUser>().Property(u => u.RegistrationDate).HasDefaultValueSql("SYSDATETIME()");
+
         #endregion
 
 

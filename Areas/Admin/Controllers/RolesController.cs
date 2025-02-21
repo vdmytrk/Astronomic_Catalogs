@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.Models;
-using Microsoft.AspNetCore.Components.Forms;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
@@ -57,7 +52,7 @@ public class RolesController : Controller
     // GET: Admin/Roles/Create
     public IActionResult Create()
     {
-        ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType");
+        //ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType");
         ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName");
         return View();
     }
@@ -67,10 +62,9 @@ public class RolesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, 
-                                            string[] selectedClaims, string[] selectedUsers)
+    public async Task<IActionResult> Create([Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
     {
-        await SetDataAsync(aspNetRole, aspNetRole, selectedClaims, selectedUsers);
+        SetData(aspNetRole, selectedUsers);
 
         if (ModelState.IsValid)
         {
@@ -79,7 +73,7 @@ public class RolesController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType", selectedClaims);
+        //ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType", selectedClaims);
         ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName", selectedUsers);
         return View(aspNetRole);
     }
@@ -103,7 +97,7 @@ public class RolesController : Controller
             return NotFound();
         }
 
-        ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType", aspNetRole.RoleClaims?.Select(rc => rc.Id.ToString()) ?? new List<string>());
+        //ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType", aspNetRole.RoleClaims?.Select(rc => rc.Id.ToString()) ?? new List<string>());
         ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName", aspNetRole.UserRoles?.Select(ur => ur.UserId) ?? new List<string>());
 
         return View(aspNetRole);
@@ -114,8 +108,7 @@ public class RolesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("Id,Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, 
-                                          string[] selectedClaims, string[] selectedUsers)
+    public async Task<IActionResult> Edit(string id, [Bind("Id,Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
     {
         if (id != aspNetRole.Id)
         {
@@ -133,7 +126,7 @@ public class RolesController : Controller
             return NotFound();
         }
 
-        await SetDataAsync(existingRole, aspNetRole, selectedClaims, selectedUsers);
+        SetData(aspNetRole, selectedUsers, existingRole);
 
         if (ModelState.IsValid)
         {
@@ -156,7 +149,7 @@ public class RolesController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType", selectedClaims);
+        //ViewData["Claims"] = new SelectList(_context.RoleClaims, "Id", "ClaimType", selectedClaims);
         ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName", selectedUsers);
         return View(aspNetRole);
     }
@@ -206,49 +199,47 @@ public class RolesController : Controller
     /// <summary>
     /// TODO: Check input values.
     /// </summary>
-    private async Task SetDataAsync(AspNetRole existingRole, AspNetRole inputRole, string[] selectedClaims, string[] selectedUsers)
+    private void SetData(AspNetRole inputRole, string[] selectedUsers, AspNetRole? existingRole = null)
     {
-        existingRole.Name = inputRole.Name;
-        existingRole.NormalizedName = inputRole.NormalizedName;
-        existingRole.ConcurrencyStamp = inputRole.ConcurrencyStamp;
+        var targetUser = existingRole ?? inputRole;
 
-        // Оновлення клеймів ролі
-        var currentClaimIds = existingRole.RoleClaims.Select(rc => rc.Id.ToString()).ToList();
-        var claimsToRemove = existingRole.RoleClaims.Where(rc => !selectedClaims.Contains(rc.Id.ToString())).ToList();
-        foreach (var claim in claimsToRemove)
-        {
-            existingRole.RoleClaims.Remove(claim);
-        }
-        foreach (var claimId in selectedClaims)
-        {
-            if (!currentClaimIds.Contains(claimId))
-            {
-                var claim = await _context.RoleClaims.FindAsync(int.Parse(claimId));
-                if (claim != null)
-                {
-                    existingRole.RoleClaims.Add(claim);
-                }
-            }
-        }
+        targetUser.Name = inputRole.Name;
+        targetUser.NormalizedName = inputRole.NormalizedName?.ToUpper();
+        targetUser.ConcurrencyStamp = inputRole?.ConcurrencyStamp;
 
         // Оновлення користувачів у ролі
-        var currentUserIds = existingRole.UserRoles.Select(ur => ur.UserId).ToList();
-        var usersToRemove = existingRole.UserRoles.Where(ur => !selectedUsers.Contains(ur.UserId)).ToList();
+        var currentUserIds = targetUser.UserRoles.Select(ur => ur.UserId).ToList();
+        var usersToRemove = targetUser.UserRoles.Where(ur => !selectedUsers.Contains(ur.UserId)).ToList();
         foreach (var userRole in usersToRemove)
         {
-            existingRole.UserRoles.Remove(userRole);
+            targetUser.UserRoles.Remove(userRole);
         }
         foreach (var userId in selectedUsers)
         {
             if (!currentUserIds.Contains(userId))
             {
-                existingRole.UserRoles.Add(new AspNetUserRole
-                {
-                    RoleId = existingRole.Id,
-                    UserId = userId
-                });
+                targetUser.UserRoles.Add(new AspNetUserRole { RoleId = targetUser.Id, UserId = userId });
             }
         }
-
+        #region Not usable
+        //// Оновлення клеймів ролі
+        //var currentClaimIds = existingRole.RoleClaims.Select(rc => rc.Id.ToString()).ToList();
+        //var claimsToRemove = existingRole.RoleClaims.Where(rc => !selectedClaims.Contains(rc.Id.ToString())).ToList();
+        //foreach (var claim in claimsToRemove)
+        //{
+        //    existingRole.RoleClaims.Remove(claim);
+        //}
+        //foreach (var claimId in selectedClaims)
+        //{
+        //    if (!currentClaimIds.Contains(claimId))
+        //    {
+        //        var claim = await _context.RoleClaims.FindAsync(int.Parse(claimId));
+        //        if (claim != null)
+        //        {
+        //            existingRole.RoleClaims.Add(claim);
+        //        }
+        //    }
+        //}
+        #endregion
     }
 }

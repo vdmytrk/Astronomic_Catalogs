@@ -74,46 +74,13 @@ hr />
             <div class="mb-3">
                 <label>Roles</label>
                 <select name="selectedRoles" class="form-select" multiple>
-                    @foreach (var role in ViewBag.Roles as SelectList ?? new SelectList(new List<AspNetUserRole>()))
+                    @foreach (var role in ViewData["Roles"] as SelectList ?? new SelectList(new List<AspNetUserRole>()))
                     {
                         <option value="@role.Value" selected="@(Model.UserRoles != null && Model.UserRoles.Any(r => r.RoleId == role.Value))">@role.Text</option>
                     }
                 </select>
             </div>
-            <div class="mb-3">
-                <label>Claims</label>
-                <select name="selectedClaims" class="form-select" multiple>
-                    @foreach (var claim in ViewBag.Claims as SelectList ?? new SelectList(new List<AspNetUserClaim>()))
-                    {
-                        <option value="@claim.Value" selected="@(Model.UserClaims != null && Model.UserClaims.Any(c => c.ClaimType == claim.Value))">@claim.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-3">
-                <label>Logins</label>
-                <select name="selectedLogins" class="form-select" multiple>
-                    @foreach (var login in ViewBag.Logins as SelectList ?? new SelectList(new List<AspNetUserLogin>()))
-                    {
-                        <option value="@login.Value" selected="@(Model.UserLogins != null && Model.UserLogins.Any(l => l.ProviderDisplayName == login.Value))">@login.Text</option>
-                    }
-                </select>
-                <select name="selectedLogins" class="form-control" multiple>
-                    @foreach (var login in ViewBag.Logins as SelectList ?? new SelectList(new List<AspNetUserLogin>()))
-                    {
-                        <option value="@login.Value" selected="@(Model.UserLogins != null && Model.UserLogins.Any(l => l.LoginProvider == login.Value))">@login.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-3">
-                <label>Tokens</label>
-                <select name="selectedTokens" class="form-select" multiple>
-                    @foreach (var token in ViewBag.Tokens as SelectList ?? new SelectList(new List<AspNetUserToken>()))
-                    {
-                        <option value="@token.Value" selected="@(Model.UserTokens != null && Model.UserTokens.Any(t => t.Name == token.Value))">@token.Text</option>
-                    }
-                </select>
-            </div>
-
+            
             <button type="submit" class="btn btn-primary">Save</button>
             <a asp-action="Index" class="btn btn-secondary">Cancel</a>
         </form>

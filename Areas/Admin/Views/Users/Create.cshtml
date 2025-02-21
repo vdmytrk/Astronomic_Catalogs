@@ -51,7 +51,6 @@
                 <input asp-for="PhoneNumberConfirmed" class="form-check-input" />
                 <label asp-for="PhoneNumberConfirmed" class="form-check-label"></label>
             </div>
-
             <div class="form-group form-check">
                 <input asp-for="TwoFactorEnabled" class="form-check-input" />
                 <label asp-for="TwoFactorEnabled" class="form-check-label"></label>
@@ -69,47 +68,13 @@
                 <label asp-for="AccessFailedCount" class="control-label"></label>
                 <input asp-for="AccessFailedCount" class="form-control" type="number" />
                 <span asp-validation-for="AccessFailedCount" class="text-danger"></span>
-            </div>
-            
+            </div>            
             <div class="form-group">
                 <label class="control-label">Roles</label>
                 <select name="selectedRoles" class="form-control" multiple>
-                    @foreach (var role in ViewBag.Roles as SelectList ?? new SelectList(new List<AspNetUserRole>()))
+                    @foreach (var role in (ViewData["Roles"] as SelectList ?? new SelectList(new List<AspNetUserRole>())))
                     {
-                        <option value="@role.Value">@role.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="control-label">Claims</label>
-                <select name="selectedClaims" class="form-control" multiple>
-                    @foreach (var claim in ViewBag.Claims as SelectList ?? new SelectList(new List<AspNetUserClaim>()))
-                    {
-                        <option value="@claim.Value">@claim.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="control-label">Logins</label>
-                <select name="selectedLogins" class="form-control" multiple>
-                    @foreach (var login in ViewBag.Logins as SelectList ?? new SelectList(new List<AspNetUserLogin>()))
-                    {
-                        <option value="@login.Value">@login.Text</option>
-                    }
-                </select>
-                <select name="selectedLogins" class="form-control" multiple>
-                    @foreach (var login in ViewBag.Logins as SelectList ?? new SelectList(new List<AspNetUserLogin>()))
-                    {
-                        <option value="@login.Value" selected="@Model.UserLogins.Any(l => l.LoginProvider == login.Value)">@login.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="control-label">Tokens</label>
-                <select name="selectedTokens" class="form-control" multiple>
-                    @foreach (var token in ViewBag.Tokens as SelectList ?? new SelectList(new List<AspNetUserToken>()))
-                    {
-                        <option value="@token.Value">@token.Text</option>
+                        <option value="@role.Value" selected="@role.Selected">@role.Text</option>
                     }
                 </select>
             </div>
