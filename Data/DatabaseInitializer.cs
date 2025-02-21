@@ -41,8 +41,17 @@ public class DatabaseInitializer(
                 await ExecuteMigrationScenarioAsync(canConnect);
                 return;
             }
-
+            // Для створення БД проведи міграцію через Package Manage Console.
+            // Розкоміть наступних два рядки:
+            //await ExecuteMigrationScenarioAsync(canConnect);
+            //await ExecuteManuallyDbInitalization(canConnect);
+            // Та закоміть цей рядок:
             await ApplyMigrationsAsync();
+            // А тоді запусти проект.
+            // Після успішного старту:
+            //  закрий проетк.
+            //  відкоти зміни зроблені з попередніми рядками.
+            // Можеш запускати проетк.
         }
         catch (Exception ex)
         {
