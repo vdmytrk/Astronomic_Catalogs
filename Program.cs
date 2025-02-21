@@ -1,6 +1,7 @@
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
+using Astronomic_Catalogs.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -39,6 +40,9 @@ public class Program
             LogEnvironmentDetails(builder.Environment, connectionStringProvider.ConnectionString);
 #endif
         });
+
+        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<RoleService>();
 
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

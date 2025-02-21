@@ -20,11 +20,6 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="NormalizedName" class="control-label"></label>
-                <input asp-for="NormalizedName" class="form-control" />
-                <span asp-validation-for="NormalizedName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="ConcurrencyStamp" class="control-label"></label>
                 <input asp-for="ConcurrencyStamp" class="form-control" />
                 <span asp-validation-for="ConcurrencyStamp" class="text-danger"></span>
@@ -34,9 +29,7 @@
                 <select name="selectedUsers" class="form-control" multiple>
                     @foreach (var user in ViewBag.Users as SelectList ?? new SelectList(new List<AspNetUserRole>()))
                     {
-                        @* <option value="@user.Value" selected="@(ViewBag.SelectedUsers != null && ViewBag.SelectedUsers.Contains(user.Value))">@user.Text</option> *@
                         <option value="@user.Value" selected="@(Model.UserRoles != null && Model.UserRoles.Any(r => r.UserId == user.Value))">@user.Text</option>
-
                     }
                 </select>
             </div>
