@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<Astronomic_Catalogs.Models.AspNetUserToken>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "User Token";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>UserToken</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -51,8 +51,8 @@
                     @Html.DisplayFor(modelItem => item.Value)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-userId="@item.UserId" asp-route-loginProvider="@item.LoginProvider">Edit</a> |
-                    <a asp-action="Details" asp-route-userId="@item.UserId" asp-route-loginProvider="@item.LoginProvider">Details</a> |
+                    <a asp-action="Edit" asp-route-userId="@item.UserId" asp-route-loginProvider="@item.LoginProvider">Edit</a> | 
+                    <a asp-action="Details" asp-route-userId="@item.UserId" asp-route-loginProvider="@item.LoginProvider">Details</a> | 
                     <a asp-action="Delete" asp-route-userId="@item.UserId" asp-route-loginProvider="@item.LoginProvider">Delete</a>
                 </td>
             </tr>

@@ -1,45 +1,26 @@
 ﻿@model IEnumerable<Astronomic_Catalogs.Models.Connection.ActualDate>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Administrations";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1> InitialIdentity
+<h1>Administrations</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <button type="button" class="btn btn-primary" style="margin: 0.5rem" onclick="CallStoreProcedure()" value="">
+        Create New
+    </button>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ActualDateProperty)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ActualDateProperty)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="dataTableContainer">
+    @await Html.PartialAsync("_ActualDatePartial", Model)
+</div>
 
-<button type="button" class="btn btn-primary myClass" style="margin: 0.5rem" onclick="CallStoreProcedureADO()" value="">
-    Виклик збереженої процедури GETACTUALDATE() через ADO.
+
+<button type="button" class="btn btn-primary" style="margin: 0.5rem" onclick="CallStoreProcedureADO()" value="">
+    Calling the stored procedure GETACTUALDATE() via ADO.
 </button>
 
-<button type="button" class="btn btn-primary myClass" style="margin: 0.5rem" onclick="CallStoreProcedureEF()" value="">
-    Виклик збереженої процедури GETACTUALDATE() через EF.
+<button type="button" class="btn btn-primary" style="margin: 0.5rem" onclick="CallStoreProcedureEF()" value="">
+    Calling the stored procedure GETACTUALDATE() via EF.
 </button>

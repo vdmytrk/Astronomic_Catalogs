@@ -1,18 +1,45 @@
 ﻿@light-bg: white;
 @light-text: black;
 @light-border: #dee2e6;
-@light-highlight: #258cfb; // Основний колір підсвічування
-
+@light-highlight: #258cfb;
+@light-check-box-unchecked: #F0F0F0;
+@light-check-box-checked: #A3A3A3;
+    
 @dark-bg: #121212;
 @dark-text: red;
 @dark-border: red;
 @dark-highlight: white;
-//@dark-highlight-a: #ffc107; // Yelow
-@dark-highlight-a: #FF3E3E; // Light red
-//@dark-highlight-a: #CD0000; // Dark red 
+@dark-highlight-a: #FF3E3E; 
 @dark-form-background: #414243;
+@dark-check-box-unchecked: #F08080;
+@dark-check-box-checked: #8B0000;
+
+@light-autofill-bg: #e8f0fe; // Колір autofill у світлій темі
+@dark-autofill-bg: rgba(70, 90, 126, 0.4); // Колір autofill у темній темі
+@autofill-text: #fff; // Колір тексту в autofill
+
 @for-test-kolor1: green;
 @for-test-kolor2: orange;
+@for-test-kolor2: #ffc107; // Dark yelow
+
+input:-webkit-autofill {
+    animation-name: autofill-fix;
+    animation-duration: 5000s; // Продовжує стиль на довгий час
+}
+
+.form-control:-webkit-autofill {
+    background-color: @light-bg !important;
+    color: @light-text !important;
+    caret-color: @light-text !important;
+    transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
+}
+
+@keyframes autofill-fix {
+    from {
+        background-color: @light-autofill-bg !important;
+        color: black !important;
+    }
+}
 
 
 #theme-toggle {
@@ -32,10 +59,6 @@ header, .navbar, .footer {
     border-color: @light-border;
 }
 
-a, .btn {
-    color: @light-highlight;
-}
-
 a:hover, .btn:hover {
     color: darken(@light-highlight, 10%);
 }
@@ -46,13 +69,30 @@ a:hover, .btn:hover {
     box-sizing: border-box;
 }
 
-// Темна тема
+
+//check-box
+.check-box {
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 1.3em;
+    height: 1.3em;
+    border: 0.1em solid gray; 
+    border-radius: 0.3em;
+    background-color: @light-check-box-unchecked; 
+    position: relative;
+}
+
+.check-box:checked {
+    background-color: @light-check-box-checked; 
+}
+// Dark theme
 .dark-theme {
     background-color: @dark-bg !important;
     color: @dark-text;
 
-    header, .navbar, .footer {
-        background-color: @dark-bg;
+    header, .navbar, .footer, .bg-white {
+        background-color: @dark-bg !important;
         color: @dark-text;
         border-color: @dark-border;
     }
@@ -75,15 +115,15 @@ a:hover, .btn:hover {
     .custom-container {
         border-color: @dark-border;
     }
-    // Changing inherited stiles from an external library
+
     header nav div ul li a {
-        color: @dark-text !important; // Зміна кольору тексту в навігації
+        color: @dark-text !important;
     }
 
     footer {
         color: @dark-text !important;
     }
-    // Видаляємо Bootstrap-класи через перевизначення
+
     .text-dark {
         color: inherit !important;
     }
@@ -93,8 +133,8 @@ a:hover, .btn:hover {
     }
 
     .btn-primary {
-        --bs-btn-color: inherit;
-        --bs-btn-bg: inherit;
+        --bs-btn-color: @dark-text !important;
+        --bs-btn-bg: transparent !important;
         --bs-btn-border-color: red !important;
         --bs-btn-hover-color: inherit;
         --bs-btn-hover-bg: inherit;
@@ -105,12 +145,22 @@ a:hover, .btn:hover {
         /*--bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);*/
         --bs-btn-disabled-color: inherit;
         --bs-btn-disabled-bg: inherit;
-        --bs-btn-disabled-border-color: @for-test-kolor2;
+        --bs-btn-disabled-border-color: inherit;
     }
 
     .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
         box-shadow: @dark-bg;
     }
+    /*select {
+        appearance: none;*/ /* Прибирає стандартний вигляд */
+    /*-webkit-appearance: none;*/ /* Для Safari */
+    /*-moz-appearance: none;*/ /* Для Firefox */
+    /*background-color: #2c2c2c;*/ /* Фон */
+    /*color: white;*/ /* Колір тексту */
+    /*padding: 8px;
+        border: 1px solid white;
+        border-radius: 4px;
+    }*/
 
     .table {
         --bs-table-color: inherit;
@@ -118,10 +168,52 @@ a:hover, .btn:hover {
         --bs-table-border-color: inherit;
     }
 
-    .form-control {
+    .form-select[multiple], .form-select[size]:not([size="1"]) {
+        padding-right: .75rem;
+        background-image: none;
+    }
+
+    .form-select {
+        color: @dark-text;
+        background-color: @dark-form-background;
+        border-color: @dark-highlight-a;
+    }
+
+    .form-control, .form-select {
         color: inherit;
         background-color: @dark-form-background;
         border-color: @dark-highlight-a;
         box-shadow: 0 0 5px @dark-highlight-a;
+        -webkit-text-fill-color: @dark-text !important;
+    }
+    // Overriding styles for Chromium-based browsers.
+    .form-control:-webkit-autofill, .form-select:-webkit-autofill {
+        background-color: @dark-bg !important;
+        color: @dark-text !important;
+        caret-color: @dark-text !important;
+        animation-name: dark-autofill-fix;
+    }
+    //check-box
+    .check-box {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 1.3em;
+        height: 1.3em;
+        border: 0.1em solid red; 
+        border-radius: 0.3em;
+        background-color: @dark-check-box-unchecked;
+        position: relative;
+    }
+
+    .check-box:checked {
+        background-color: @dark-check-box-checked;
+    }
+}
+
+@keyframes dark-autofill-fix {
+    from {
+        background-color: @dark-autofill-bg !important;
+        color: @autofill-text !important;
     }
 }

@@ -101,6 +101,14 @@ public class Program
 
         app.MapRazorPages();
 
+#if DEBUG
+        app.Use(async (context, next) =>
+        {
+            Console.WriteLine($"Requested Path: {context.Request.Path}");
+            await next.Invoke();
+        });
+#endif
+
         await app.RunAsync();
     }
 
