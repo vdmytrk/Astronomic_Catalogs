@@ -2,6 +2,7 @@ using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Astronomic_Catalogs.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -39,17 +40,49 @@ public class Program
 #if DEBUG
             LogEnvironmentDetails(builder.Environment, connectionStringProvider.ConnectionString);
 #endif
-        });
+        });       
+
+
+
 
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<RoleService>();
 
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-        builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+        #region Identity
+        // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
+        //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
+        builder.Services.AddIdentity<Models.AspNetUser, Models.AspNetRole>(options =>
+        {
+            options.SignIn.RequireConfirmedAccount = true;
+        })
+                .AddEntityFrameworkStores<ApplicationDbContext>() // Connects Identity to the database via Entity Framework.
+                .AddDefaultTokenProviders(); // Adds tokens for password reset, email confirmation, etc.
+
+        ///  Custom settings for Identity:
+        builder.Services.Configure<IdentityOptions>(options =>
+        {
+            // Password settings.
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 8;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireLowercase = true;
+
+            // Lockout settings.
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+
+            // User settings.
+            options.User.RequireUniqueEmail = true;
+        });
+        #endregion
+
 
         builder.Services.AddControllersWithViews();
+        builder.Services.AddRazorPages();
 
 
 
@@ -86,6 +119,7 @@ public class Program
         app.UseStaticFiles();
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapStaticAssets();
