@@ -18,8 +18,8 @@ public class HomeAdminController : Controller
     private string connectionString = null!;
 
     public HomeAdminController(
-        ApplicationDbContext context, 
-        ILogger<DatabaseInitializer> logger, 
+        ApplicationDbContext context,
+        ILogger<DatabaseInitializer> logger,
         ConnectionStringProvider connectionStringProvider)
     {
         _logger = logger;
@@ -40,38 +40,79 @@ public class HomeAdminController : Controller
         return View();
     }
 
+    // GET: Admin/ActualDates/Delete/5
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
+        }
+
+        var actualDate = await _context.ActualDates
+            .FirstOrDefaultAsync(m => m.Id == id);
+        if (actualDate == null)
+        {
+            return NotFound();
+        }
+
+        return View(actualDate);
+    }
+
+    // POST: Admin/ActualDates/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int? id)
+    {
+        var actualDate = await _context.ActualDates.FindAsync(id);
+        if (actualDate != null)
+        {
+            _context.ActualDates.Remove(actualDate);
+        }
+
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
-    public string GetDateFromProcedureADO()
+    public async Task<string> GetDateFromProcedureADOAsync()
     {
-        using (SqlConnection conn = new SqlConnection(connectionString))
+        await using (SqlConnection conn = new SqlConnection(connectionString))
         {
-            conn.Open();
-            SqlCommand cmd = new SqlCommand("GETACTUALDATE", conn);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            DateTime dateRequest = (DateTime)cmd.ExecuteScalar();
-
-            string date = dateRequest.ToString() ?? "Data absence.";
-            return date;
+            await conn.OpenAsync();
+            await using (SqlCommand cmd = new SqlCommand("GETACTUALDATE", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                object? result = await cmd.ExecuteScalarAsync();
+                if (result is DateTime dateRequest)
+                {
+                    return dateRequest.ToString();
+                }
+                return "Data absence.";
+            }
         }
     }
 
-    public string GetDateFromProcedureEF()
+    public async Task<string> GetDateFromProcedureEFAsync()
     {
-        using (_context)
+        await foreach (var dateRequest in _context.ActualDates
+        .FromSqlRaw("EXEC GETACTUALDATE")
+        .AsAsyncEnumerable())
         {
-            var dateRequest = _context.ActualDates
-                .FromSqlRaw("EXEC GETACTUALDATE")
-                .AsEnumerable()
-                .FirstOrDefault();
-
-            return dateRequest?.ActualDateProperty.ToString() ?? "Data absence.";
+            return dateRequest.ActualDateProperty.ToString();
         }
+        return "Data absence.";
     }
+
+    public async Task<IActionResult> CallCreateNewDateProcedureAsync()
+    {
+        await _context.Database.ExecuteSqlRawAsync("EXEC CREATENEWDATE");
+        var updatedData = await _context.ActualDates.ToListAsync();
+        return PartialView("_ActualDatePartial", updatedData);
+    }
+
 }

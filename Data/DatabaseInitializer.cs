@@ -41,17 +41,8 @@ public class DatabaseInitializer(
                 await ExecuteMigrationScenarioAsync(canConnect);
                 return;
             }
-            // Для створення БД проведи міграцію через Package Manage Console.
-            // Розкоміть наступних два рядки:
-            //await ExecuteMigrationScenarioAsync(canConnect);
-            //await ExecuteManuallyDbInitalization(canConnect);
-            // Та закоміть цей рядок:
+            // To create the database using migration through the Package Manager Console, refer to the Areas\Admin\Models\README.md file.
             await ApplyMigrationsAsync();
-            // А тоді запусти проект.
-            // Після успішного старту:
-            //  закрий проетк.
-            //  відкоти зміни зроблені з попередніми рядками.
-            // Можеш запускати проетк.
         }
         catch (Exception ex)
         {
@@ -222,6 +213,7 @@ public class DatabaseInitializer(
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_While.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/SearchFilteredNGCICData.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/GetActualDate.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/CreateNewDate.sql");
     }
 
     private async Task ExecuteInsertDataSqlScriptsAsync()
