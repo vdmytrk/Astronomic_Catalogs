@@ -4,6 +4,7 @@ using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Astronomic_Catalogs.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using NLog;
@@ -40,18 +41,18 @@ public class Program
 #if DEBUG
             LogEnvironmentDetails(builder.Environment, connectionStringProvider.ConnectionString);
 #endif
-        });       
-
-
-
+        });
+        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<RoleService>();
 
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
         #region Identity
+        builder.Services.AddSingleton<IEmailSender, DummyEmailSender>(); 
+        // Ouvveee@gmail.com - Abbccdd@#$1 | voltpozytyv@gmail.com - Abbccdd@#$2
+        //builder.Services.AddSingleton<IEmailSender, EmailSender>();
+
         // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
         //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
         builder.Services.AddIdentity<Models.AspNetUser, Models.AspNetRole>(options =>
