@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
@@ -86,7 +87,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             [EmailAddress]
             public string Email { get; set; }
         }
-        
+
         public IActionResult OnGet() => RedirectToPage("./Login");
 
         public IActionResult OnPost(string provider, string returnUrl = null)
@@ -202,7 +203,9 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         {
             try
             {
-                return Activator.CreateInstance<AspNetUser>();
+                var user = Activator.CreateInstance<AspNetUser>();
+                user.EmailConfirmed = true;  // DV: Disabling email confirmation for external accounts.
+                return user;
             }
             catch
             {

@@ -29,7 +29,7 @@ public class UsersController : Controller
             .Include(u => u.UserLogins)
             .Include(u => u.UserTokens)
             .ToListAsync();
-        return View(aspNetUser.OrderBy(u => u.RegistrationDate).OrderBy(u => u.UserName));
+        return View(aspNetUser.OrderBy(u => u.UserName).OrderBy(u => u.RegistrationDate));
     }
 
     // GET: Admin/Users/Details/5

@@ -7,8 +7,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using NLog;
 using NLog.Web;
+using Astronomic_Catalogs.Models.Services;
+using Microsoft.Extensions.Options;
 
 namespace Astronomic_Catalogs;
 
@@ -48,11 +52,8 @@ public class Program
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<RoleService>();
 
-        #region Identity
-        builder.Services.AddSingleton<IEmailSender, DummyEmailSender>(); 
-        // Ouvveee@gmail.com - Abbccdd@#$1 | voltpozytyv@gmail.com - Abbccdd@#$2
-        //builder.Services.AddSingleton<IEmailSender, EmailSender>();
-
+        #region IDENTITY
+        #region External accounts
         // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
         //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
         builder.Services.AddIdentity<Models.AspNetUser, Models.AspNetRole>(options =>
@@ -62,7 +63,44 @@ public class Program
                 .AddEntityFrameworkStores<ApplicationDbContext>() // Connects Identity to the database via Entity Framework.
                 .AddDefaultTokenProviders(); // Adds tokens for password reset, email confirmation, etc.
 
-        ///  Custom settings for Identity:
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // Google ÿê äåôîëòíèé
+        })
+        .AddGoogle(googleOptions =>
+        {
+            googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+            googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        })
+        .AddMicrosoftAccount(microsoftOptions =>
+        {
+            microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]!; // ÄÎÄÀÉ ÏÅÐÅÂ²ÐÊÓ ÍÀ NULL
+            microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]!;
+        })
+        /// TODO:
+        ///.AddApple(appleOptions =>
+        ///{
+        ///    appleOptions.ClientId = builder.Configuration["Authentication:Apple:ClientId"];
+        ///    appleOptions.ClientSecret = builder.Configuration["Authentication:Apple:ClientSecret"];
+        ///})
+        ///.AddOAuth("Phone", options =>
+        ///{
+        ///    options.ClientId = builder.Configuration["Authentication:Phone:ClientId"];
+        ///    options.ClientSecret = builder.Configuration["Authentication:Phone:ClientSecret"];
+        ///    options.AuthorizationEndpoint = "https://example.com/oauth/authorize";
+        ///    options.TokenEndpoint = "https://example.com/oauth/token";
+        ///    options.CallbackPath = "/signin-phone";
+        ///})
+        ;
+        #endregion
+        #region Email
+        builder.Services.AddTransient<IEmailSender, EmailSender>(); // Use DummyEmailSender for devolopment
+        builder.Services.AddOptions();
+        builder.Services.Configure<AuthMessageSenderOptions>(
+            builder.Configuration.GetSection("AuthMessageSenderOptions")
+            );
+
         builder.Services.Configure<IdentityOptions>(options =>
         {
             // Password settings.
@@ -81,7 +119,7 @@ public class Program
             options.User.RequireUniqueEmail = true;
         });
         #endregion
-
+        #endregion
 
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();

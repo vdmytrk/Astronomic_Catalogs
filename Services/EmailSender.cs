@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Astronomic_Catalogs.Models.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -8,39 +10,31 @@ namespace Astronomic_Catalogs.Services;
 
 public class EmailSender : IEmailSender
 {
-    private readonly IConfiguration _configuration;
+    private readonly AuthMessageSenderOptions _options;
 
-    public EmailSender(IConfiguration configuration)
+    public EmailSender(IOptions<AuthMessageSenderOptions> options)
     {
-        _configuration = configuration;
+        _options = options.Value;
     }
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        var emailSettings = _configuration.GetSection("EmailSettings");
-        var smtpServer = emailSettings["SmtpServer"];
-        var port = int.Parse(emailSettings["Port"]!);
-        var senderEmail = emailSettings["SenderEmail"];
-        var senderName = emailSettings["SenderName"];
-        var password = emailSettings["Password"];
-
-        var client = new SmtpClient(smtpServer)
+        using (var client = new SmtpClient("smtp.gmail.com", 587))
         {
-            Port = port,
-            Credentials = new NetworkCredential(senderEmail, password),
-            EnableSsl = true
-        };
+            client.Credentials = new NetworkCredential(_options.Email, _options.Password);
+            client.EnableSsl = true;
 
-        var mailMessage = new MailMessage
-        {
-            From = new MailAddress(senderEmail, senderName),
-            Subject = subject,
-            Body = htmlMessage,
-            IsBodyHtml = true
-        };
-        mailMessage.To.Add(email);
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_options.Email),
+                Subject = subject,
+                Body = htmlMessage,
+                IsBodyHtml = true,
+            };
+            mailMessage.To.Add(email);
 
-        await client.SendMailAsync(mailMessage);
+            await client.SendMailAsync(mailMessage);
+        }
     }
 }
 

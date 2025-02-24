@@ -6,18 +6,38 @@
 
 <h1>@ViewData["Title"]</h1>
 @{
-    if (@Model.DisplayConfirmAccountLink)
+    // DV: Left in case social media registration stops working. Not for release.
+    @switch ((Env.IsDevelopment(), Model.DisplayConfirmAccountLink))
     {
-<p>
-    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-</p>
+        case (true, true):
+            <p>
+                <strong>Development mode: </strong>
+                This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
+                Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
+            </p>
+            break;
+
+        case (true, false):
+            <p>
+                <strong>Development mode:</strong> Please check your email to confirm your account.
+            </p>
+            break;
     }
-    else
+
+    <p>
+        Thank you for registering! To complete the registration, please check your email and click the confirmation link.
+    </p>
+
+    @if (!string.IsNullOrEmpty(Model.Email))
     {
-<p>
-        Please check your email to confirm your account.
-</p>
+        <p>
+            If you don’t receive an email within a few minutes, check your spam folder or <strong>try resending the confirmation email</strong>.
+        </p>
+
+        <form method="post">
+            <input type="hidden" name="ResendEmail" value="@Model.Email" />
+            <button type="submit" class="btn btn-primary">Resend Confirmation Email</button>
+        </form>
     }
 }
 
