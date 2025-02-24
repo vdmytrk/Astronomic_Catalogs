@@ -118,10 +118,10 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
 
             // TODO: Check for correct registration.
-if (user.EmailConfirmed)
-{
-    return RedirectToPage("Login");
-}
+            if (user.EmailConfirmed)
+            {
+                return RedirectToPage("Login");
+            }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
