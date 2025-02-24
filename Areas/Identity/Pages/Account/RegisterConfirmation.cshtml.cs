@@ -99,7 +99,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
 
         /// <summary>
-        /// DV: Confirm your e-mail.
+        /// TODO: Set time before send new letter.
         /// </summary>
         /// <returns></returns>
         public async Task<IActionResult> OnPostAsync(string resendEmail)
@@ -118,10 +118,10 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
 
             // TODO: Check for correct registration.
-            if (user.EmailConfirmed)
-            {
-                return RedirectToPage("Login");
-            }
+if (user.EmailConfirmed)
+{
+    return RedirectToPage("Login");
+}
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
