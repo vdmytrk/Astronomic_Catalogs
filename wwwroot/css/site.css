@@ -40,3 +40,8 @@ body {
     padding-right: 5em;
     box-sizing: border-box;
 }
+
+.identityStyle {
+    width: 2em;
+    height: 2em;
+}

@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,12 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<AspNetUser> _userManager;
         private readonly SignInManager<AspNetUser> _signInManager;
-        private readonly IEmailSender _emailSender;
+        private readonly ICustomEmailSender _emailSender;
 
         public EmailModel(
             UserManager<AspNetUser> userManager,
             SignInManager<AspNetUser> signInManager,
-            IEmailSender emailSender)
+            ICustomEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;

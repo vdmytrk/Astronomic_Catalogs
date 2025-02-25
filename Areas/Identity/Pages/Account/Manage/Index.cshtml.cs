@@ -81,7 +81,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-
+            await _signInManager.RefreshSignInAsync(user);
             await LoadAsync(user);
             return Page();
         }

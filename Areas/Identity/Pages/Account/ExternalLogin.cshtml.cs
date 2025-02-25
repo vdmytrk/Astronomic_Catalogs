@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Astronomic_Catalogs.Services.Interfaces;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
@@ -29,7 +30,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IUserStore<AspNetUser> _userStore;
         private readonly IUserEmailStore<AspNetUser> _emailStore;
-        private readonly IEmailSender _emailSender;
+        private readonly ICustomEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
@@ -37,7 +38,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             UserManager<AspNetUser> userManager,
             IUserStore<AspNetUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            ICustomEmailSender emailSender)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -118,6 +119,34 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+
+                var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                if (user != null)
+                {
+                    // Getting the avatar URL
+                    var pictureClaim = info.Principal.FindFirst("picture")?.Value
+                                    ?? info.Principal.FindFirst("urn:microsoftaccount:picture")?.Value;
+
+                    if (!string.IsNullOrEmpty(pictureClaim))
+                    {
+                        var userClaims = await _userManager.GetClaimsAsync(user);
+                        var existingClaim = userClaims.FirstOrDefault(c => c.Type == "profile_picture");
+
+                        if (existingClaim != null)
+                        {
+                            await _userManager.ReplaceClaimAsync(user, existingClaim, new Claim("profile_picture", pictureClaim));
+                        }
+                        else
+                        {
+                            await _userManager.AddClaimAsync(user, new Claim("profile_picture", pictureClaim));
+                        }
+                    }
+#if DEBUG
+                    Console.WriteLine(string.Join(", ", info.Principal.Claims.Select(c => c.Type + "=" + c.Value)));                    
+#endif
+                    await _signInManager.RefreshSignInAsync(user);
+                }
+
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -138,6 +167,13 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
                 }
                 return Page();
             }
+
+
+
+
+
+
+            
         }
 
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)

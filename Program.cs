@@ -13,6 +13,7 @@ using NLog;
 using NLog.Web;
 using Astronomic_Catalogs.Models.Services;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication;
 using Astronomic_Catalogs.Services.Interfaces;
 
 namespace Astronomic_Catalogs;
@@ -52,7 +53,6 @@ public class Program
 
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<RoleService>();
-        builder.Services.AddTransient<ICustomEmailSender, EmailSender>();
 
         #region IDENTITY
         #region External accounts
@@ -62,13 +62,13 @@ public class Program
         {
             options.SignIn.RequireConfirmedAccount = true;
         })
-                .AddEntityFrameworkStores<ApplicationDbContext>() // Connects Identity to the database via Entity Framework.
+                .AddEntityFrameworkStores<ApplicationDbContext>() 
                 .AddDefaultTokenProviders(); // Adds tokens for password reset, email confirmation, etc.
 
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // Google як дефолтний
+            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // Google as default
         })
         .AddGoogle(googleOptions =>
         {
@@ -76,6 +76,7 @@ public class Program
              ?? throw new InvalidOperationException("Google ClientId is missing.");
             googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
               ?? throw new InvalidOperationException("Google ClientSecret is missing.");
+            googleOptions.ClaimActions.MapJsonKey("picture", "picture");
         })
         .AddMicrosoftAccount(microsoftOptions =>
         {
@@ -83,6 +84,7 @@ public class Program
               ?? throw new InvalidOperationException("Microsoft ClientId is missing."); 
             microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]
               ?? throw new InvalidOperationException("Microsoft ClientSecret is missing.");
+            microsoftOptions.ClaimActions.MapJsonKey("urn:microsoftaccount:picture", "picture");
         })
         /// TODO:
         ///.AddApple(appleOptions =>
@@ -101,7 +103,7 @@ public class Program
         ;
         #endregion
         #region Email
-        builder.Services.AddTransient<IEmailSender, EmailSender>(); // Use DummyEmailSender for devolopment
+        builder.Services.AddTransient<ICustomEmailSender, EmailSender>(); // Use DummyEmailSender for devolopment
         builder.Services.AddOptions();
         builder.Services.Configure<AuthMessageSenderOptions>(
             builder.Configuration.GetSection("AuthMessageSenderOptions")

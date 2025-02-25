@@ -5,12 +5,30 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-        </li>
+        var avatarUrl = User.Claims.FirstOrDefault(c => c.Type == "profile_picture")?.Value;
+        avatarUrl = avatarUrl.Replace("s96-c", "s256-c");
+        var displayName = User.Identity?.Name ?? "";
+        displayName = displayName.Split('@')[0];
+
+        @if (!string.IsNullOrEmpty(avatarUrl))
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">
+                    <img id="userAvatar" src="@avatarUrl" alt="Profile Picture" class="rounded-circle identityStyle" />
+                    <span>Hello @displayName!</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark identityStyle" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @displayName!</a>
+            </li>
+        }
+
         <li class="nav-item">
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                <button type="submit" class="nav-link btn btn-link text-dark identityStyle">Logout</button>
             </form>
         </li>
     }
@@ -24,3 +42,32 @@
         </li>
     }
 </ul>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarUrl = document.getElementById('userAvatar').src;
+        if (!avatarUrl) {
+            console.error('Avatar URL is not available');
+            return;
+        }
+
+        const avatarCacheKey = 'userAvatar';
+        const cachedAvatar = localStorage.getItem(avatarCacheKey);
+
+        if (cachedAvatar) {
+            document.getElementById('userAvatar').src = cachedAvatar;
+        } else {
+            const img = new Image();
+            img.src = avatarUrl;
+
+            img.onload = function() {
+                localStorage.setItem(avatarCacheKey, avatarUrl);
+            }
+
+            img.onerror = function() {
+                console.error('Failed to load avatar');
+            }
+        }
+    });
+
+</script>

@@ -14,15 +14,16 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Astronomic_Catalogs.Services.Interfaces;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
     public class ForgotPasswordModel : PageModel
     {
         private readonly UserManager<AspNetUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly ICustomEmailSender _emailSender;
 
-        public ForgotPasswordModel(UserManager<AspNetUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(UserManager<AspNetUser> userManager, ICustomEmailSender emailSender)
         {
             _userManager = userManager;
             _emailSender = emailSender;

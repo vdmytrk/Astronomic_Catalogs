@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Astronomic_Catalogs.Services.Interfaces;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
@@ -29,14 +30,14 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         private readonly IUserStore<AspNetUser> _userStore;
         private readonly IUserEmailStore<AspNetUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly ICustomEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<AspNetUser> userManager,
             IUserStore<AspNetUser> userStore,
             SignInManager<AspNetUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            ICustomEmailSender emailSender)
         {
             _userManager = userManager;
             _userStore = userStore;
