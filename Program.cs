@@ -13,6 +13,7 @@ using NLog;
 using NLog.Web;
 using Astronomic_Catalogs.Models.Services;
 using Microsoft.Extensions.Options;
+using Astronomic_Catalogs.Services.Interfaces;
 
 namespace Astronomic_Catalogs;
 
@@ -51,6 +52,7 @@ public class Program
 
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<RoleService>();
+        builder.Services.AddTransient<ICustomEmailSender, EmailSender>();
 
         #region IDENTITY
         #region External accounts
@@ -70,13 +72,17 @@ public class Program
         })
         .AddGoogle(googleOptions =>
         {
-            googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-            googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+            googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]
+             ?? throw new InvalidOperationException("Google ClientId is missing.");
+            googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
+              ?? throw new InvalidOperationException("Google ClientSecret is missing.");
         })
         .AddMicrosoftAccount(microsoftOptions =>
         {
-            microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]!; // ÄÎÄÀÉ ÏÅÐÅÂ²ÐÊÓ ÍÀ NULL
-            microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]!;
+            microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]
+              ?? throw new InvalidOperationException("Microsoft ClientId is missing."); 
+            microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]
+              ?? throw new InvalidOperationException("Microsoft ClientSecret is missing.");
         })
         /// TODO:
         ///.AddApple(appleOptions =>

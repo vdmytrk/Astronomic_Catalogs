@@ -46,7 +46,7 @@ public class DatabaseInitializer(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred during database initialization.");
+            _logger.LogError(ex, "An error occurred during database initialization.");
             throw; 
         }
     }

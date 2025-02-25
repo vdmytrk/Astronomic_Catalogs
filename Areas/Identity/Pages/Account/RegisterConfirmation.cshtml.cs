@@ -16,6 +16,7 @@ using Astronomic_Catalogs.Services;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using Astronomic_Catalogs.Data;
 using Microsoft.EntityFrameworkCore;
+using Astronomic_Catalogs.Services.Interfaces;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
@@ -23,14 +24,20 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
     public class RegisterConfirmationModel : PageModel
     {
         private readonly UserManager<AspNetUser> _userManager;
-        private readonly IEmailSender _sender;
+        private readonly ICustomEmailSender _sender;
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<DatabaseInitializer> _logger;
 
-        public RegisterConfirmationModel(ApplicationDbContext context, UserManager<AspNetUser> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(
+            ApplicationDbContext context, 
+            UserManager<AspNetUser> userManager,
+            ICustomEmailSender sender, 
+            ILogger<DatabaseInitializer> logger)
         {
             _userManager = userManager;
             _sender = sender;
             _context = context;
+            _logger = logger;
         }
 
         /// <summary>
@@ -53,6 +60,8 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
         [BindProperty]
         public string ResendEmail { get; set; } = null!; // DV: To retrieve a value from the form for resending the email.
+
+        public int CountEmailSent { get; set; }
 
         private string UserId { get; set; }
 
@@ -112,53 +121,67 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
 
         /// <summary>
-        /// TODO: Set time before send new letter.
+        /// DV: 
         /// </summary>
         /// <returns></returns>
-    public async Task<IActionResult> OnPostAsync(string resendEmail)
-    {
-        Email = resendEmail;
-
-        if (string.IsNullOrEmpty(resendEmail))
+        public async Task<IActionResult> OnPostAsync(string resendEmail)
         {
-            ModelState.AddModelError(string.Empty, "Email is required.");
+            Email = resendEmail;
+
+            if (string.IsNullOrEmpty(resendEmail))
+            {
+                ModelState.AddModelError(string.Empty, "Email is required.");
+                return Page();
+            }
+
+            var user = await _userManager.FindByEmailAsync(resendEmail);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with email '{resendEmail}'.");
+            }
+
+            if (user.CountEmailSent > 2)
+            {
+                ModelState.AddModelError(string.Empty, "You cannot send more than three registration emails. Please contact the site administration.");
+                return Page();
+            }
+            else if (user.LastEmailSent.HasValue && (DateTime.UtcNow - user.LastEmailSent.Value).TotalMinutes < 3)
+            {
+                ModelState.AddModelError(string.Empty, "You can request a new confirmation email only every 3 minutes.");
+                return Page();
+            }
+
+            // TODO: Check for correct registration.
+            var userLogins = await _userManager.GetLoginsAsync(user);
+            bool isExternalLogin = userLogins.Any(l => l.LoginProvider == "Google" || l.LoginProvider == "Microsoft");
+            if (user.EmailConfirmed && !isExternalLogin)
+            {
+                return RedirectToPage("Login");
+            }
+
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = Url.Page(
+                "/Account/ConfirmEmail",
+                pageHandler: null,
+                values: new { userId = user.Id, code },
+            protocol: Request.Scheme);
+
+            try
+            {
+                await _sender.SendEmailAsync(
+                resendEmail,
+                "Confirm your email",
+                $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.",
+                user.Id
+                );
+            }
+            catch
+            {
+                throw;
+            }
+
             return Page();
         }
-
-        var user = await _userManager.FindByEmailAsync(resendEmail);
-        if (user == null)
-        {
-            return NotFound($"Unable to load user with email '{resendEmail}'.");
-        }
-
-        if (user.LastEmailSent.HasValue && (DateTime.UtcNow - user.LastEmailSent.Value).TotalMinutes < 3)
-        {
-            ModelState.AddModelError(string.Empty, "You can request a new confirmation email only every 5 minutes.");
-            return Page();
-        }
-
-        // TODO: Check for correct registration.
-        var userLogins = await _userManager.GetLoginsAsync(user);
-        bool isExternalLogin = userLogins.Any(l => l.LoginProvider == "Google" || l.LoginProvider == "Microsoft");
-        if (user.EmailConfirmed && !isExternalLogin)
-        {
-            return RedirectToPage("Login");
-        }
-
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = Url.Page(
-            "/Account/ConfirmEmail",
-            pageHandler: null,
-            values: new { userId = user.Id, code },
-        protocol: Request.Scheme);
-
-        await _sender.SendEmailAsync(
-            resendEmail,
-            "Confirm your email",
-            $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
-
-        return Page();
-    }
     }
 }

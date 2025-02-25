@@ -1,21 +1,35 @@
-﻿using Astronomic_Catalogs.Models.Services;
+﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Models.Services;
+using Astronomic_Catalogs.Services.Interfaces;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace Astronomic_Catalogs.Services;
 
-public class EmailSender : IEmailSender
+public class EmailSender : ICustomEmailSender
 {
     private readonly AuthMessageSenderOptions _options;
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger<DatabaseInitializer> _logger;
 
-    public EmailSender(IOptions<AuthMessageSenderOptions> options)
+    public EmailSender(
+        IOptions<AuthMessageSenderOptions> options, 
+        ApplicationDbContext context, 
+        ILogger<DatabaseInitializer> logger
+        )
     {
         _options = options.Value;
+        _context = context;
+        _logger = logger;
     }
+
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
@@ -29,11 +43,65 @@ public class EmailSender : IEmailSender
                 From = new MailAddress(_options.Email),
                 Subject = subject,
                 Body = htmlMessage,
-                IsBodyHtml = true,
+                IsBodyHtml = true
+            };
+            mailMessage.To.Add(email);            
+
+            try
+            {
+                await client.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred during sending the email to {_options.Email}.");
+                throw;
+            }
+        }
+    }
+
+    /// <summary>
+    /// DV: To count the number of registration email sent. 
+    /// </summary>
+    /// <param name="email"></param>
+    /// <param name="subject"></param>
+    /// <param name="htmlMessage"></param>
+    /// <param name="userId">For registration email</param>
+    /// <param name="registrationEmail"></param>
+    /// <returns></returns>
+    public async Task SendEmailAsync(string email, string subject, string htmlMessage, string? userId = null)
+    {
+        using (var client = new SmtpClient("smtp.gmail.com", 587))
+        {
+            client.Credentials = new NetworkCredential(_options.Email, _options.Password);
+            client.EnableSsl = true;
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(_options.Email),
+                Subject = subject,
+                Body = htmlMessage,
+                IsBodyHtml = true
             };
             mailMessage.To.Add(email);
+                        
+            var aspNetUser = await _context.Users.FindAsync(userId);
+            if (aspNetUser is not null)
+            {
+                aspNetUser.LastEmailSent = DateTime.UtcNow;
+                aspNetUser.CountEmailSent += 1;
+                _context.Update(aspNetUser);
+                await _context.SaveChangesAsync();
+            }
 
-            await client.SendMailAsync(mailMessage);
+            try
+            {
+                await client.SendMailAsync(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred during sending the email to {_options.Email}.");
+                throw;
+            }
         }
     }
 }

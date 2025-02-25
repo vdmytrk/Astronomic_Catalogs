@@ -7,21 +7,19 @@
 <h1>@ViewData["Title"]</h1>
 @{
     // DV: Left in case social media registration stops working. Not for release.
-    @switch ((Env.IsDevelopment(), Model.DisplayConfirmAccountLink))
+    if (Env.IsDevelopment() && Model.DisplayConfirmAccountLink)
     {
-        case (true, true):
-            <p>
-                <strong>Development mode: </strong>
-                This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
-                Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
-            </p>
-            break;
-
-        case (true, false):
-            <p>
-                <strong>Development mode:</strong> Please check your email to confirm your account.
-            </p>
-            break;
+        <p>
+            <strong>Development mode: </strong>
+            This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
+            Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
+        </p>
+    }
+    else if (Env.IsDevelopment() && !Model.DisplayConfirmAccountLink)
+    {
+        <p>
+            <strong>Development mode:</strong> Please check your email to confirm your account.
+        </p>
     }
 
     <p>
