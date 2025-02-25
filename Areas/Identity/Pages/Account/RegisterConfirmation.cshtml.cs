@@ -112,7 +112,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
             // DV: Email statistic
             var aspNetUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == UserId);
-            aspNetUser.LastEmailSent = DateTime.UtcNow;
+            aspNetUser.LastRegisterEmailSent = DateTime.UtcNow;
             _context.Update(aspNetUser);
             await _context.SaveChangesAsync();
 
@@ -140,12 +140,12 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
                 return NotFound($"Unable to load user with email '{resendEmail}'.");
             }
 
-            if (user.CountEmailSent > 2)
+            if (user.CountRegisterEmailSent > 2)
             {
                 ModelState.AddModelError(string.Empty, "You cannot send more than three registration emails. Please contact the site administration.");
                 return Page();
             }
-            else if (user.LastEmailSent.HasValue && (DateTime.UtcNow - user.LastEmailSent.Value).TotalMinutes < 3)
+            else if (user.LastRegisterEmailSent.HasValue && (DateTime.UtcNow - user.LastRegisterEmailSent.Value).TotalMinutes < 3)
             {
                 ModelState.AddModelError(string.Empty, "You can request a new confirmation email only every 3 minutes.");
                 return Page();

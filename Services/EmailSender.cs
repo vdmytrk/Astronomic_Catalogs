@@ -87,8 +87,8 @@ public class EmailSender : ICustomEmailSender
             var aspNetUser = await _context.Users.FindAsync(userId);
             if (aspNetUser is not null)
             {
-                aspNetUser.LastEmailSent = DateTime.UtcNow;
-                aspNetUser.CountEmailSent += 1;
+                aspNetUser.LastRegisterEmailSent = DateTime.UtcNow;
+                aspNetUser.CountRegisterEmailSent += 1;
                 _context.Update(aspNetUser);
                 await _context.SaveChangesAsync();
             }

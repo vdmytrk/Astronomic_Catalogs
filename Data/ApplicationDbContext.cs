@@ -91,7 +91,7 @@ public class ApplicationDbContext : IdentityDbContext
             .HasForeignKey(ur => ur.UserId);
 
         modelBuilder.Entity<Models.AspNetUser>().Property(u => u.RegistrationDate).HasDefaultValueSql("SYSDATETIME()");
-        modelBuilder.Entity<Models.AspNetUser>().Property(u => u.CountEmailSent).HasDefaultValue(0);
+        modelBuilder.Entity<Models.AspNetUser>().Property(u => u.CountRegisterEmailSent).HasDefaultValue(1); // Since one email is automatically sent upon registration.
 
         #endregion
 
