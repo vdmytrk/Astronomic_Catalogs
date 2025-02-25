@@ -34,10 +34,21 @@
             If you don’t receive an email within a few minutes, check your spam folder or <strong>try resending the confirmation email</strong>.
         </p>
 
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
         <form method="post">
             <input type="hidden" name="ResendEmail" value="@Model.Email" />
             <button type="submit" class="btn btn-primary">Resend Confirmation Email</button>
         </form>
     }
+
 }
 

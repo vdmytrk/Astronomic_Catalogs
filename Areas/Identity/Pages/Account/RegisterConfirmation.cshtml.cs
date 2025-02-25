@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Astronomic_Catalogs.Services;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using Astronomic_Catalogs.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
@@ -21,11 +24,13 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
     {
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IEmailSender _sender;
+        private readonly ApplicationDbContext _context;
 
-        public RegisterConfirmationModel(UserManager<AspNetUser> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(ApplicationDbContext context, UserManager<AspNetUser> userManager, IEmailSender sender)
         {
             _userManager = userManager;
             _sender = sender;
+            _context = context;
         }
 
         /// <summary>
@@ -48,6 +53,8 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
         [BindProperty]
         public string ResendEmail { get; set; } = null!; // DV: To retrieve a value from the form for resending the email.
+
+        private string UserId { get; set; }
 
         public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null)
         {
@@ -79,20 +86,26 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             ///        protocol: Request.Scheme);
             ///}
 
-            DisplayConfirmAccountLink = false;
 
-            // DV: 
+            // DV: After the real email sener was added
+            DisplayConfirmAccountLink = false;
             if (_userManager.Options.SignIn.RequireConfirmedAccount)
             {
-                var userId = await _userManager.GetUserIdAsync(user);
+                UserId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 EmailConfirmationUrl = Url.Page(
                     "/Account/ConfirmEmail",
                     pageHandler: null,
-                    values: new { userId, code },
+                    values: new { UserId, code },
                     protocol: Request.Scheme);
             }
+
+            // DV: Email statistic
+            var aspNetUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == UserId);
+            aspNetUser.LastEmailSent = DateTime.UtcNow;
+            _context.Update(aspNetUser);
+            await _context.SaveChangesAsync();
 
             return Page();
         }
@@ -102,41 +115,50 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         /// TODO: Set time before send new letter.
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> OnPostAsync(string resendEmail)
+    public async Task<IActionResult> OnPostAsync(string resendEmail)
+    {
+        Email = resendEmail;
+
+        if (string.IsNullOrEmpty(resendEmail))
         {
-            if (string.IsNullOrEmpty(resendEmail))
-            {
-                ModelState.AddModelError(string.Empty, "Email is required.");
-                return Page();
-            }
-
-            var user = await _userManager.FindByEmailAsync(resendEmail);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with email '{resendEmail}'.");
-            }
-
-
-            // TODO: Check for correct registration.
-            if (user.EmailConfirmed)
-            {
-                return RedirectToPage("Login");
-            }
-
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = Url.Page(
-                "/Account/ConfirmEmail",
-                pageHandler: null,
-                values: new { userId = user.Id, code },
-            protocol: Request.Scheme);
-
-            await _sender.SendEmailAsync(
-                resendEmail,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
-
+            ModelState.AddModelError(string.Empty, "Email is required.");
             return Page();
         }
+
+        var user = await _userManager.FindByEmailAsync(resendEmail);
+        if (user == null)
+        {
+            return NotFound($"Unable to load user with email '{resendEmail}'.");
+        }
+
+        if (user.LastEmailSent.HasValue && (DateTime.UtcNow - user.LastEmailSent.Value).TotalMinutes < 3)
+        {
+            ModelState.AddModelError(string.Empty, "You can request a new confirmation email only every 5 minutes.");
+            return Page();
+        }
+
+        // TODO: Check for correct registration.
+        var userLogins = await _userManager.GetLoginsAsync(user);
+        bool isExternalLogin = userLogins.Any(l => l.LoginProvider == "Google" || l.LoginProvider == "Microsoft");
+        if (user.EmailConfirmed && !isExternalLogin)
+        {
+            return RedirectToPage("Login");
+        }
+
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+        var callbackUrl = Url.Page(
+            "/Account/ConfirmEmail",
+            pageHandler: null,
+            values: new { userId = user.Id, code },
+        protocol: Request.Scheme);
+
+        await _sender.SendEmailAsync(
+            resendEmail,
+            "Confirm your email",
+            $"Please confirm your account by <a href='{callbackUrl}'>clicking here</a>.");
+
+        return Page();
+    }
     }
 }
