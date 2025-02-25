@@ -113,7 +113,14 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
             {
                 foreach (var error in changePasswordResult.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    if (error.Code == "PasswordMismatch") // DV: Catching the wrong password error
+                    {
+                        ModelState.AddModelError("Input.OldPassword", "The current password is incorrect.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
                 return Page();
             }

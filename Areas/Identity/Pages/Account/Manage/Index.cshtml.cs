@@ -47,6 +47,11 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
         public InputModel Input { get; set; }
 
         /// <summary>
+        /// DV: To check if it is the local account
+        /// </summary>
+        public bool IsLocalAccount { get; set; }
+
+        /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
@@ -83,6 +88,10 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
             }
             await _signInManager.RefreshSignInAsync(user);
             await LoadAsync(user);
+
+            var logins = await _userManager.GetLoginsAsync(user);
+            IsLocalAccount = logins.Count == 0; 
+
             return Page();
         }
 

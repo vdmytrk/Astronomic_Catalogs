@@ -16,7 +16,7 @@
                 <label asp-for="Username" class="form-label"></label>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
+                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number." />
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
@@ -24,6 +24,19 @@
         </form>
     </div>
 </div>
+@if (Model.IsLocalAccount)
+{
+    <div class="row pt-5">
+        <div class="col-md-6">
+            <div class="form-floating">
+                <a asp-page="/Account/Manage/Email" class="w-100 btn btn-lg btn-primary">Change email</a>
+            </div>
+            <div class="form-floating pt-2">
+                <a asp-page="/Account/Manage/ChangePassword" class="w-100 btn btn-lg btn-primary">Change password</a>
+            </div>
+        </div>
+    </div>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
