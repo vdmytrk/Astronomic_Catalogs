@@ -28,7 +28,7 @@
 
         <li class="nav-item">
             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                <button type="submit" class="nav-link btn btn-link text-dark identityStyle">Logout</button>
+                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
             </form>
         </li>
     }
@@ -44,8 +44,15 @@
 </ul>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const avatarUrl = document.getElementById('userAvatar').src;
+    // Save the avatar into the cache.
+    window.addEventListener('DOMContentLoaded', function () {
+        const avatarElement = document.getElementById('userAvatar');
+        if (!avatarElement) {
+            console.warn('Avatar element is not found in the DOM');
+            return;
+        }
+
+        const avatarUrl = avatarElement.src;
         if (!avatarUrl) {
             console.error('Avatar URL is not available');
             return;
@@ -60,14 +67,13 @@
             const img = new Image();
             img.src = avatarUrl;
 
-            img.onload = function() {
+            img.onload = function () {
                 localStorage.setItem(avatarCacheKey, avatarUrl);
             }
 
-            img.onerror = function() {
+            img.onerror = function () {
                 console.error('Failed to load avatar');
             }
         }
     });
-
 </script>

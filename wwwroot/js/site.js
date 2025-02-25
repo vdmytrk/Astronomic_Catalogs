@@ -146,3 +146,5 @@ function CallStoreProcedure() {
         showAlert("EF. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
     });
 }
+
+
