@@ -10,7 +10,7 @@ public class AspNetUser : IdentityUser
 {
     public DateTime RegistrationDate { get; set; }
     public DateTime? LastEmailSent { get; set; }
-    public DateTime? CountEmailSent { get; set; }
+    public int CountEmailSent { get; set; }
     public ICollection<AspNetUserClaim> UserClaims { get; set; } = new List<AspNetUserClaim>();
     public ICollection<AspNetUserRole> UserRoles { get; set; } = new List<AspNetUserRole>();
     public ICollection<AspNetUserLogin> UserLogins { get; set; } = new List<AspNetUserLogin>();
