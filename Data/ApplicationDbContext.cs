@@ -2,6 +2,7 @@
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Configuration;
 using Astronomic_Catalogs.Models.Configuration.Connection;
+using Astronomic_Catalogs.Models.Configuration.Identity;
 using Astronomic_Catalogs.Models.Connection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -25,9 +26,7 @@ public class ApplicationDbContext : IdentityDbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
-
     }
-
 
     public DbSet<ActualDate> ActualDates { get; set; } = null!;
     public DbSet<SourceType> SourceTypes { get; set; } = null!;    
@@ -53,48 +52,14 @@ public class ApplicationDbContext : IdentityDbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<ActualDate>().ToTable("DateTable");
-        modelBuilder.Entity<NameObject>(entity =>
-            entity.HasNoKey()
-        );
-        modelBuilder.Entity<SourceType>(entity =>
-            entity.HasNoKey()
-        );
+        modelBuilder.Entity<NameObject>(entity =>entity.HasNoKey());
+        modelBuilder.Entity<SourceType>(entity =>entity.HasNoKey());
 
         #region Identity
-        modelBuilder.Entity<AspNetUserRole>()
-            .HasKey(ur => new { ur.UserId, ur.RoleId });
-
-        modelBuilder.Entity<Models.AspNetRole>()
-            .HasMany(r => r.RoleClaims)
-            .WithOne(rc => rc.Role)
-            .HasForeignKey(rc => rc.RoleId);
-        modelBuilder.Entity<Models.AspNetRole>()
-            .HasMany(r => r.UserRoles)
-            .WithOne(ur => ur.Role)
-            .HasForeignKey(ur => ur.RoleId);
-
-        modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(u => u.UserClaims)
-            .WithOne(rc => rc.User)
-            .HasForeignKey(rc => rc.UserId);
-        modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(u => u.UserRoles)
-            .WithOne(ur => ur.User)
-            .HasForeignKey(ur => ur.UserId);
-        modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(u => u.UserLogins)
-            .WithOne(rc => rc.User)
-            .HasForeignKey(rc => rc.UserId);
-        modelBuilder.Entity<Models.AspNetUser>()
-            .HasMany(u => u.UserTokens)
-            .WithOne(ur => ur.User)
-            .HasForeignKey(ur => ur.UserId);
-
-        modelBuilder.Entity<Models.AspNetUser>().Property(u => u.RegistrationDate).HasDefaultValueSql("SYSDATETIME()");
-        modelBuilder.Entity<Models.AspNetUser>().Property(u => u.CountRegisterEmailSent).HasDefaultValue(1); // Since one email is automatically sent upon registration.
-
+        modelBuilder.Entity<AspNetUserRole>().HasKey(ur => new { ur.UserId, ur.RoleId });
+        modelBuilder.ApplyConfiguration(new AspNetRoleConfiguration());
+        modelBuilder.ApplyConfiguration(new AspNetUserConfiguration());
         #endregion
-
 
         modelBuilder.ApplyConfiguration(new CollinderCatalogConfiguration());
         modelBuilder.ApplyConfiguration(new ConstellationConfiguration());
