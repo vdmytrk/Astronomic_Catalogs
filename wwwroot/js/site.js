@@ -143,7 +143,7 @@ function CallStoreProcedure() {
     }).done(function (data) {
             $("#dataTableContainer").html(data);
     }).fail(function () {
-        showAlert("EF. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
+        showAlert("AN ARROR OCCURRED WHEN THE CallCreateNewDateProcedure WAS CALLED. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
     });
 }
 

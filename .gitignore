@@ -375,3 +375,7 @@ NLogLocalConfigurations.cs
 DatabaseInitializer_extended.cs
 Database Scripts/Data
 Areas/Admin/Models
+
+# html
+_ActualDate.cshtml
+_ActualDateTable.cshtml

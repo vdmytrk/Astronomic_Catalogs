@@ -7,20 +7,10 @@
 
 <h1>Administrations</h1>
 
-<p>
-    <button type="button" class="btn btn-primary" style="margin: 0.5rem" onclick="CallStoreProcedure()" value="">
-        Create New
-    </button>
-</p>
-<div id="dataTableContainer">
-    @await Html.PartialAsync("_ActualDatePartial", Model)
-</div>
-
-
-<button type="button" class="btn btn-primary" style="margin: 0.5rem" onclick="CallStoreProcedureADO()" value="">
-    Calling the stored procedure GETACTUALDATE() via ADO.
-</button>
-
-<button type="button" class="btn btn-primary" style="margin: 0.5rem" onclick="CallStoreProcedureEF()" value="">
-    Calling the stored procedure GETACTUALDATE() via EF.
-</button>
+@try
+{
+    @await Html.PartialAsync("~/Areas/Admin/Views/HomeAdmin/_ActualDate.cshtml")
+}
+catch
+{
+}

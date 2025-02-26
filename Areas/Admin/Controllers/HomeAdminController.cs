@@ -112,7 +112,7 @@ public class HomeAdminController : Controller
     {
         await _context.Database.ExecuteSqlRawAsync("EXEC CREATENEWDATE");
         var updatedData = await _context.ActualDates.ToListAsync();
-        return PartialView("_ActualDatePartial", updatedData);
+        return PartialView("_ActualDateTable", updatedData);
     }
 
 }
