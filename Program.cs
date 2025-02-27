@@ -135,6 +135,10 @@ public class Program
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
             };
         });
+        builder.Services.Configure<IdentityOptions>(options =>
+        {
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _-.";
+        });
         #endregion
         #region Email
         builder.Services.AddTransient<ICustomEmailSender, EmailSender>(); // Use DummyEmailSender for devolopment

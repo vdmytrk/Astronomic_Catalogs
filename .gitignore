@@ -375,7 +375,6 @@ NLogLocalConfigurations.cs
 DatabaseInitializer_extended.cs
 Database Scripts/Data
 Areas/Admin/Models
-RolesController - Copy.cs
 
 # html
 _ActualDate.cshtml

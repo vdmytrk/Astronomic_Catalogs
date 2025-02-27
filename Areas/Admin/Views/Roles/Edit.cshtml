@@ -22,7 +22,7 @@
             <div class="form-group">
                 <label class="control-label">Users in Role</label>
                 <select name="selectedUsers" class="form-select" multiple>
-                    @foreach (var user in ViewBag.Users as SelectList ?? new SelectList(new List<AspNetUserRole>()))
+                    @foreach (var user in ViewData["Users"] as SelectList ?? new SelectList(new List<AspNetUserRole>()))
                     {
                         <option value="@user.Value" selected="@(Model.UserRoles != null && Model.UserRoles.Any(r => r.UserId == user.Value))">@user.Text</option>
                     }

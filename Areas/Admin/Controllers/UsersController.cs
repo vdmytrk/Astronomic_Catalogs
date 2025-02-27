@@ -1,28 +1,34 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Data;
+using System.Linq;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
 [Area("Admin")]
 public class UsersController : Controller
 {
-    private readonly ApplicationDbContext _context;
     private readonly UserControllerService _userService;
+    private readonly RoleManager<AspNetRole> _roleManager;
+    private readonly UserManager<AspNetUser> _userManager;
 
-    public UsersController(ApplicationDbContext context, UserControllerService userService)
+    public UsersController(RoleManager<AspNetRole> roleManager, UserManager<AspNetUser> userManager, UserControllerService userService)
     {
-        _context = context;
         _userService = userService;
+        _roleManager = roleManager;
+        _userManager = userManager;
     }
 
     // GET: Admin/Users
     public async Task<IActionResult> Index()
     {
-        var aspNetUser = await _context.Users
+        var aspNetUser = await _userManager.Users
             .Include(u => u.UserClaims)
             .Include(u => u.UserRoles)
                 .ThenInclude(r => r.Role)
@@ -40,7 +46,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var aspNetUser = await _context.Users
+        var aspNetUser = await _userManager.Users
             .Include(u => u.UserClaims)
             .Include(u => u.UserRoles)
                 .ThenInclude(r => r.Role)
@@ -59,7 +65,7 @@ public class UsersController : Controller
     // GET: Admin/Users/Create
     public IActionResult Create()
     {
-        ViewData["Roles"] = new SelectList(_context.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
+        ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
 
         return View();
     }
@@ -70,17 +76,22 @@ public class UsersController : Controller
     public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                             string[] selectedRoles)
     {
-        _userService.SetData(aspNetUser, selectedRoles);
 
         if (ModelState.IsValid)
         {
+            _userService.SetData(aspNetUser, selectedRoles);
 
-            _context.Add(aspNetUser);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            //_context.Add(aspNetUser);
+            //await _context.SaveChangesAsync();
+            var result = await _userManager.CreateAsync(aspNetUser);
+            if (result.Succeeded)
+                return RedirectToAction(nameof(Index));
+            
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
         }
 
-        ViewData["Roles"] = new SelectList(_context.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name"); 
+        ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
         return View(aspNetUser);
     }
 
@@ -92,7 +103,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        var aspNetUser = await _context.Users
+        var aspNetUser = await _userManager.Users
             .Include(u => u.UserClaims)
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
@@ -105,7 +116,7 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        ViewData["Roles"] = new SelectList(_context.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
+        ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
 
         return View(aspNetUser);
     }
@@ -118,36 +129,69 @@ public class UsersController : Controller
                                           string[] selectedRoles)
     {
         if (id != aspNetUser.Id)
-        {
             return NotFound();
-        }
 
-        var existingUser = await _context.Users
+        var existingUser = await _userManager.Users
             .Include(u => u.UserClaims)
             .Include(u => u.UserRoles)
                 .ThenInclude(r => r.Role)
             .Include(u => u.UserLogins)
             .Include(u => u.UserTokens)
             .FirstOrDefaultAsync(m => m.Id == id);
-
         if (existingUser == null)
-        {
             return NotFound();
-        }
 
-        _userService.SetData(aspNetUser, selectedRoles, existingUser);
+        var allRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync(); 
+        var userRoles = await _userManager.GetRolesAsync(existingUser);
+        var roleDictionary = await _roleManager.Roles.ToDictionaryAsync(r => r.Id, r => r.Name);
 
 
         if (ModelState.IsValid)
         {
             try
             {
-                _context.Update(existingUser);
-                await _context.SaveChangesAsync();
+                _userService.SetData(aspNetUser, selectedRoles, existingUser);
+                var result = await _userManager.UpdateAsync(existingUser);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    return View(existingUser);
+                }
+
+                //foreach (var role in selectedRoles)
+                //{
+                //    if (!await _userManager.IsInRoleAsync(existingUser, role))
+                //        await _userManager.AddToRoleAsync(existingUser, role);
+                //}
+
+                foreach (var roleId in selectedRoles)
+                {
+                    if (roleDictionary.TryGetValue(roleId, out var roleName))
+                    {
+                        if (!await _userManager.IsInRoleAsync(existingUser, roleName!))
+                            await _userManager.AddToRoleAsync(existingUser, roleName!);
+                    }
+                }
+
+                //foreach (var role in userRoles)
+                //{
+                //    if (!selectedRoles.Contains(role))
+                //        await _userManager.RemoveFromRoleAsync(existingUser, role);
+                //}
+
+                foreach (var roleName in userRoles)
+                {
+                    if (!selectedRoles.Contains(roleDictionary.FirstOrDefault(r => r.Value == roleName).Key))
+                    {
+                        await _userManager.RemoveFromRoleAsync(existingUser, roleName);
+                    }
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AspNetUserExists(existingUser.Id))
+                var user = await _userManager.FindByIdAsync(id);
+                if (user is null)
                 {
                     return NotFound();
                 }
@@ -160,7 +204,7 @@ public class UsersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Roles"] = new SelectList(_context.Roles, "Id", "Name", selectedRoles);
+        ViewData["Roles"] = new SelectList(allRoles, "Id", "Name", selectedRoles);
         return View(existingUser);
     }
 
@@ -168,11 +212,9 @@ public class UsersController : Controller
     public async Task<IActionResult> Delete(string id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
-        var aspNetUser = await _context.Users
+        var aspNetUser = await _userManager.Users
             .Include(u => u.UserClaims)
             .Include(u => u.UserRoles)
                 .ThenInclude(r => r.Role)
@@ -181,9 +223,7 @@ public class UsersController : Controller
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (aspNetUser == null)
-        {
             return NotFound();
-        }
 
         return View(aspNetUser);
     }
@@ -193,19 +233,20 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(string id)
     {
-        var aspNetUser = await _context.Users.FindAsync(id);
+        var aspNetUser = await _userManager.FindByIdAsync(id);
+
         if (aspNetUser != null)
         {
-            _context.Users.Remove(aspNetUser);
+            var result = await _userManager.DeleteAsync(aspNetUser);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return View(aspNetUser);
+            }
         }
 
-        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
-    }
-
-    private bool AspNetUserExists(string id)
-    {
-        return _context.Users.Any(e => e.Id == id);
     }
 
 }

@@ -17,9 +17,9 @@ public class RolesController : Controller
 
     public RolesController(RoleManager<AspNetRole> roleManager, UserManager<AspNetUser> userManager, RoleControllerService roleService)
     {
+        _roleService = roleService;
         _roleManager = roleManager;
         _userManager = userManager;
-        _roleService = roleService;
     }
 
     // GET: Admin/Roles
@@ -94,7 +94,11 @@ public class RolesController : Controller
         if (aspNetRole == null)
             return NotFound();
 
-        ViewData["Users"] = new SelectList(_userManager.Users, "Id", "UserName", aspNetRole.UserRoles?.Select(ur => ur.UserId) ?? new List<string>());
+        ViewData["Users"] = new SelectList(
+            _userManager.Users.Select(u => new { u.Id, u.UserName }), 
+            "Id", 
+            "UserName", 
+            aspNetRole.UserRoles?.Select(ur => ur.UserId) ?? new List<string>());
         return View(aspNetRole);
     }
 
@@ -116,7 +120,7 @@ public class RolesController : Controller
         if (existingRole == null)
             return NotFound();
 
-        var allUsers = _userManager.Users.ToList();
+        var allUsers = await _userManager.Users.ToListAsync();
 
         if (ModelState.IsValid)
         {
