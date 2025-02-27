@@ -53,6 +53,10 @@ a:hover,
 .check-box:checked {
   background-color: #A3A3A3;
 }
+select[multiple] option.selected-fix {
+  background-color: #cecece !important;
+  color: #101010 !important;
+}
 .dark-theme {
   background-color: #121212 !important;
   color: red;
@@ -138,10 +142,10 @@ a:hover,
   box-shadow: 0 0 5px #FF3E3E;
   -webkit-text-fill-color: red !important;
 }
-.dark-theme .form-control:-webkit-autofill,
-.dark-theme .form-select:-webkit-autofill {
+.dark-theme input.form-control:-webkit-autofill,
+.dark-theme input.form-select:-webkit-autofill {
   background-color: #121212 !important;
-  color: red !important;
+  color: red;
   caret-color: red !important;
   animation-name: dark-autofill-fix;
 }
@@ -158,6 +162,10 @@ a:hover,
 }
 .dark-theme .check-box:checked {
   background-color: #8B0000;
+}
+.dark-theme select[multiple] option.selected-fix {
+  background-color: #545454 !important;
+  color: #ffffff !important;
 }
 @keyframes dark-autofill-fix {
   from {

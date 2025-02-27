@@ -15,6 +15,8 @@ using Astronomic_Catalogs.Models.Services;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using Astronomic_Catalogs.Services.Interfaces;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Astronomic_Catalogs;
 
@@ -50,24 +52,31 @@ public class Program
         });
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-
-        builder.Services.AddScoped<UserService>();
-        builder.Services.AddScoped<RoleService>();
-
         #region IDENTITY
-        #region External accounts
+        builder.Services.AddScoped<UserControllerService>();
+        builder.Services.AddScoped<RoleControllerService>();
+        builder.Services.AddScoped<JwtService>();
         // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
         //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
         builder.Services.AddIdentity<Models.AspNetUser, Models.AspNetRole>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
+            options.User.RequireUniqueEmail = true;
         })
-                .AddEntityFrameworkStores<ApplicationDbContext>() 
-                .AddDefaultTokenProviders(); // Adds tokens for password reset, email confirmation, etc.
+        .AddEntityFrameworkStores<ApplicationDbContext>() 
+        .AddDefaultTokenProviders(); // Adds tokens for password reset, email confirmation, etc.
 
         builder.Services.AddAuthentication(options =>
         {
+            options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme; - ÎÑÊ²ËÜÊÈ ÍÈÆ×Å:  Google as default
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        });
+
+        #region External accounts
+        builder.Services.AddAuthentication(options =>
+        {
             options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // Google as default
         })
         .AddGoogle(googleOptions =>
@@ -102,6 +111,31 @@ public class Program
         ///})
         ;
         #endregion
+        #region Cookies and JWT
+        builder.Services.AddAuthentication()
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+            options.SlidingExpiration = true;
+        })
+        .AddJwtBearer(options =>
+        {
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                // Set the validation options.
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+            };
+        });
+        #endregion
         #region Email
         builder.Services.AddTransient<ICustomEmailSender, EmailSender>(); // Use DummyEmailSender for devolopment
         builder.Services.AddOptions();
@@ -112,8 +146,8 @@ public class Program
         builder.Services.Configure<IdentityOptions>(options =>
         {
             // Password settings.
-            options.Password.RequireDigit = true;
             options.Password.RequiredLength = 8;
+            options.Password.RequireDigit = true;
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = true;
             options.Password.RequireLowercase = true;

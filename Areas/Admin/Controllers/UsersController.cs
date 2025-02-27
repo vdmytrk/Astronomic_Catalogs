@@ -11,9 +11,9 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 public class UsersController : Controller
 {
     private readonly ApplicationDbContext _context;
-    private readonly UserService _userService;
+    private readonly UserControllerService _userService;
 
-    public UsersController(ApplicationDbContext context, UserService userService)
+    public UsersController(ApplicationDbContext context, UserControllerService userService)
     {
         _context = context;
         _userService = userService;

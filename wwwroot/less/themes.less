@@ -4,19 +4,19 @@
 @light-highlight: #258cfb;
 @light-check-box-unchecked: #F0F0F0;
 @light-check-box-checked: #A3A3A3;
-    
+
 @dark-bg: #121212;
 @dark-text: red;
 @dark-border: red;
 @dark-highlight: white;
-@dark-highlight-a: #FF3E3E; 
+@dark-highlight-a: #FF3E3E;
 @dark-form-background: #414243;
 @dark-check-box-unchecked: #F08080;
 @dark-check-box-checked: #8B0000;
 
-@light-autofill-bg: #e8f0fe; // Колір autofill у світлій темі
-@dark-autofill-bg: rgba(70, 90, 126, 0.4); // Колір autofill у темній темі
-@autofill-text: #fff; // Колір тексту в autofill
+@light-autofill-bg: #e8f0fe; // Autofill color in light theme
+@dark-autofill-bg: rgba(70, 90, 126, 0.4); // Autofill color in dark theme
+@autofill-text: #fff; // Text color in autofill
 
 @for-test-kolor1: green;
 @for-test-kolor2: orange;
@@ -24,7 +24,7 @@
 
 input:-webkit-autofill {
     animation-name: autofill-fix;
-    animation-duration: 5000s; // Продовжує стиль на довгий час
+    animation-duration: 5000s; // Keeps the style going for a long time
 }
 
 .form-control:-webkit-autofill {
@@ -72,23 +72,30 @@ a:hover, .btn:hover {
 
 //check-box
 .check-box {
-    appearance: none; 
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 1.3em;
     height: 1.3em;
-    border: 0.1em solid gray; 
+    border: 0.1em solid gray;
     border-radius: 0.3em;
-    background-color: @light-check-box-unchecked; 
+    background-color: @light-check-box-unchecked;
     position: relative;
 }
 
 .check-box:checked {
-    background-color: @light-check-box-checked; 
+    background-color: @light-check-box-checked;
 }
 
-//
+// To solve problem with selected items in browser.
+select[multiple] option.selected-fix {
+    background-color: rgb(206, 206, 206) !important;
+    color: rgb(16, 16, 16) !important;
+}
+
+///////////////////////////////////////////////////////////
 // Dark theme
+///////////////////////////////////////////////////////////
 .dark-theme {
     background-color: @dark-bg !important;
     color: @dark-text;
@@ -153,7 +160,7 @@ a:hover, .btn:hover {
     .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
         box-shadow: @dark-bg;
     }
-    
+
     .table {
         --bs-table-color: inherit;
         --bs-table-bg: inherit;
@@ -179,9 +186,9 @@ a:hover, .btn:hover {
         -webkit-text-fill-color: @dark-text !important;
     }
     // Overriding styles for Chromium-based browsers.
-    .form-control:-webkit-autofill, .form-select:-webkit-autofill {
+    input.form-control:-webkit-autofill, input.form-select:-webkit-autofill {
         background-color: @dark-bg !important;
-        color: @dark-text !important;
+        color: @dark-text;
         caret-color: @dark-text !important;
         animation-name: dark-autofill-fix;
     }
@@ -192,7 +199,7 @@ a:hover, .btn:hover {
         -moz-appearance: none;
         width: 1.3em;
         height: 1.3em;
-        border: 0.1em solid red; 
+        border: 0.1em solid red;
         border-radius: 0.3em;
         background-color: @dark-check-box-unchecked;
         position: relative;
@@ -200,6 +207,11 @@ a:hover, .btn:hover {
 
     .check-box:checked {
         background-color: @dark-check-box-checked;
+    }
+    // To solve problem with selected items in browser.
+    select[multiple] option.selected-fix {
+        background-color: rgb(84, 84, 84) !important;
+        color: rgb(255, 255, 255) !important;
     }
 }
 

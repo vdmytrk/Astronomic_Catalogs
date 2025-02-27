@@ -44,3 +44,7 @@ body {
 .identityStyle {
     height: 2em;
 }
+
+select {
+    height: 20em;
+}

@@ -1,6 +1,7 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,19 +11,21 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 [Area("Admin")]
 public class RolesController : Controller
 {
-    private readonly ApplicationDbContext _context;
-    private readonly RoleService _roleService;
+    private readonly RoleControllerService _roleService;
+    private readonly RoleManager<AspNetRole> _roleManager;
+    private readonly UserManager<AspNetUser> _userManager;
 
-    public RolesController(ApplicationDbContext context, RoleService roleService)
+    public RolesController(RoleManager<AspNetRole> roleManager, UserManager<AspNetUser> userManager, RoleControllerService roleService)
     {
-        _context = context;
+        _roleManager = roleManager;
+        _userManager = userManager;
         _roleService = roleService;
     }
 
     // GET: Admin/Roles
     public async Task<IActionResult> Index()
     {
-        var aspNetRole = await _context.Roles
+        var aspNetRole = await _roleManager.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
                 .ThenInclude(ur => ur.User)
@@ -34,20 +37,16 @@ public class RolesController : Controller
     public async Task<IActionResult> Details(string id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
-        var aspNetRole = await _context.Roles
+        var aspNetRole = await _roleManager.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
                 .ThenInclude(ur => ur.User)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (aspNetRole == null)
-        {
             return NotFound();
-        }
 
         return View(aspNetRole);
     }
@@ -55,7 +54,7 @@ public class RolesController : Controller
     // GET: Admin/Roles/Create
     public IActionResult Create()
     {
-        ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName");
+        ViewData["Users"] = new SelectList(_userManager.Users, "Id", "UserName");
         return View();
     }
 
@@ -66,14 +65,17 @@ public class RolesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
     {
-        _roleService.SetData(aspNetRole, selectedUsers);
         if (ModelState.IsValid)
         {
-            _context.Add(aspNetRole);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            _roleService.SetData(aspNetRole, selectedUsers);
+            var result = await _roleManager.CreateAsync(aspNetRole);
+            if (result.Succeeded)
+                return RedirectToAction(nameof(Index));
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(string.Empty, error.Description);
         }
-        ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName", selectedUsers);
+        ViewData["Users"] = new SelectList(_userManager.Users, "Id", "UserName", selectedUsers);
         return View(aspNetRole);
     }
 
@@ -81,22 +83,18 @@ public class RolesController : Controller
     public async Task<IActionResult> Edit(string id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
-        var aspNetRole = await _context.Roles
+        var aspNetRole = await _roleManager.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
                 .ThenInclude(ur => ur.User)
             .FirstOrDefaultAsync(r => r.Id == id);
 
         if (aspNetRole == null)
-        {
             return NotFound();
-        }
 
-        ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName", aspNetRole.UserRoles?.Select(ur => ur.UserId) ?? new List<string>());
+        ViewData["Users"] = new SelectList(_userManager.Users, "Id", "UserName", aspNetRole.UserRoles?.Select(ur => ur.UserId) ?? new List<string>());
         return View(aspNetRole);
     }
 
@@ -108,33 +106,49 @@ public class RolesController : Controller
     public async Task<IActionResult> Edit(string id, [Bind("Id,Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
     {
         if (id != aspNetRole.Id)
-        {
             return NotFound();
-        }
 
-        var existingRole = await _context.Roles
+        var existingRole = await _roleManager.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
                 .ThenInclude(ur => ur.User)
             .FirstOrDefaultAsync(r => r.Id == id);
-
         if (existingRole == null)
-        {
             return NotFound();
-        }
 
-        _roleService.SetData(aspNetRole, selectedUsers, existingRole);
+        var allUsers = _userManager.Users.ToList();
 
         if (ModelState.IsValid)
         {
             try
             {
-                _context.Update(existingRole);
-                await _context.SaveChangesAsync();
+                _roleService.SetData(aspNetRole, selectedUsers, existingRole);
+                var result = await _roleManager.UpdateAsync(existingRole);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    return View(existingRole);
+                }
+
+                foreach (var user in allUsers)
+                {
+                    if (selectedUsers.Contains(user.Id))
+                    {
+                        if (!await _userManager.IsInRoleAsync(user, existingRole.Name!))
+                            await _userManager.AddToRoleAsync(user, existingRole.Name!);
+                    }
+                    else
+                    {
+                        if (await _userManager.IsInRoleAsync(user, existingRole.Name!))
+                            await _userManager.RemoveFromRoleAsync(user, existingRole.Name!);
+                    }
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AspNetRoleExists(existingRole.Id))
+                var role = await _roleManager.FindByIdAsync(id);
+                if (role is null)
                 {
                     return NotFound();
                 }
@@ -146,7 +160,7 @@ public class RolesController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Users"] = new SelectList(_context.Users, "Id", "UserName", selectedUsers);
+        ViewData["Users"] = new SelectList(allUsers, "Id", "UserName", selectedUsers);
         return View(aspNetRole);
     }
 
@@ -154,20 +168,16 @@ public class RolesController : Controller
     public async Task<IActionResult> Delete(string id)
     {
         if (id == null)
-        {
             return NotFound();
-        }
 
-        var aspNetRole = await _context.Roles
+        var aspNetRole = await _roleManager.Roles
             .Include(r => r.RoleClaims)
             .Include(r => r.UserRoles)
                 .ThenInclude(ur => ur.User)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (aspNetRole == null)
-        {
             return NotFound();
-        }
 
         return View(aspNetRole);
     }
@@ -177,19 +187,20 @@ public class RolesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(string id)
     {
-        var aspNetRole = await _context.Roles.FindAsync(id);
+        var aspNetRole = await _roleManager.FindByIdAsync(id);
+
         if (aspNetRole != null)
         {
-            _context.Roles.Remove(aspNetRole);
+            var result = await _roleManager.DeleteAsync(aspNetRole);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError(string.Empty, error.Description);
+                return View(aspNetRole);
+            }
         }
 
-        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
-    }
-
-    private bool AspNetRoleExists(string id)
-    {
-        return _context.Roles.Any(e => e.Id == id);
     }
 
 }

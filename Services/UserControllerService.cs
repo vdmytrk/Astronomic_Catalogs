@@ -2,7 +2,7 @@
 
 namespace Astronomic_Catalogs.Services;
 
-public class UserService
+public class UserControllerService
 {
     internal void SetData(AspNetUser inputUser, string[] selectedRoles, AspNetUser? existingUser = null)
     {

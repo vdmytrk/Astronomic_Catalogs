@@ -1,6 +1,7 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using System.Diagnostics;
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
 [Area("Admin")]
+//[Authorize(Roles = "Admin")]
 public class HomeAdminController : Controller
 {
     private readonly ApplicationDbContext _context;

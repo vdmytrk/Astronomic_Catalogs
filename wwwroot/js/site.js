@@ -148,3 +148,55 @@ function CallStoreProcedure() {
 }
 
 
+// To solve problem with the background color of selected items in browser.
+document.addEventListener("DOMContentLoaded", function () {
+    let selects = document.querySelectorAll("select.form-select"); // Can be used with "select.form-control"
+
+    selects.forEach(select => {
+        let selectedValues = new Set();
+
+        for (let option of select.options) {
+            if (option.hasAttribute("selected") || option.selected) {
+                selectedValues.add(option.value);
+                option.selected = true;
+                option.classList.add("selected-fix");
+            }
+        }
+
+        select.addEventListener("change", function () {
+            for (let option of select.options) {
+                if (option.selected) {
+                    selectedValues.add(option.value);
+                    option.classList.add("selected-fix");
+                } else {
+                    selectedValues.delete(option.value);
+                    option.classList.remove("selected-fix");
+                }
+            }
+        });
+
+        select.addEventListener("mousedown", function (event) {
+            event.preventDefault();
+
+            let option = event.target;
+
+            if (option.tagName === "OPTION") {
+                if (selectedValues.has(option.value)) {
+                    selectedValues.delete(option.value);
+                    option.selected = false;
+                    option.classList.remove("selected-fix");
+                } else {
+                    selectedValues.add(option.value);
+                    option.selected = true;
+                    option.classList.add("selected-fix");
+                }
+            }
+
+            return false; // Prevents selected values ​​from "disappearing"
+        });
+    });
+});
+
+
+
+

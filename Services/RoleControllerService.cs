@@ -2,7 +2,7 @@
 
 namespace Astronomic_Catalogs.Services;
 
-public class RoleService
+public class RoleControllerService
 {
     internal void SetData(AspNetRole inputRole, string[] selectedUsers, AspNetRole? existingRole = null)
     {
