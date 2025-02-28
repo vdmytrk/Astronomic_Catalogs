@@ -73,7 +73,9 @@ public class UsersController : Controller
     // POST: Admin/Users/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+    public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed," +
+                                            "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+                                            string password,
                                             string[] selectedRoles)
     {
 
@@ -81,9 +83,7 @@ public class UsersController : Controller
         {
             _userService.SetData(aspNetUser, selectedRoles);
 
-            //_context.Add(aspNetUser);
-            //await _context.SaveChangesAsync();
-            var result = await _userManager.CreateAsync(aspNetUser);
+            var result = await _userManager.CreateAsync(aspNetUser, password);
             if (result.Succeeded)
                 return RedirectToAction(nameof(Index));
             
@@ -125,7 +125,8 @@ public class UsersController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string id,
-                                          [Bind("Id,UserName,Email,EmailConfirmed,PasswordHash,SecurityStamp,ConcurrencyStamp,PhoneNumber,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+                                          [Bind("Id,UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed," +
+                                          "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                           string[] selectedRoles)
     {
         if (id != aspNetUser.Id)
@@ -159,12 +160,6 @@ public class UsersController : Controller
                     return View(existingUser);
                 }
 
-                //foreach (var role in selectedRoles)
-                //{
-                //    if (!await _userManager.IsInRoleAsync(existingUser, role))
-                //        await _userManager.AddToRoleAsync(existingUser, role);
-                //}
-
                 foreach (var roleId in selectedRoles)
                 {
                     if (roleDictionary.TryGetValue(roleId, out var roleName))
@@ -173,12 +168,6 @@ public class UsersController : Controller
                             await _userManager.AddToRoleAsync(existingUser, roleName!);
                     }
                 }
-
-                //foreach (var role in userRoles)
-                //{
-                //    if (!selectedRoles.Contains(role))
-                //        await _userManager.RemoveFromRoleAsync(existingUser, role);
-                //}
 
                 foreach (var roleName in userRoles)
                 {

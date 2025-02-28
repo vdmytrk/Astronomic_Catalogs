@@ -11,17 +11,10 @@ public class UserControllerService
         var rolesToRemove = targetUser.UserRoles.Where(ur => !selectedRoles.Contains(ur.RoleId)).ToList();
 
         targetUser.UserName = inputUser.UserName;
-        targetUser.NormalizedUserName = inputUser.UserName?.ToUpper();
         targetUser.Email = inputUser.Email;
-        targetUser.NormalizedEmail = inputUser.Email?.ToUpper();
         targetUser.EmailConfirmed = inputUser.EmailConfirmed;
 
         // Поля безпечності
-        if (!string.IsNullOrWhiteSpace(inputUser.PasswordHash))
-        {
-            targetUser.PasswordHash = inputUser.PasswordHash;
-        }
-        ///
         /// Отримати старий пароль користувача.
         /// Захешувати новий пароль через PasswordHasher.
         /// Присвоїти хеш у PasswordHash.
