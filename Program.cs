@@ -158,7 +158,7 @@ public class Program
             );
         #endregion
         #endregion
-
+        
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 
