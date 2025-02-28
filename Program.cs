@@ -142,7 +142,7 @@ public class Program
         #region Identity Options
         builder.Services.Configure<IdentityOptions>(options =>
         {
-            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _-.";
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _-.@";
 
             options.Password.RequiredLength = 8;
             options.Password.RequireDigit = true;
