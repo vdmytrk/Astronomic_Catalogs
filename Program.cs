@@ -52,6 +52,11 @@ public class Program
         });
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
         #region IDENTITY
         builder.Services.AddScoped<UserControllerService>();
         builder.Services.AddScoped<RoleControllerService>();
@@ -63,22 +68,44 @@ public class Program
             options.SignIn.RequireConfirmedAccount = true;
             options.User.RequireUniqueEmail = true;
         })
-        .AddEntityFrameworkStores<ApplicationDbContext>() 
+        .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders(); // Adds tokens for password reset, email confirmation, etc.
 
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme; - ÎÑÊ²ËÜÊÈ ÍÈÆ×Å:  Google as default
+            //options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme; 
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        });
 
-        #region External accounts
-        builder.Services.AddAuthentication(options =>
-        {
             options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // Google as default
         })
+
+        #region Cookies and JWT
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+            options.SlidingExpiration = true;
+        })
+        .AddJwtBearer(options =>
+        {
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                // Set the validation options.
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+            };
+        })
+        #endregion
+        #region External accounts        
         .AddGoogle(googleOptions =>
         {
             googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]
@@ -90,7 +117,7 @@ public class Program
         .AddMicrosoftAccount(microsoftOptions =>
         {
             microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]
-              ?? throw new InvalidOperationException("Microsoft ClientId is missing."); 
+              ?? throw new InvalidOperationException("Microsoft ClientId is missing.");
             microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]
               ?? throw new InvalidOperationException("Microsoft ClientSecret is missing.");
             microsoftOptions.ClaimActions.MapJsonKey("urn:microsoftaccount:picture", "picture");
@@ -111,33 +138,23 @@ public class Program
         ///})
         ;
         #endregion
-        #region Cookies and JWT
-        builder.Services.AddAuthentication()
-        .AddCookie(options =>
-        {
-            options.LoginPath = "/Account/Login";
-            options.AccessDeniedPath = "/Account/AccessDenied";
-            options.SlidingExpiration = true;
-        })
-        .AddJwtBearer(options =>
-        {
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                // Set the validation options.
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
-            };
-        });
+        #endregion
+        #region Identity Options
         builder.Services.Configure<IdentityOptions>(options =>
         {
             options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _-.";
+
+            options.Password.RequiredLength = 8;
+            options.Password.RequireDigit = true;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireLowercase = true;
+
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+
+            options.User.RequireUniqueEmail = true;
         });
         #endregion
         #region Email
@@ -145,28 +162,9 @@ public class Program
         builder.Services.AddOptions();
         builder.Services.Configure<AuthMessageSenderOptions>(
             builder.Configuration.GetSection("AuthMessageSenderOptions")
-            );
-
-        builder.Services.Configure<IdentityOptions>(options =>
-        {
-            // Password settings.
-            options.Password.RequiredLength = 8;
-            options.Password.RequireDigit = true;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireLowercase = true;
-
-            // Lockout settings.
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
-
-            // User settings.
-            options.User.RequireUniqueEmail = true;
-        });
+        );
         #endregion
-        #endregion
-
+        
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 
