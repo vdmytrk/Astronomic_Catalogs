@@ -45,9 +45,7 @@
                     @Html.DisplayFor(modelItem => item.ProviderDisplayName)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-loginProvider="@item.LoginProvider" asp-route-providerKey="@item.ProviderKey">Edit</a> | 
-                    <a asp-action="Details" asp-route-loginProvider="@item.LoginProvider" asp-route-providerKey="@item.ProviderKey">Details</a> | 
-                    <a asp-action="Delete" asp-route-loginProvider="@item.LoginProvider" asp-route-providerKey="@item.ProviderKey">Delete</a>
+                    <a asp-action="Details" asp-route-loginProvider="@item.LoginProvider" asp-route-providerKey="@item.ProviderKey">Details</a>
                 </td>
             </tr>
         }
