@@ -2,23 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using Astronomic_Catalogs.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Security.Claims;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.ComponentModel.DataAnnotations;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account;
 
@@ -31,7 +21,7 @@ public class LoginModel : PageModel
 
 
     public LoginModel(
-        SignInManager<AspNetUser> signInManager, 
+        SignInManager<AspNetUser> signInManager,
         ILogger<LoginModel> logger,
         UserManager<AspNetUser> userManager,
         JwtService jwtService
@@ -81,7 +71,6 @@ public class LoginModel : PageModel
     public async Task<IActionResult> OnPostAsync(string returnUrl = null)
     {
         returnUrl ??= Url.Content("~/");
-
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
         if (ModelState.IsValid)
@@ -92,6 +81,7 @@ public class LoginModel : PageModel
             {
                 _logger.LogWarning($"User with {Input.Email} email not found.");
                 ModelState.AddModelError(string.Empty, $"User with {Input.Email} email not found.");
+                return Page();
             }
 
             // This doesn't count login failures towards account lockout
@@ -101,29 +91,12 @@ public class LoginModel : PageModel
             {
                 _logger.LogInformation("User logged in.");
 
-                #region DV: For cookies and JWT
-                var roles = await _userManager.GetRolesAsync(user);
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email)
-                };
-                claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties { IsPersistent = Input.RememberMe };
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
-                var token = _jwtService.GenerateJwtToken(user, roles);
-
                 // DV: If this is an API request (JS Fetch/AJAX), return JSON. In a future Mobile App
                 if (HttpContext.Request.Headers["Accept"].ToString().Contains("application/json"))
                 {
-                    return new JsonResult(new { token });
+                    var authResult = await _jwtService.AuthenticateToken(HttpContext, user, Input.RememberMe);
+                    return new JsonResult(new { token = authResult });
                 }
-                #endregion
 
                 return LocalRedirect(returnUrl);
             }
@@ -141,8 +114,6 @@ public class LoginModel : PageModel
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 return Page();
             }
-
-
         }
 
         // If we got this far, something failed, redisplay form

@@ -14,25 +14,13 @@ public class UserControllerService
         targetUser.Email = inputUser.Email;
         targetUser.EmailConfirmed = inputUser.EmailConfirmed;
 
-        // Поля безпечності
-        /// Отримати старий пароль користувача.
-        /// Захешувати новий пароль через PasswordHasher.
-        /// Присвоїти хеш у PasswordHash.
-        ///
-        ///if (!string.IsNullOrWhiteSpace(newPassword))
-        ///{
-        ///    var passwordHasher = new PasswordHasher<AspNetUser>();
-        ///    aspNetUser.PasswordHash = passwordHasher.HashPassword(aspNetUser, newPassword);
-        ///    aspNetUser.SecurityStamp = Guid.NewGuid().ToString(); // Оновлюємо SecurityStamp
-        ///}
-
-        // Оновлюємо SecurityStamp, якщо змінюємо критичні дані (пароль, email)
+        // Security fields.
+        // Updating SecurityStamp when changing critical data (password, email).
         if (targetUser.Email != inputUser.Email || targetUser.PasswordHash != inputUser.PasswordHash)
         {
             targetUser.SecurityStamp = Guid.NewGuid().ToString();
         }
-
-        // Оновлюємо ConcurrencyStamp для вирішення конфліктів оновлення
+        // Updating ConcurrencyStamp to resolve update conflicts.
         targetUser.ConcurrencyStamp = Guid.NewGuid().ToString();
 
         targetUser.PhoneNumber = inputUser.PhoneNumber;
