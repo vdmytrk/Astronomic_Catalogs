@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
 [Area("Admin")]
-//[Authorize(Roles = "Admin")]
+//[Authorize(Policy = "AdminPolicy")]
 public class HomeAdminController : Controller
 {
     private readonly ApplicationDbContext _context;

@@ -74,14 +74,17 @@ public class UsersController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed," +
-                                            "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+                                                "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                             string password,
                                             string[] selectedRoles)
     {
-
+        if (selectedRoles == null || selectedRoles.Length == 0)
+        {
+            ModelState.AddModelError("selectedRoles", "The user must have at least one role.");
+        }
         if (ModelState.IsValid)
         {
-            _userService.SetData(aspNetUser, selectedRoles);
+            _userService.SetData(aspNetUser, selectedRoles!);
 
             var result = await _userManager.CreateAsync(aspNetUser, password);
             if (result.Succeeded)
@@ -126,7 +129,7 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string id,
                                           [Bind("Id,UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed," +
-                                          "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+                                              "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                           string[] selectedRoles)
     {
         if (id != aspNetUser.Id)
@@ -147,11 +150,15 @@ public class UsersController : Controller
         var roleDictionary = await _roleManager.Roles.ToDictionaryAsync(r => r.Id, r => r.Name);
 
 
+        if (selectedRoles == null || selectedRoles.Length == 0)
+        {
+            ModelState.AddModelError("selectedRoles", "The user must have at least one role.");
+        }
         if (ModelState.IsValid)
         {
             try
             {
-                _userService.SetData(aspNetUser, selectedRoles, existingUser);
+                _userService.SetData(aspNetUser, selectedRoles!, existingUser);
                 var result = await _userManager.UpdateAsync(existingUser);
                 if (!result.Succeeded)
                 {
@@ -160,7 +167,7 @@ public class UsersController : Controller
                     return View(existingUser);
                 }
 
-                foreach (var roleId in selectedRoles)
+                foreach (var roleId in selectedRoles!)
                 {
                     if (roleDictionary.TryGetValue(roleId, out var roleName))
                     {
@@ -193,7 +200,9 @@ public class UsersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        ViewData["Roles"] = new SelectList(allRoles, "Id", "Name", selectedRoles);
+        ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name", selectedRoles ?? Array.Empty<string>());
+
+
         return View(existingUser);
     }
 

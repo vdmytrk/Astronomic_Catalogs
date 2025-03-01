@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Forced autofill update.
     function refreshAutofillStyles() {
-        console.log("🔄 Примусове оновлення autofill");
+        console.log("🔄 Forced autofill update.");
         inputs.forEach(input => {
             const prevName = input.getAttribute("name"); // Saving the old name.
             input.setAttribute("name", prevName + "_tmp"); // Changing it so the browser forgets autofill.
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Autofill fix after theme switching.
     function forceAutofillFix() {
-        console.log("🎨 Застосування autofill фіксу");
+        console.log("🎨 Applied autofill fix.");
         inputs.forEach(input => {
             input.addEventListener("animationstart", (event) => {
                 if (event.animationName.includes("autofill") ||

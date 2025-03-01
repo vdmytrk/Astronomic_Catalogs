@@ -54,11 +54,12 @@ hr />
             <div class="mb-3">
                 <label>Assign roles</label>
                 <select name="selectedRoles" class="form-select" multiple>
-                    @foreach (var role in ViewData["Roles"] as SelectList ?? new SelectList(new List<AspNetUserRole>()))
+                    @foreach (var role in (ViewData["Roles"] as SelectList ?? new SelectList(new List<AspNetUserRole>())))
                     {
-                        <option value="@role.Value" selected="@(Model.UserRoles != null && Model.UserRoles.Any(r => r.RoleId == role.Value))">@role.Text</option>
+                        <option value="@role.Value" selected="@role.Selected">@role.Text</option>
                     }
                 </select>
+                <span class="text-danger">@Html.ValidationMessage("selectedRoles")</span>
             </div>
 
             <div class="form-group">
