@@ -63,7 +63,7 @@ public class RolesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
+    public async Task<IActionResult> Create([Bind("Name,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
     {
         if (ModelState.IsValid)
         {
@@ -107,7 +107,7 @@ public class RolesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string id, [Bind("Id,Name,NormalizedName,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
+    public async Task<IActionResult> Edit(string id, [Bind("Id,Name,ConcurrencyStamp")] AspNetRole aspNetRole, string[] selectedUsers)
     {
         if (id != aspNetRole.Id)
             return NotFound();

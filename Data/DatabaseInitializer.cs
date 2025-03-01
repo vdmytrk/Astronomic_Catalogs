@@ -1,26 +1,51 @@
 ﻿using Astronomic_Catalogs.Infrastructure;
+using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Services;
+using Astronomic_Catalogs.Services.Constants;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Astronomic_Catalogs.Data;
 
-public class DatabaseInitializer(
-        ApplicationDbContext context,
-        ILogger<DatabaseInitializer> logger)
+public class DatabaseInitializer
 {
-    private readonly ApplicationDbContext _context = context;
-    private readonly ILogger<DatabaseInitializer> _logger = logger;
+    private readonly ApplicationDbContext _context;
+    private readonly ILogger<DatabaseInitializer> _logger;
+    private readonly UserControllerService _userService;
+    private readonly RoleControllerService _roleService;
+    private readonly RoleManager<AspNetRole> _roleManager;
+    private readonly UserManager<AspNetUser> _userManager;
+
+    public DatabaseInitializer(
+        ApplicationDbContext context,
+        ILogger<DatabaseInitializer> logger,
+        UserControllerService userService,
+        RoleControllerService roleService,
+        RoleManager<AspNetRole> roleManager,
+        UserManager<AspNetUser> userManager
+        )
+    {
+        _context = context;
+        _logger = logger;
+        _userService = userService;
+        _roleService = roleService;
+        _roleManager = roleManager;
+        _userManager = userManager;
+    }
 
 #if !DEBUG
         private readonly string _scriptsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database Scripts");
 #else
-        private readonly string _scriptsDirectory = "Database Scripts";
+    private readonly string _scriptsDirectory = "Database Scripts";
 #endif
-    
 
-    
+
+
 
     /// <summary>
     ///                ATTENTION!!!
@@ -32,7 +57,7 @@ public class DatabaseInitializer(
     /// </summary>
     public async Task InitializeDatabaseAsync()
     {
-        bool canConnect = await _context.Database.CanConnectAsync(); 
+        bool canConnect = await _context.Database.CanConnectAsync();
         try
         {
             if (!canConnect)
@@ -43,11 +68,73 @@ public class DatabaseInitializer(
             }
             // To create the database using migration through the Package Manager Console, refer to the Areas\Admin\Models\README.md file.
             await ApplyMigrationsAsync();
+
+            await EnsureIdentityDataAsync();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An error occurred during database initialization.");
-            throw; 
+            throw;
+        }
+    }
+
+    private async Task EnsureIdentityDataAsync()
+    {
+        string[] roles = RoleNames.AllRoles;
+
+        foreach (var role in roles)
+        {
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                var newRole = new AspNetRole() { Name = role };
+                _roleService.SetData(newRole);
+                var roleResult = await _roleManager.CreateAsync(newRole);
+                if (!roleResult.Succeeded)
+                {
+                    var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    var errorMessage = $"Failed to create role '{role}'. Errors: {errors}";
+                    throw new InvalidOperationException(errorMessage);
+                }
+
+                _logger.LogInformation($"Role '{role}' created successfully.");
+            }
+        }
+
+        string adminUserName = "TestAdmin@example.com";
+        string adminEmail = "TestAdmin@example.com";
+        string adminPassword = "Password123!";
+
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
+        if (user == null)
+        {
+            user = new AspNetUser
+            {
+                UserName = adminUserName,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
+
+            var existingRole = await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == "OwnerAdministratorPower")
+                ?? throw new Exception("The OwnerAdministratorPower role does not exist and couldn't be added to the TestAdmin user!");
+
+            var result = await _userManager.CreateAsync(user, adminPassword);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation($"Admin user '{adminUserName}' created successfully.");
+
+                string role = RoleNames.Admin.ToString();
+                await _userManager.AddToRoleAsync(user, existingRole.Name!);
+                await _userManager.AddClaimsAsync(user, new[]
+                {
+                    new Claim("Department", "HQ"), // Headquarters 
+                    new Claim("CanEditUsers", "true"),
+                    new Claim("DateOfBirth", "2000")
+                });
+            }
+            else
+            {
+                _logger.LogError($"Failed to create user '{adminUserName}'. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
         }
     }
 
@@ -64,7 +151,7 @@ public class DatabaseInitializer(
         }
         catch (Exception ex) when (ex.Message.Contains("PendingModelChangesWarning"))
         {
-            _logger.LogWarning(ex, "Model changes detected, but no migration was added. Applying SQL scripts manually.");    
+            _logger.LogWarning(ex, "Model changes detected, but no migration was added. Applying SQL scripts manually.");
             await ExecuteManuallyDbInitalization(canConnect);
         }
         catch (Exception ex)
@@ -125,7 +212,7 @@ public class DatabaseInitializer(
 
             _logger.LogInformation($"Stored procedure {storedProcedure} executed successfully.");
         }
-        catch (DbUpdateException dbEx) 
+        catch (DbUpdateException dbEx)
         {
             _logger.LogError(dbEx, $"Database update error while executing stored procedure {storedProcedure}.");
             throw;
@@ -162,7 +249,7 @@ public class DatabaseInitializer(
             {
                 if (
                     scriptPath == "Database Scripts/Data/NGC2000_UKTemporarily.sql" // TODO: DO NOT WORK IN Azure!!!
-                   ) 
+                   )
                 {
                     defaultTimeout = _context.Database.GetCommandTimeout();
                     _context.Database.SetCommandTimeout(600);
