@@ -45,8 +45,8 @@ body {
     height: 2em;
 }
 
-select {
-    height: 20em;
+select[multiple] {
+    height: 12em;
 }
 
 .text-wrap {

@@ -65,7 +65,9 @@ public class UsersController : Controller
     // GET: Admin/Users/Create
     public IActionResult Create()
     {
+        ViewData["Years"] = Enumerable.Range(DateTime.Now.Year - 120, 121).Reverse().ToList();        
         ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
+        ViewData["AccessFailedCount"] = 0;
 
         return View();
     }
@@ -73,8 +75,8 @@ public class UsersController : Controller
     // POST: Admin/Users/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed," +
-                                                "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+    public async Task<IActionResult> Create([Bind("UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,YearOfBirth," +
+                                              "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                             string password,
                                             string[] selectedRoles)
     {
@@ -94,6 +96,7 @@ public class UsersController : Controller
                 ModelState.AddModelError(string.Empty, error.Description);
         }
 
+        ViewData["Years"] = Enumerable.Range(DateTime.Now.Year - 120, 121).Reverse().ToList();
         ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
         return View(aspNetUser);
     }
@@ -119,7 +122,12 @@ public class UsersController : Controller
             return NotFound();
         }
 
-        ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name");
+        ViewData["Years"] = Enumerable.Range(DateTime.Now.Year - 120, 121).Reverse().ToList();
+        ViewData["Roles"] = new SelectList(
+            _roleManager.Roles.Select(r => new { r.Id, r.Name }), 
+            "Id", 
+            "Name",
+            aspNetUser.UserRoles?.Select(ur => ur.RoleId) ?? new List<string>());
 
         return View(aspNetUser);
     }
@@ -128,8 +136,8 @@ public class UsersController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string id,
-                                          [Bind("Id,UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed," +
-                                              "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
+                                          [Bind("Id,UserName,Email,EmailConfirmed,PhoneNumber,PhoneNumberConfirmed,YearOfBirth," +
+                                            "TwoFactorEnabled,LockoutEnd,LockoutEnabled,AccessFailedCount")] AspNetUser aspNetUser,
                                           string[] selectedRoles)
     {
         if (id != aspNetUser.Id)
@@ -200,6 +208,7 @@ public class UsersController : Controller
             return RedirectToAction(nameof(Index));
         }
 
+        ViewData["Years"] = Enumerable.Range(DateTime.Now.Year - 120, 121).Reverse().ToList();
         ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name", selectedRoles ?? Array.Empty<string>());
 
 

@@ -26,6 +26,7 @@ public class UserControllerService
         targetUser.PhoneNumber = inputUser.PhoneNumber;
         targetUser.PhoneNumberConfirmed = inputUser.PhoneNumberConfirmed;
 
+        targetUser.YearOfBirth = inputUser.YearOfBirth;
         targetUser.TwoFactorEnabled = inputUser.TwoFactorEnabled;
         targetUser.LockoutEnd = inputUser.LockoutEnd;
         targetUser.LockoutEnabled = inputUser.LockoutEnabled;
