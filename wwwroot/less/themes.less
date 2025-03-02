@@ -8,20 +8,20 @@
 @dark-bg: #121212;
 @dark-text: red;
 @dark-border: red;
+@dark-top-border: white;
 @dark-highlight: white;
 @dark-highlight-a: #FF3E3E;
-@dark-form-background: #414243;
+@dark-form-background-dark: #2C2C2C;
+@dark-form-background-light: #414243;
 @dark-check-box-unchecked: #F08080;
 @dark-check-box-checked: #8B0000;
 
 @light-autofill-bg: #e8f0fe; // Autofill color in light theme
 @dark-autofill-bg: rgba(70, 90, 126, 0.4); // Autofill color in dark theme
 @autofill-text: #fff; // Text color in autofill
-
 @for-test-kolor1: green;
 @for-test-kolor2: orange;
 @for-test-kolor2: #ffc107; // Dark yelow
-
 input:-webkit-autofill {
     animation-name: autofill-fix;
     animation-duration: 5000s; // Keeps the style going for a long time
@@ -112,7 +112,7 @@ select[multiple] option.selected-fix {
 
     .btn {
         color: @dark-highlight-a;
-        background-color: @dark-form-background;
+        background-color: @dark-form-background-light;
         border-color: @dark-highlight-a;
         box-shadow: 0 0 5px @dark-highlight-a;
     }
@@ -167,6 +167,21 @@ select[multiple] option.selected-fix {
         --bs-table-border-color: inherit;
     }
 
+    .table-dark {
+        --bs-table-color: @dark-text;
+        --bs-table-bg: @dark-form-background-light;
+    }
+
+    .table-secondary {
+        --bs-table-color: @dark-text;
+        --bs-table-bg: @dark-form-background-dark;
+    }
+
+    tr {
+        border-top-color: @dark-top-border;
+        border-bottom-color: @dark-border;
+    }
+
     .form-select[multiple], .form-select[size]:not([size="1"]) {
         padding-right: .75rem;
         background-image: none;
@@ -174,13 +189,13 @@ select[multiple] option.selected-fix {
 
     .form-select {
         color: @dark-text;
-        background-color: @dark-form-background;
+        background-color: @dark-form-background-light;
         border-color: @dark-highlight-a;
     }
 
     .form-control, .form-select {
         color: inherit;
-        background-color: @dark-form-background;
+        background-color: @dark-form-background-light;
         border-color: @dark-highlight-a;
         box-shadow: 0 0 5px @dark-highlight-a;
         -webkit-text-fill-color: @dark-text !important;

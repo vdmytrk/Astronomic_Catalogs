@@ -160,9 +160,12 @@ public class Program
             options.AddPolicy("AdminPolicy", policy =>
                 policy.RequireClaim("Department", "HQ"));   
 
-            options.AddPolicy("CanEditUsers", policy =>
-                policy.RequireClaim("CanEditUsers", "true"));   
-            
+            options.AddPolicy("UsersClaimAccess", policy =>
+                policy.RequireClaim("CanUsersAccess", "true"));
+
+            options.AddPolicy("UsersRoleClaimAccess", policy =>
+                policy.RequireClaim("CanRoleAccess", "true"));
+
             options.AddPolicy("Over18", policy =>
                 policy.Requirements.Add(new MinimumAgeRequirement(18)));
         });

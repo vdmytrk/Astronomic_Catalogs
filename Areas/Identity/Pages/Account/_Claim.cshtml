@@ -1,0 +1,77 @@
+﻿@model dynamic
+@{
+    var userClaims = Model.userClaims as List<AspNetUserClaim>;
+    var roles = Model.roles as List<AspNetRole>;
+    var roleClaims = Model.roleClaims as List<AspNetRoleClaim>;
+}
+
+<h3 class="mt-4">User Claims</h3>
+<table class="table">
+    <thead class="table-dark">
+        <tr class="h5">
+            <th>Claims of current user</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (userClaims != null && userClaims.Count != 0)
+        {
+            @foreach (var claim in userClaims)
+            {
+                <tr>
+                    <td>@($"{claim.ClaimType}: {claim.ClaimValue}")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td>No claims available.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3 class="mt-5 pt-5">User Roles & Claims</h3>
+<table class="table">
+    <thead class="table-dark">
+        <tr class="h5">
+            <th>Claim Type</th>
+            <th>Claim Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (roles != null && roleClaims != null)
+        {
+            @foreach (var role in roles)
+            {
+                <tr class="table-secondary">
+                    <td colspan="2" class="text-center"><strong>@role.Name</strong></td>
+                </tr>
+
+                var claims = roleClaims.Where(rc => rc.RoleId == role.Id).ToList();
+                if (claims.Any())
+                {
+                    @foreach (var claim in claims)
+                    {
+                        <tr>
+                            <td>@claim.ClaimType</td>
+                            <td>@claim.ClaimValue</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="2" class="text-muted">No claims available.</td>
+                    </tr>
+                }
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="2" class="text-muted">No roles or claims found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

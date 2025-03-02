@@ -124,6 +124,18 @@ select[multiple] option.selected-fix {
   --bs-table-bg: inherit;
   --bs-table-border-color: inherit;
 }
+.dark-theme .table-dark {
+  --bs-table-color: red;
+  --bs-table-bg: #414243;
+}
+.dark-theme .table-secondary {
+  --bs-table-color: red;
+  --bs-table-bg: #2C2C2C;
+}
+.dark-theme tr {
+  border-top-color: white;
+  border-bottom-color: red;
+}
 .dark-theme .form-select[multiple],
 .dark-theme .form-select[size]:not([size="1"]) {
   padding-right: 0.75rem;

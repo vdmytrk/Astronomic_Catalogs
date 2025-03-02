@@ -4,12 +4,15 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
 {
@@ -17,14 +20,26 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<AspNetUser> _userManager;
         private readonly SignInManager<AspNetUser> _signInManager;
+        private readonly RoleManager<AspNetRole> _roleManager;
+        private readonly ApplicationDbContext _context;
 
         public IndexModel(
             UserManager<AspNetUser> userManager,
-            SignInManager<AspNetUser> signInManager)
+            SignInManager<AspNetUser> signInManager,
+            RoleManager<AspNetRole> roleManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
+            _context = context;
         }
+
+
+        public List<AspNetUserClaim> UserClaims { get; set; } = new();
+        public List<AspNetRoleClaim> RoleClaims { get; set; } = new();
+        public List<AspNetRole>? Roles { get; set; }
+
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -90,7 +105,43 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
             await LoadAsync(user);
 
             var logins = await _userManager.GetLoginsAsync(user);
-            IsLocalAccount = logins.Count == 0; 
+            IsLocalAccount = logins.Count == 0;
+
+            #region DV: Current claims
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                UserClaims = await _context.UserClaims
+                    .Where(c => c.UserId == userId)
+                    .ToListAsync();
+            }
+
+            if (user != null)
+            {
+                var roleNames = await _userManager.GetRolesAsync(user);
+                Roles = await _roleManager.Roles
+                    .Where(r => r.Name != null && roleNames.Contains(r.Name))
+                    .ToListAsync();
+            }
+
+            if (Roles != null)
+            {
+                foreach (var role in Roles)
+                {
+                    var roleEntity = await _roleManager.FindByNameAsync(role.Name ?? "");
+                    if (roleEntity != null)
+                    {
+                        var claims = await _roleManager.GetClaimsAsync(roleEntity);
+                        RoleClaims.AddRange(claims.Select(c => new AspNetRoleClaim
+                        {
+                            RoleId = roleEntity.Id,
+                            ClaimType = c.Type,
+                            ClaimValue = c.Value
+                        }));
+                    }
+                }
+            }
+            #endregion
 
             return Page();
         }

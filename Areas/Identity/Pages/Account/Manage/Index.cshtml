@@ -38,6 +38,8 @@
     </div>
 }
 
+@await Html.PartialAsync("_Claim", new { userClaims = Model.UserClaims, roles = Model.Roles, roleClaims = Model.RoleClaims })
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

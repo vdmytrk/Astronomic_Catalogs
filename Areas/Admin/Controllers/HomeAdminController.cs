@@ -14,6 +14,8 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
 [Area("Admin")]
 [Authorize(Policy = "Over18")]
+[Authorize(Policy = "UsersClaimAccess")]
+[Authorize(Policy = "UsersRoleClaimAccess")]
 [Authorize(Roles = RoleNames.Admin)]
 public class HomeAdminController : Controller
 {
