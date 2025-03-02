@@ -198,5 +198,24 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// Prohibiting unauthorized access.
+document.addEventListener("DOMContentLoaded", function () {
+    var div = document.getElementById("restrictedDiv");
+    if (!div) return; 
+
+    if (typeof window.isAuthenticated !== "undefined" && !window.isAuthenticated) {
+        if (div) {
+            div.classList.add("disabled-container");            
+        }
+
+        document.addEventListener("click", function (event) {
+            if (event.target.closest("#restrictedDiv, #restrictedDiv *")) {
+                showAlert("Filters are unavailable for unregistered users. Please sign in.");
+            }
+        });
+    }
+});
+
+
 
 

@@ -149,10 +149,10 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             {
                 var existingClaims = await _userManager.GetClaimsAsync(existUser);
                 var claimsToAdd = new List<Claim>
-            {
-                new Claim("CanUsersAccess", "true"),
-                new Claim(ClaimTypes.DateOfBirth, adminYearOfBirth.ToString())
-            };
+                    {
+                        new Claim("CanUsersAccess", "true"),
+                        new Claim(ClaimTypes.DateOfBirth, adminYearOfBirth.ToString())
+                    };
 
                 var newClaims = claimsToAdd.Where(c => !existingClaims.Any(ec => ec.Type == c.Type)).ToList();
                 if (newClaims.Any())

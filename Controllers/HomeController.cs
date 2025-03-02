@@ -1,11 +1,14 @@
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Services.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace Astronomic_Catalogs.Controllers;
 
+[Authorize(Policy = "Over7")]
 public class HomeController(
     ApplicationDbContext context,
     ILogger<DatabaseInitializer> logger
@@ -31,4 +34,5 @@ public class HomeController(
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
 }

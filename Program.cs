@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using NLog.Web;
+using System.Security.Claims;
 using System.Text;
 
 namespace Astronomic_Catalogs;
@@ -76,8 +77,10 @@ public class Program
         #region Cookies and JWT
         .AddCookie(options =>
         {
-            options.LoginPath = "/Account/Login";
-            options.AccessDeniedPath = "/Account/AccessDenied";
+            options.Cookie.Name = "AstroCatalogsAppCookie";
+            options.LoginPath = "/Identity/Account/Login";
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
             options.SlidingExpiration = true;
         })
         .AddJwtBearer(options =>
@@ -158,19 +161,34 @@ public class Program
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("AdminPolicy", policy =>
-                policy.RequireClaim("Department", "HQ"));   
+                policy.RequireClaim("Department", "HQ")); 
 
-            options.AddPolicy("UsersClaimAccess", policy =>
+            options.AddPolicy("UsersAccessClaim", policy =>
                 policy.RequireClaim("CanUsersAccess", "true"));
 
-            options.AddPolicy("UsersRoleClaimAccess", policy =>
+            options.AddPolicy("RoleAccessClaim", policy =>
                 policy.RequireClaim("CanRoleAccess", "true"));
 
-            options.AddPolicy("Over18", policy =>
-                policy.Requirements.Add(new MinimumAgeRequirement(18)));
-        });
+            options.AddPolicy("RoleModifyClaim", policy =>
+                policy.RequireClaim("CanRolelModify", "true"));
 
+            options.AddPolicy("RoleWatchClaim", policy =>
+                policy.RequireClaim("CanRoleWatch", "true"));
+
+            options.AddPolicy("Over7", policy =>
+                policy.Requirements.Add(new MinimumAgeRequirement(7)));
+        });
         #endregion
+#if DEBUG
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.Name = "AstroCatalogsAppCookie"; 
+            options.LoginPath = "/Identity/Account/Login"; 
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+            options.SlidingExpiration = true;
+        });
+#endif
         #endregion
 
         builder.Services.AddControllersWithViews();

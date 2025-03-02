@@ -1,4 +1,7 @@
-﻿input:-webkit-autofill {
+﻿.disabled-container {
+  opacity: 0.4;
+}
+input:-webkit-autofill {
   animation-name: autofill-fix;
   animation-duration: 5000s;
 }

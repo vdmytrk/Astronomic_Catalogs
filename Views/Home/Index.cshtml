@@ -1,6 +1,20 @@
 ﻿@{
     ViewData["Title"] = "HOME";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
 }
 
 <h1>@ViewData["Title"]</h1>
+
+
+<div class="pt-5">
+    <button id="" type="submit" class="w-100 btn btn-lg btn-primary">Just a button</button>
+</div>
+
+<div class="pt-5" id="restrictedDiv">
+    <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Just a button</button>
+</div>
+
+<script>
+    window.isAuthenticated = @isAuthenticated.ToString().ToLower();
+</script>
