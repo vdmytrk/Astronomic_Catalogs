@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Services.Constants;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
@@ -28,6 +30,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<AspNetUser> _signInManager;
         private readonly UserManager<AspNetUser> _userManager;
+        private readonly RoleManager<AspNetRole> _roleManager;
         private readonly IUserStore<AspNetUser> _userStore;
         private readonly IUserEmailStore<AspNetUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
@@ -38,7 +41,8 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             IUserStore<AspNetUser> userStore,
             SignInManager<AspNetUser> signInManager,
             ILogger<RegisterModel> logger,
-            ICustomEmailSender emailSender)
+            ICustomEmailSender emailSender,
+            RoleManager<AspNetRole> roleManager)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -46,11 +50,14 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         [BindProperty]
         public InputModel Input { get; set; }
         public string ReturnUrl { get; set; }
+        public int YearOfBirth { get; set; }
+        public List<int> Years { get; set; } = Enumerable.Range(DateTime.Now.Year - 120, 121).Reverse().ToList();
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
         public class InputModel
         {
@@ -69,6 +76,10 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [Required]
+            [Display(Name = "Year of birth")]
+            public int YearOfBirth { get; set; }
         }
 
 
@@ -96,6 +107,8 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
                     string role = RoleNames.AutoUser.ToString();
                     await _userManager.AddToRoleAsync(user, role); // VD: The user role is added for each new user.
+                    await AddRoleClaims(); // VD: The role claims is added for each new user.
+                    await AddUserClaims(Input.Email, Input.YearOfBirth); // VD: The user claims is added for each new user.
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -127,6 +140,48 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
             // If we got this far, something failed, redisplay form
             return Page();
+        }
+
+        private async Task AddUserClaims(string adminEmail, int adminYearOfBirth)
+        {
+            var existUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
+            if (existUser != null)
+            {
+                var existingClaims = await _userManager.GetClaimsAsync(existUser);
+                var claimsToAdd = new List<Claim>
+            {
+                new Claim("CanUsersAccess", "true"),
+                new Claim(ClaimTypes.DateOfBirth, adminYearOfBirth.ToString())
+            };
+
+                var newClaims = claimsToAdd.Where(c => !existingClaims.Any(ec => ec.Type == c.Type)).ToList();
+                if (newClaims.Any())
+                    await _userManager.AddClaimsAsync(existUser, newClaims);
+            }
+        }
+        public async Task AddRoleClaims()
+        {
+            string[] roles = RoleNames.AllRoles;
+            var claimsToAdd = new List<Claim>
+                    {
+                        new Claim("CanRoleAccess", "true"),
+                        new Claim("CanRolelModify", "true"),
+                        new Claim("CanRoleWatch", "true"),
+                    };
+
+            foreach (var roleName in roles)
+            {
+                var role = await _roleManager.FindByNameAsync(roleName);
+                if (role is null)
+                    throw new Exception($"Adding a claim to the roleName is not possible because the {roleName} role does not exist.");
+
+                var existingClaims = await _roleManager.GetClaimsAsync(role);
+                var newClaims = claimsToAdd.Where(c => !existingClaims.Any(ec => ec.Type == c.Type)).ToList();
+                foreach (var claim in newClaims)
+                {
+                    await _roleManager.AddClaimAsync(role, claim);
+                }
+            }
         }
 
         private AspNetUser CreateUser()

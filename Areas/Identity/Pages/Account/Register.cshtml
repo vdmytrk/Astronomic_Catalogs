@@ -27,7 +27,14 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            <div class="form-group mb-3">
+                <label asp-for="Input.YearOfBirth" class="control-label"></label>
+                <select asp-for="Input.YearOfBirth" asp-items="@(new SelectList(Model.Years))" class="form-control"></select>
+                <span asp-validation-for="Input.YearOfBirth" class="text-danger"></span>
+            </div>
+            <div class="pt-5">
+                <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            </div>
         </form>
     </div>
     <div class="col-md-6 col-md-offset-2">

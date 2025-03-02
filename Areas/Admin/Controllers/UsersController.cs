@@ -211,7 +211,6 @@ public class UsersController : Controller
         ViewData["Years"] = Enumerable.Range(DateTime.Now.Year - 120, 121).Reverse().ToList();
         ViewData["Roles"] = new SelectList(_roleManager.Roles.Select(r => new { r.Id, r.Name }), "Id", "Name", selectedRoles ?? Array.Empty<string>());
 
-
         return View(existingUser);
     }
 

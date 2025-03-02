@@ -44,7 +44,6 @@
             <div class="form-group">
                 <label asp-for="YearOfBirth" class="control-label"></label>
                 <select asp-for="YearOfBirth" asp-items="@(new SelectList(ViewData["Years"] as List<int>))" class="form-control"></select>
-
                 <span asp-validation-for="YearOfBirth" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
