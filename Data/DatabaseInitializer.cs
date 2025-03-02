@@ -20,6 +20,7 @@ public class DatabaseInitializer
     private readonly RoleControllerService _roleService;
     private readonly RoleManager<AspNetRole> _roleManager;
     private readonly UserManager<AspNetUser> _userManager;
+    private readonly SignInManager<AspNetUser> _signInManager;
 
     public DatabaseInitializer(
         ApplicationDbContext context,
@@ -27,7 +28,9 @@ public class DatabaseInitializer
         UserControllerService userService,
         RoleControllerService roleService,
         RoleManager<AspNetRole> roleManager,
-        UserManager<AspNetUser> userManager
+        UserManager<AspNetUser> userManager,
+        SignInManager<AspNetUser> signInManager
+
         )
     {
         _context = context;
@@ -36,6 +39,7 @@ public class DatabaseInitializer
         _roleService = roleService;
         _roleManager = roleManager;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
 #if !DEBUG
@@ -68,7 +72,6 @@ public class DatabaseInitializer
             }
             // To create the database using migration through the Package Manager Console, refer to the Areas\Admin\Models\README.md file.
             await ApplyMigrationsAsync();
-
             await EnsureIdentityDataAsync();
         }
         catch (Exception ex)
@@ -80,8 +83,18 @@ public class DatabaseInitializer
 
     private async Task EnsureIdentityDataAsync()
     {
-        string[] roles = RoleNames.AllRoles;
+        string adminEmail = "TestAdmin@example.com";
+        string adminPassword = "Password123!";
+        int adminYearOfBirth = 2000;
 
+        await AddRoles();
+        await AddAdmin(adminEmail, adminPassword, adminYearOfBirth);
+        await AddClaims(adminEmail, adminYearOfBirth);
+    }
+
+    public async Task AddRoles()
+    {
+        string[] roles = RoleNames.AllRoles;
         foreach (var role in roles)
         {
             if (!await _roleManager.RoleExistsAsync(role))
@@ -99,42 +112,55 @@ public class DatabaseInitializer
                 _logger.LogInformation($"Role '{role}' created successfully.");
             }
         }
+    }
 
-        string adminUserName = "TestAdmin@example.com";
-        string adminEmail = "TestAdmin@example.com";
-        string adminPassword = "Password123!";
-
+    public async Task AddAdmin(string adminEmail, string adminPassword, int adminYearOfBirth)
+    {
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
         if (user == null)
         {
             user = new AspNetUser
             {
-                UserName = adminUserName,
+                UserName = adminEmail,
                 Email = adminEmail,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                YearOfBirth = adminYearOfBirth
             };
 
-            var existingRole = await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == "OwnerAdministratorPower")
-                ?? throw new Exception("The OwnerAdministratorPower role does not exist and couldn't be added to the TestAdmin user!");
+            string role = RoleNames.Admin.ToString();
+            var existingRole = await _roleManager.Roles.FirstOrDefaultAsync(r => r.Name == role)
+                ?? throw new Exception($"The {role} role does not exist and couldn't be added to the TestAdmin user!");
 
             var result = await _userManager.CreateAsync(user, adminPassword);
             if (result.Succeeded)
             {
-                _logger.LogInformation($"Admin user '{adminUserName}' created successfully.");
+                _logger.LogInformation($"Admin user '{adminEmail}' created successfully.");
 
-                string role = RoleNames.Admin.ToString();
                 await _userManager.AddToRoleAsync(user, existingRole.Name!);
-                await _userManager.AddClaimsAsync(user, new[]
-                {
-                    new Claim("Department", "HQ"), // Headquarters 
-                    new Claim("CanEditUsers", "true"),
-                    new Claim("DateOfBirth", "2000")
-                });
             }
             else
             {
-                _logger.LogError($"Failed to create user '{adminUserName}'. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                _logger.LogError($"Failed to create user '{adminEmail}'. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
+        }
+    }
+
+    private async Task AddClaims(string adminEmail, int adminYearOfBirth)
+    {
+        var existUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
+        if (existUser != null)
+        {
+            var existingClaims = await _userManager.GetClaimsAsync(existUser);
+            var claimsToAdd = new List<Claim>
+            {
+                new Claim("Department", "HQ"), // HeadQuarters 
+                new Claim("CanEditUsers", "true"),
+                new Claim(ClaimTypes.DateOfBirth, adminYearOfBirth.ToString())
+            };
+            
+            var newClaims = claimsToAdd.Where(c => !existingClaims.Any(ec => ec.Type == c.Type)).ToList();
+            if (newClaims.Any())
+                await _userManager.AddClaimsAsync(existUser, newClaims);
         }
     }
 

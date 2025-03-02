@@ -8,4 +8,29 @@
 <h1>@ViewData["Title"]</h1>
 
 
+<table class="table">
+    <thead>
+        <tr>
+            <th>Claims of carrent user.</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (ViewBag.Claims != null)
+        {
+            @foreach (var claim in ViewBag.Claims)
+            {
+                <tr>
+                    <td>@($"{claim.ClaimType}: {claim.ClaimValue}")</td>
+                </tr>
+            }
+        }
+        @if (ViewBag.Claims.Count == 0)
+        {
+            <tr>
+                <td>No claims available.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
 

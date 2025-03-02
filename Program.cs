@@ -1,21 +1,17 @@
+using Astronomic_Catalogs.Authorization;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
+using Astronomic_Catalogs.Models.Services;
 using Astronomic_Catalogs.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Astronomic_Catalogs.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
+using Microsoft.IdentityModel.Tokens;
 using NLog;
 using NLog.Web;
-using Astronomic_Catalogs.Models.Services;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Authentication;
-using Astronomic_Catalogs.Services.Interfaces;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 namespace Astronomic_Catalogs;
@@ -56,6 +52,7 @@ public class Program
         #region IDENTITY
         builder.Services.AddScoped<UserControllerService>();
         builder.Services.AddScoped<RoleControllerService>();
+        builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
         builder.Services.AddScoped<JwtService>();
         // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
         //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
@@ -157,8 +154,22 @@ public class Program
             builder.Configuration.GetSection("AuthMessageSenderOptions")
             );
         #endregion
+        #region Policy
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminPolicy", policy =>
+                policy.RequireClaim("Department", "HQ"));   
+
+            options.AddPolicy("CanEditUsers", policy =>
+                policy.RequireClaim("CanEditUsers", "true"));   
+            
+            options.AddPolicy("Over18", policy =>
+                policy.Requirements.Add(new MinimumAgeRequirement(18)));
+        });
+
         #endregion
-        
+        #endregion
+
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 
