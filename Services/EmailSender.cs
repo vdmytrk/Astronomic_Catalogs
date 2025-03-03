@@ -17,12 +17,12 @@ public class EmailSender : ICustomEmailSender
 {
     private readonly AuthMessageSenderOptions _options;
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<DatabaseInitializer> _logger;
+    private readonly ILogger<EmailSender> _logger;
 
     public EmailSender(
         IOptions<AuthMessageSenderOptions> options, 
         ApplicationDbContext context, 
-        ILogger<DatabaseInitializer> logger
+        ILogger<EmailSender> logger
         )
     {
         _options = options.Value;

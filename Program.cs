@@ -208,10 +208,11 @@ public class Program
             var nlogService = scope.ServiceProvider.GetRequiredService<NLogConfigProvider>();
             nlogService.ConfigureLogger();
         }
-#if (DEBUG)
+
         if ("Development" == builder.Environment.EnvironmentName)
+        {
             TestConfigurationUpoaded();
-#endif
+        }
 
         using (var scope = app.Services.CreateScope())
         {

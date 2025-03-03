@@ -11,11 +11,11 @@ namespace Astronomic_Catalogs.Controllers;
 [Authorize(Policy = "OverAgeOrAnonymous")]
 public class HomeController(
     ApplicationDbContext context,
-    ILogger<DatabaseInitializer> logger
+    ILogger<HomeController> logger
     ) : Controller
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly ILogger<DatabaseInitializer> _logger = logger;
+    private readonly ILogger<HomeController> _logger = logger;
 
     // GET: Home
     public async Task<IActionResult> Index()

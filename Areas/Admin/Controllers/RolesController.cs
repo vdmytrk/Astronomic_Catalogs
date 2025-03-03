@@ -20,12 +20,18 @@ public class RolesController : Controller
     private readonly RoleControllerService _roleService;
     private readonly RoleManager<AspNetRole> _roleManager;
     private readonly UserManager<AspNetUser> _userManager;
+    private readonly SignInManager<AspNetUser> _signInManager;
 
-    public RolesController(RoleManager<AspNetRole> roleManager, UserManager<AspNetUser> userManager, RoleControllerService roleService)
+    public RolesController(
+        RoleManager<AspNetRole> roleManager,
+        UserManager<AspNetUser> userManager,
+        RoleControllerService roleService,
+        SignInManager<AspNetUser> signInManager)
     {
         _roleService = roleService;
         _roleManager = roleManager;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     // GET: Admin/Roles
@@ -76,11 +82,20 @@ public class RolesController : Controller
             _roleService.SetData(aspNetRole, selectedUsers);
             var result = await _roleManager.CreateAsync(aspNetRole);
             if (result.Succeeded)
+            {
+                foreach (var userId in selectedUsers) 
+                {
+                    var user = await _userManager.FindByIdAsync(userId);
+                    if (user != null)
+                        await _signInManager.RefreshSignInAsync(user);
+                }
                 return RedirectToAction(nameof(Index));
+            }
 
             foreach (var error in result.Errors)
                 ModelState.AddModelError(string.Empty, error.Description);
         }
+
         ViewData["Users"] = new SelectList(_userManager.Users, "Id", "UserName", selectedUsers);
         return View(aspNetRole);
     }
@@ -101,9 +116,9 @@ public class RolesController : Controller
             return NotFound();
 
         ViewData["Users"] = new SelectList(
-            _userManager.Users.Select(u => new { u.Id, u.UserName }), 
-            "Id", 
-            "UserName", 
+            _userManager.Users.Select(u => new { u.Id, u.UserName }),
+            "Id",
+            "UserName",
             aspNetRole.UserRoles?.Select(ur => ur.UserId) ?? new List<string>());
         return View(aspNetRole);
     }
@@ -153,6 +168,7 @@ public class RolesController : Controller
                         if (await _userManager.IsInRoleAsync(user, existingRole.Name!))
                             await _userManager.RemoveFromRoleAsync(user, existingRole.Name!);
                     }
+                    await _signInManager.RefreshSignInAsync(user);
                 }
             }
             catch (DbUpdateConcurrencyException)
@@ -201,12 +217,19 @@ public class RolesController : Controller
 
         if (aspNetRole != null)
         {
+            var usersInRole = await _userManager.GetUsersInRoleAsync(aspNetRole.Name!); 
+
             var result = await _roleManager.DeleteAsync(aspNetRole);
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
                     ModelState.AddModelError(string.Empty, error.Description);
                 return View(aspNetRole);
+            }
+
+            foreach (var user in usersInRole) 
+            {
+                await _signInManager.RefreshSignInAsync(user);
             }
         }
 

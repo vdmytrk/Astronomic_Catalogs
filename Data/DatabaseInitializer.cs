@@ -17,30 +17,24 @@ public class DatabaseInitializer
 {
 	private readonly ApplicationDbContext _context;
 	private readonly ILogger<DatabaseInitializer> _logger;
-	private readonly UserControllerService _userService;
 	private readonly RoleControllerService _roleService;
 	private readonly RoleManager<AspNetRole> _roleManager;
 	private readonly UserManager<AspNetUser> _userManager;
-	private readonly SignInManager<AspNetUser> _signInManager;
 
 	public DatabaseInitializer(
 		ApplicationDbContext context,
 		ILogger<DatabaseInitializer> logger,
-		UserControllerService userService,
 		RoleControllerService roleService,
 		RoleManager<AspNetRole> roleManager,
-		UserManager<AspNetUser> userManager,
-		SignInManager<AspNetUser> signInManager
+		UserManager<AspNetUser> userManager
 
 		)
 	{
 		_context = context;
 		_logger = logger;
-		_userService = userService;
 		_roleService = roleService;
 		_roleManager = roleManager;
 		_userManager = userManager;
-		_signInManager = signInManager;
 	}
 
 #if !DEBUG
