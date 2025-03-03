@@ -237,6 +237,8 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.UseMiddleware<RequestLoggingMiddleware>();
+
         app.MapStaticAssets();
 
         app.MapControllerRoute(

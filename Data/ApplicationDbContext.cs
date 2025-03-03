@@ -3,7 +3,9 @@ using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Configuration;
 using Astronomic_Catalogs.Models.Configuration.Connection;
 using Astronomic_Catalogs.Models.Configuration.Identity;
+using Astronomic_Catalogs.Models.Configuration.Services;
 using Astronomic_Catalogs.Models.Connection;
+using Astronomic_Catalogs.Models.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -47,13 +49,17 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<AspNetUserLogin> UserLogins { get; set; } = null!;
     public DbSet<AspNetUserToken> UserTokens { get; set; } = null!;
 
+    public DbSet<RequestLog> RequestLogs { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<ActualDate>().ToTable("DateTable");
-        modelBuilder.Entity<NameObject>(entity =>entity.HasNoKey());
-        modelBuilder.Entity<SourceType>(entity =>entity.HasNoKey());
+        modelBuilder.Entity<NameObject>().HasNoKey();
+        modelBuilder.Entity<SourceType>().HasNoKey();
+
+        modelBuilder.ApplyConfiguration(new RequestLogConfiguration());
 
         #region Identity
         modelBuilder.Entity<AspNetUserRole>().HasKey(ur => new { ur.UserId, ur.RoleId });
@@ -61,6 +67,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.ApplyConfiguration(new AspNetUserConfiguration());
         #endregion
 
+        #region Astronomic catalogs
         modelBuilder.ApplyConfiguration(new CollinderCatalogConfiguration());
         modelBuilder.ApplyConfiguration(new ConstellationConfiguration());
         modelBuilder.ApplyConfiguration(new NameObjectConfiguration());
@@ -71,7 +78,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.ApplyConfiguration(new LogProcFuncConfiguration());
         modelBuilder.ApplyConfiguration(new NLogApplicationCodeConfiguration());
         modelBuilder.ApplyConfiguration(new TestConnectionForNLogConfiguration());
-
+        #endregion
     }
 }
 

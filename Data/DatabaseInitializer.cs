@@ -336,6 +336,7 @@ public class DatabaseInitializer
 		await ExecuteSqlScriptAsync($"Tables/NGCWikipedia_TemporarilySource.sql");
 		await ExecuteSqlScriptAsync($"Tables/NGCWikipedia_ExtensionTemporarilySource.sql");
 		await ExecuteSqlScriptAsync($"Tables/NGCICOpendatasoft_Source.sql");
+		await ExecuteSqlScriptAsync($"Tables/RequestLog.sql");
 	}
 
 	private async Task ExecuteCreateProcedureFunctionSqlScriptsAsync()

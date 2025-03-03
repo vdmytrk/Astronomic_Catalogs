@@ -1,15 +1,9 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Services;
 using Astronomic_Catalogs.Services.Interfaces;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
 
 namespace Astronomic_Catalogs.Services;
 
