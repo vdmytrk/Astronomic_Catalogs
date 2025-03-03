@@ -18,9 +18,7 @@ public class MinimumAgeHandler : AuthorizationHandler<MinimumAgeRequirement>
             return Task.CompletedTask;
 
         int birthDate = int.Parse(birthDateClaim.Value);
-        int carrentDate = DateTime.Today.Year;
-        var age = carrentDate - birthDate;
-
+        var age = DateTime.Today.Year - birthDate;
         if (age >= requirement.MinimumAge)
             context.Succeed(requirement);
 

@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Astronomic_Catalogs.Controllers;
 
-[Authorize(Policy = "Over7")]
+[Authorize(Policy = "OverAgeOrAnonymous")]
 public class HomeController(
     ApplicationDbContext context,
     ILogger<DatabaseInitializer> logger

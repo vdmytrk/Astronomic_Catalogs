@@ -55,6 +55,7 @@ public class Program
         builder.Services.AddScoped<RoleControllerService>();
         builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
         builder.Services.AddScoped<JwtService>();
+        builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeOrAnonymousHandler>();
         // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
         //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
         builder.Services.AddIdentity<Models.AspNetUser, Models.AspNetRole>(options =>
@@ -161,7 +162,7 @@ public class Program
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("AdminPolicy", policy =>
-                policy.RequireClaim("Department", "HQ")); 
+                policy.RequireClaim("Department", "HQ"));
 
             options.AddPolicy("UsersAccessClaim", policy =>
                 policy.RequireClaim("CanUsersAccess", "true"));
@@ -175,15 +176,18 @@ public class Program
             options.AddPolicy("RoleWatchClaim", policy =>
                 policy.RequireClaim("CanRoleWatch", "true"));
 
-            options.AddPolicy("Over7", policy =>
-                policy.Requirements.Add(new MinimumAgeRequirement(7)));
+            options.AddPolicy("OverAge", policy =>
+                policy.Requirements.Add(new MinimumAgeRequirement(7))); // TODO: Use environment variable 
+
+            options.AddPolicy("OverAgeOrAnonymous", policy =>
+                policy.Requirements.Add(new MinimumAgeRequirement(7))); // TODO: Use environment variable 
         });
         #endregion
 #if DEBUG
         builder.Services.ConfigureApplicationCookie(options =>
         {
-            options.Cookie.Name = "AstroCatalogsAppCookie"; 
-            options.LoginPath = "/Identity/Account/Login"; 
+            options.Cookie.Name = "AstroCatalogsAppCookie";
+            options.LoginPath = "/Identity/Account/Login";
             options.AccessDeniedPath = "/Identity/Account/AccessDenied";
             options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
             options.SlidingExpiration = true;

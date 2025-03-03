@@ -7,10 +7,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Services.Constants;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
 [Area("Admin")]
+[Authorize(Roles = RoleNames.Admin)]
+[Authorize(Policy = "AdminPolicy")]
+[Authorize(Policy = "UsersAccessClaim")]
+[Authorize(Policy = "OverAge")]
 public class RoleClaimsController : Controller
 {
     private readonly ApplicationDbContext _context;

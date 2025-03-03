@@ -4,12 +4,15 @@
 // Write your JavaScript code.
 
 document.addEventListener("DOMContentLoaded", function () {
+    /////////////////////////////////////////////
+    // Theme block
+    /////////////////////////////////////////////
     const themeToggle = document.getElementById("theme-toggle");
     const body = document.body;
     const inputs = document.querySelectorAll(".form-control");
 
     // Forced autofill update.
-    function refreshAutofillStyles() {
+    function RefreshAutofillStyles() {
         console.log("🔄 Forced autofill update.");
         inputs.forEach(input => {
             const prevName = input.getAttribute("name"); // Saving the old name.
@@ -20,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Autofill fix after theme switching.
-    function forceAutofillFix() {
+    function ForceAutofillFix() {
         console.log("🎨 Applied autofill fix.");
         inputs.forEach(input => {
             input.addEventListener("animationstart", (event) => {
@@ -52,8 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("theme", body.classList.contains("dark-theme") ? "dark" : "light");
 
         // Forcing autofill update.
-        refreshAutofillStyles();
-        forceAutofillFix();
+        RefreshAutofillStyles();
+        ForceAutofillFix();
 
         // Forcing autofill re-render.
         inputs.forEach(input => {
@@ -64,8 +67,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Updating autofill styles on page load.
-    refreshAutofillStyles();
-    forceAutofillFix();
+    RefreshAutofillStyles();
+    ForceAutofillFix();
 
     // On load pages
     (function () {
@@ -84,33 +87,92 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }, 100);
     })();
+
+
+    /////////////////////////////////////////////
+    // Style block
+    /////////////////////////////////////////////
+    // To solve problem with the background color of selected items in browser.
+    function FixSelectBehavior() {
+        let selects = document.querySelectorAll("select.form-select"); // Can be used with "select.form-control"
+
+        selects.forEach(select => {
+            let selectedValues = new Set();
+
+            for (let option of select.options) {
+                if (option.hasAttribute("selected") || option.selected) {
+                    selectedValues.add(option.value);
+                    option.selected = true;
+                    option.classList.add("selected-fix");
+                }
+            }
+
+            select.addEventListener("change", function () {
+                for (let option of select.options) {
+                    if (option.selected) {
+                        selectedValues.add(option.value);
+                        option.classList.add("selected-fix");
+                    } else {
+                        selectedValues.delete(option.value);
+                        option.classList.remove("selected-fix");
+                    }
+                }
+            });
+
+            select.addEventListener("mousedown", function (event) {
+                event.preventDefault();
+
+                let option = event.target;
+
+                if (option.tagName === "OPTION") {
+                    if (selectedValues.has(option.value)) {
+                        selectedValues.delete(option.value);
+                        option.selected = false;
+                        option.classList.remove("selected-fix");
+                    } else {
+                        selectedValues.add(option.value);
+                        option.selected = true;
+                        option.classList.add("selected-fix");
+                    }
+                }
+
+                return false; // Prevents selected values ​​from "disappearing"
+            });
+        });
+    };
+
+
+    /////////////////////////////////////////////
+    // Access block
+    /////////////////////////////////////////////
+    // Prohibiting unauthorized access.
+    function AlertUnauthorizedAccess() {
+        var div = document.getElementById("restrictedDiv");
+        if (!div) return;
+
+        if (typeof window.isAuthenticated !== "undefined" && !window.isAuthenticated) {
+            div.classList.add("disabled-container");
+
+            document.addEventListener("click", HandleUnauthorizedClick);
+        }
+    }
+
+    function HandleUnauthorizedClick(event) {
+        if (event.target.closest("#restrictedDiv, #restrictedDiv *")) {
+            showAlert("Filters are unavailable for unregistered users. Please sign in.");
+        }
+    }
+
+
+    FixSelectBehavior();
+    AlertUnauthorizedAccess();
 });
 
-function showAlert(message) {
-    if (localStorage.getItem("theme") === "dark") {
-        Swal.fire({
-            title: "Attention!",
-            text: message, 
-            icon: "info",
-            background: "#414243", 
-            color: "red", 
-            confirmButtonColor: "red", 
-            confirmButtonText: "OK"
-        });
-    } else {
-        Swal.fire({
-            title: "Attention!",
-            text: message, 
-            icon: "info",
-            background: "white", 
-            color: "black", 
-            confirmButtonColor: "blue", 
-            confirmButtonText: "OK"
-        });
-    }
-}
 
-function CallStoreProcedureADO() {
+/////////////////////////////////////////////
+// Store procedure block
+/////////////////////////////////////////////
+function fetchDateUsingADO() {
     $.ajax({
         url: '/Admin/HomeAdmin/GetDateFromProcedureADO',
         type: 'GET'
@@ -124,11 +186,11 @@ function CallStoreProcedureADO() {
     });
 }
 
-function CallStoreProcedureEF() {
+function fetchDateUsingEF() {
     $.ajax({
         url: '/Admin/HomeAdmin/GetDateFromProcedureEF',
         type: 'GET'
-    }).done(function (data) {        
+    }).done(function (data) {
         showAlert(data);
     }).fail(function (data) {
         showAlert("EF. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
@@ -136,85 +198,44 @@ function CallStoreProcedureEF() {
     });
 }
 
-function CallStoreProcedure() {
+function executeCreateNewDateProcedure() {
     $.ajax({
         url: '/Admin/HomeAdmin/CallCreateNewDateProcedure',
         type: 'GET'
     }).done(function (data) {
-            $("#dataTableContainer").html(data);
+        $("#dataTableContainer").html(data);
     }).fail(function () {
         showAlert("AN ARROR OCCURRED WHEN THE CallCreateNewDateProcedure WAS CALLED. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
     });
 }
 
 
-// To solve problem with the background color of selected items in browser.
-document.addEventListener("DOMContentLoaded", function () {
-    let selects = document.querySelectorAll("select.form-select"); // Can be used with "select.form-control"
-
-    selects.forEach(select => {
-        let selectedValues = new Set();
-
-        for (let option of select.options) {
-            if (option.hasAttribute("selected") || option.selected) {
-                selectedValues.add(option.value);
-                option.selected = true;
-                option.classList.add("selected-fix");
-            }
-        }
-
-        select.addEventListener("change", function () {
-            for (let option of select.options) {
-                if (option.selected) {
-                    selectedValues.add(option.value);
-                    option.classList.add("selected-fix");
-                } else {
-                    selectedValues.delete(option.value);
-                    option.classList.remove("selected-fix");
-                }
-            }
+/////////////////////////////////////////////
+// Alert block
+/////////////////////////////////////////////
+function showAlert(message) {
+    if (localStorage.getItem("theme") === "dark") {
+        Swal.fire({
+            title: "Attention!",
+            text: message,
+            icon: "info",
+            background: "#414243",
+            color: "red",
+            confirmButtonColor: "red",
+            confirmButtonText: "OK"
         });
-
-        select.addEventListener("mousedown", function (event) {
-            event.preventDefault();
-
-            let option = event.target;
-
-            if (option.tagName === "OPTION") {
-                if (selectedValues.has(option.value)) {
-                    selectedValues.delete(option.value);
-                    option.selected = false;
-                    option.classList.remove("selected-fix");
-                } else {
-                    selectedValues.add(option.value);
-                    option.selected = true;
-                    option.classList.add("selected-fix");
-                }
-            }
-
-            return false; // Prevents selected values ​​from "disappearing"
-        });
-    });
-});
-
-
-// Prohibiting unauthorized access.
-document.addEventListener("DOMContentLoaded", function () {
-    var div = document.getElementById("restrictedDiv");
-    if (!div) return; 
-
-    if (typeof window.isAuthenticated !== "undefined" && !window.isAuthenticated) {
-        if (div) {
-            div.classList.add("disabled-container");            
-        }
-
-        document.addEventListener("click", function (event) {
-            if (event.target.closest("#restrictedDiv, #restrictedDiv *")) {
-                showAlert("Filters are unavailable for unregistered users. Please sign in.");
-            }
+    } else {
+        Swal.fire({
+            title: "Attention!",
+            text: message,
+            icon: "info",
+            background: "white",
+            color: "black",
+            confirmButtonColor: "blue",
+            confirmButtonText: "OK"
         });
     }
-});
+}
 
 
 
