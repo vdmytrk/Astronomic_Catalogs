@@ -8,10 +8,6 @@ public class ConnectionStringProvider
 
     public ConnectionStringProvider(IConfiguration configuration)
     {
-        var builder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
-            .AddEnvironmentVariables();
         var azureConnectionString = Environment.GetEnvironmentVariable("DefaultConnectionAzure");
 
         if (!string.IsNullOrEmpty(azureConnectionString))

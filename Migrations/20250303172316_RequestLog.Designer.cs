@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Astronomic_Catalogs.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250303150734_RequestLog")]
+    [Migration("20250303172316_RequestLog")]
     partial class RequestLog
     {
         /// <inheritdoc />
