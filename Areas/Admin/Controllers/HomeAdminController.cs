@@ -16,7 +16,6 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 [Authorize(Roles = RoleNames.Admin)]
 [Authorize(Policy = "AdminPolicy")]
 [Authorize(Policy = "UsersAccessClaim")]
-[Authorize(Policy = "OverAge")]
 public class HomeAdminController : Controller
 {
     private readonly ApplicationDbContext _context;

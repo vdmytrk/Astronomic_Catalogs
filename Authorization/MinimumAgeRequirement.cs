@@ -23,5 +23,6 @@ public class MinimumAgeHandler : AuthorizationHandler<MinimumAgeRequirement>
             context.Succeed(requirement);
 
         return Task.CompletedTask;
+
     }
 }

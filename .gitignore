@@ -379,3 +379,7 @@ Areas/Admin/Models
 # html
 _ActualDate.cshtml
 _ActualDateTable.cshtml
+
+# Style
+wwwroot\less\themes.css
+wwwroot\less\themes.less

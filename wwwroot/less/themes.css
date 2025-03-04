@@ -100,6 +100,9 @@ select[multiple] option.selected-fix {
 .dark-theme .text-muted {
   color: inherit !important;
 }
+.dark-theme .text-danger {
+  color: white !important;
+}
 .dark-theme .btn-primary {
   --bs-btn-color: red !important;
   --bs-btn-bg: transparent !important;

@@ -53,9 +53,8 @@ public class Program
         #region IDENTITY
         builder.Services.AddScoped<UserControllerService>();
         builder.Services.AddScoped<RoleControllerService>();
-        builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
         builder.Services.AddScoped<JwtService>();
-        builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeOrAnonymousHandler>();
+        builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
         // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
         //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
         builder.Services.AddIdentity<Models.AspNetUser, Models.AspNetRole>(options =>
@@ -177,9 +176,6 @@ public class Program
                 policy.RequireClaim("CanRoleWatch", "true"));
 
             options.AddPolicy("OverAge", policy =>
-                policy.Requirements.Add(new MinimumAgeRequirement(7))); // TODO: Use environment variable 
-
-            options.AddPolicy("OverAgeOrAnonymous", policy =>
                 policy.Requirements.Add(new MinimumAgeRequirement(7))); // TODO: Use environment variable 
         });
         #endregion
