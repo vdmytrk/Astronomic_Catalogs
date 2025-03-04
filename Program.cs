@@ -239,6 +239,7 @@ public class Program
 
         app.UseMiddleware<UserLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
+        app.UseMiddleware<UserAccessMiddleware>();
 
         app.MapStaticAssets();
 

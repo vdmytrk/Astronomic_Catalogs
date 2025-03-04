@@ -16,7 +16,7 @@ public class RequestLoggingMiddleware
         _logger = logger;
     }
 
-    public async Task Invoke(HttpContext context, ApplicationDbContext dbContext)
+    public async Task InvokeAsync(HttpContext context, ApplicationDbContext dbContext)
     {
         var log = new RequestLog
         {

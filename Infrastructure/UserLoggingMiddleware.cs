@@ -1,37 +1,36 @@
 ﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Text.Json;
 
 namespace Astronomic_Catalogs.Infrastructure;
 
-public class UserLoggingMiddleware
+public class UserLoggingMiddleware(
+        RequestDelegate next,
+        ILogger<UserLoggingMiddleware> logger,
+        IServiceScopeFactory serviceScopeFactory)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<UserLoggingMiddleware> _logger;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<UserLoggingMiddleware> _logger = logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private static readonly HttpClient HttpClient = new HttpClient();
 
-    public UserLoggingMiddleware(RequestDelegate next, ILogger<UserLoggingMiddleware> logger, IServiceScopeFactory serviceScopeFactory)
-    {
-        _next = next;
-        _logger = logger;
-        _serviceScopeFactory = serviceScopeFactory;
-    }
-
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         var userAgent = context.Request.Headers["User-Agent"].ToString();
         var osName = GetOsName(userAgent);
         var browserName = GetBrowserName(userAgent);
         var isMobile = userAgent.Contains("Mobi");
         var requstTime = DateTime.UtcNow;
+        bool IsAuthenticated = context.User.Identity?.IsAuthenticated ?? false;
 
         var log = new UserLog
         {
             IpAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
-            UserName = context.User.Identity?.IsAuthenticated == true ? context.User.Identity.Name ?? "Unknown" : "Anonymous",
+            UserName = IsAuthenticated == true ? context.User.Identity!.Name ?? "Unknown" : "Anonymous",
             UserAgent = userAgent,
             Route = context.Request.Path,
             HttpMethod = context.Request.Method,
@@ -54,24 +53,24 @@ public class UserLoggingMiddleware
 
         await SetGeoLocationData(log);
 
-        if (await IsRequestBlocked(log))
-        {
-            context.Response.StatusCode = 429;
-            await context.Response.WriteAsync("Too Many Requests");
-            return;
-        }
+            if (await IsRequestBlocked(log))
+            {
+                context.Response.StatusCode = 429;
+                await context.Response.WriteAsync("Too Many Requests");
+                return;
+            }
 
-        try
-        {
-            await _next(context);
-            log.StatusCode = context.Response.StatusCode;
-        }
-        catch (Exception ex)
-        {
-            log.StatusCode = 500;
-            log.ErrorMessage = ex.Message;
-            _logger.LogError(ex, "Exception occurred while processing request.");
-        }
+            try
+            {
+                await _next(context);
+                log.StatusCode = context.Response.StatusCode;
+            }
+            catch (Exception ex)
+            {
+                log.StatusCode = 500;
+                log.ErrorMessage = ex.Message;
+                _logger.LogError(ex, "Exception occurred while processing request.");
+            }
 
         using (var scope = _serviceScopeFactory.CreateScope())
         {
@@ -114,6 +113,7 @@ public class UserLoggingMiddleware
                 .OrderBy(ul => ul.RequestTimeUtc)
                 .Select(ul => ul.MaxRequests)
                 .FirstOrDefaultAsync();
+
             return recentRequests > maxRequests;
         }
     }
