@@ -11,13 +11,9 @@ public class ConnectionStringProvider
         var azureConnectionString = Environment.GetEnvironmentVariable("DefaultConnectionAzure");
 
         if (!string.IsNullOrEmpty(azureConnectionString))
-        {
             ConnectionString = azureConnectionString;
-        }
         else
-        {
             ConnectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-        }
     }
 }

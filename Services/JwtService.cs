@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Astronomic_Catalogs.Infrastructure;
 
 namespace Astronomic_Catalogs.Services;
 
@@ -13,11 +14,13 @@ public class JwtService
 {
     private readonly IConfiguration _config;
     private readonly UserManager<AspNetUser> _userManager;
+    private readonly AuthenticationSettingsProvider _authSettings;
 
-    public JwtService(IConfiguration config, UserManager<AspNetUser> userManager)
+    public JwtService(IConfiguration config, UserManager<AspNetUser> userManager, AuthenticationSettingsProvider authSettings)
     {
         _config = config;
         _userManager = userManager;
+        _authSettings = authSettings;
     }
 
     public async Task<string> AuthenticateToken(HttpContext httpContext, AspNetUser user, bool rememberMe)
@@ -50,15 +53,14 @@ public class JwtService
 
     public string GenerateJwtToken(List<Claim> claims)
     {
-        var jwtSettings = _config.GetSection("JwtSettings");
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettings.JwtKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: jwtSettings["Issuer"],
-            audience: jwtSettings["Audience"],
+            issuer: _authSettings.JwtIssuer,
+            audience: _authSettings.JwtAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpireMinutes"])),
+            expires: DateTime.UtcNow.AddMinutes(_authSettings.JwtExpireMinutes),
             signingCredentials: credentials
         );
 

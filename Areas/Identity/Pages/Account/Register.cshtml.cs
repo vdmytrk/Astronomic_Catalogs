@@ -23,11 +23,13 @@ using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Services.Constants;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Astronomic_Catalogs.Areas.Services;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
+        private readonly UserRegister _userRgister;
         private readonly SignInManager<AspNetUser> _signInManager;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly RoleManager<AspNetRole> _roleManager;
@@ -37,6 +39,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         private readonly ICustomEmailSender _emailSender;
 
         public RegisterModel(
+            UserRegister userRgister,
             UserManager<AspNetUser> userManager,
             IUserStore<AspNetUser> userStore,
             SignInManager<AspNetUser> signInManager,
@@ -44,6 +47,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             ICustomEmailSender emailSender,
             RoleManager<AspNetRole> roleManager)
         {
+            _userRgister = userRgister;
             _userManager = userManager;
             _userStore = userStore;
             _emailStore = GetEmailStore();
@@ -107,8 +111,8 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 
                     string role = RoleNames.AutoUser.ToString();
                     await _userManager.AddToRoleAsync(user, role); // VD: The user role is added for each new user.
-                    await AddRoleClaims(); // VD: The role claims is added for each new user.
-                    await AddUserClaims(Input.Email, Input.YearOfBirth); // VD: The user claims is added for each new user.
+                    await _userRgister.AddRoleClaims(); // VD: The role claims is added for each new user.
+                    await _userRgister.AddUserClaims(Input.Email, Input.YearOfBirth); // VD: The user claims is added for each new user.
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -142,47 +146,6 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private async Task AddUserClaims(string adminEmail, int adminYearOfBirth)
-        {
-            var existUser = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
-            if (existUser != null)
-            {
-                var existingClaims = await _userManager.GetClaimsAsync(existUser);
-                var claimsToAdd = new List<Claim>
-                    {
-                        new Claim("CanUsersAccess", "true"),
-                        new Claim(ClaimTypes.DateOfBirth, adminYearOfBirth.ToString())
-                    };
-
-                var newClaims = claimsToAdd.Where(c => !existingClaims.Any(ec => ec.Type == c.Type)).ToList();
-                if (newClaims.Any())
-                    await _userManager.AddClaimsAsync(existUser, newClaims);
-            }
-        }
-        public async Task AddRoleClaims()
-        {
-            string[] roles = RoleNames.AllRoles;
-            var claimsToAdd = new List<Claim>
-                    {
-                        new Claim("CanRoleAccess", "true"),
-                        new Claim("CanRolelModify", "true"),
-                        new Claim("CanRoleWatch", "true"),
-                    };
-
-            foreach (var roleName in roles)
-            {
-                var role = await _roleManager.FindByNameAsync(roleName);
-                if (role is null)
-                    throw new Exception($"Adding a claim to the roleName is not possible because the {roleName} role does not exist.");
-
-                var existingClaims = await _roleManager.GetClaimsAsync(role);
-                var newClaims = claimsToAdd.Where(c => !existingClaims.Any(ec => ec.Type == c.Type)).ToList();
-                foreach (var claim in newClaims)
-                {
-                    await _roleManager.AddClaimAsync(role, claim);
-                }
-            }
-        }
 
         private AspNetUser CreateUser()
         {

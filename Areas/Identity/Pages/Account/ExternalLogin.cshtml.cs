@@ -20,12 +20,15 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using Astronomic_Catalogs.Services.Interfaces;
+using Astronomic_Catalogs.Areas.Services;
+using Astronomic_Catalogs.Services.Constants;
 
 namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
+        private readonly UserRegister _userRgister;
         private readonly SignInManager<AspNetUser> _signInManager;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IUserStore<AspNetUser> _userStore;
@@ -34,12 +37,14 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
+            UserRegister userRgister,
             SignInManager<AspNetUser> signInManager,
             UserManager<AspNetUser> userManager,
             IUserStore<AspNetUser> userStore,
             ILogger<ExternalLoginModel> logger,
             ICustomEmailSender emailSender)
         {
+            _userRgister = userRgister;
             _signInManager = signInManager;
             _userManager = userManager;
             _userStore = userStore;
@@ -74,6 +79,9 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
+        public int YearOfBirth { get; set; }
+        public List<int> Years { get; set; } = Enumerable.Range(DateTime.Now.Year - 120, 121).Reverse().ToList();
+
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -87,6 +95,10 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             public string Email { get; set; }
+            
+            [Required]
+            [Display(Name = "Year of birth")]
+            public int YearOfBirth { get; set; }
         }
 
         public IActionResult OnGet() => RedirectToPage("./Login");
@@ -201,6 +213,11 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
                     if (result.Succeeded)
                     {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+
+                        string role = RoleNames.AutoUser.ToString();
+                        await _userManager.AddToRoleAsync(user, role); // VD: The user role is added for each new user.
+                        await _userRgister.AddRoleClaims(); // VD: The role claims is added for each new user.
+                        await _userRgister.AddUserClaims(Input.Email, Input.YearOfBirth); // VD: The user claims is added for each new user.
 
                         var userId = await _userManager.GetUserIdAsync(user);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

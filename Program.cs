@@ -1,3 +1,4 @@
+using Astronomic_Catalogs.Areas.Services;
 using Astronomic_Catalogs.Authorization;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
@@ -9,9 +10,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using NLog.Web;
+using System.Configuration;
 using System.Security.Claims;
 using System.Text;
 
@@ -23,8 +26,11 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         string connectionString = "";
-
-        builder.Services.AddSingleton<ConnectionStringProvider>();
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
 
 #if !DEBUG
         builder.Logging.ClearProviders();
@@ -35,6 +41,7 @@ public class Program
         builder.Host.UseNLog();
 
         // Add services to the container. 
+        builder.Services.AddSingleton<ConnectionStringProvider>();
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddScoped<DatabaseInitializer>();
@@ -49,11 +56,13 @@ public class Program
         });
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-
         #region IDENTITY
+        var authSettings = new AuthenticationSettingsProvider(configuration);
+        builder.Services.AddSingleton(authSettings);
         builder.Services.AddScoped<UserControllerService>();
         builder.Services.AddScoped<RoleControllerService>();
         builder.Services.AddScoped<JwtService>();
+        builder.Services.AddScoped<UserRegister>();
         builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
         // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
         //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
@@ -85,7 +94,7 @@ public class Program
         })
         .AddJwtBearer(options =>
         {
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            //var jwtSettings = builder.Configuration.GetSection("JwtSettings");
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 // Set the validation options.
@@ -94,27 +103,23 @@ public class Program
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
 
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
+                ValidIssuer = authSettings.JwtIssuer,
+                ValidAudience = authSettings.JwtAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.JwtKey))
             };
         })
         #endregion
         #region External accounts
         .AddGoogle(googleOptions =>
         {
-            googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]
-             ?? throw new InvalidOperationException("Google ClientId is missing.");
-            googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
-              ?? throw new InvalidOperationException("Google ClientSecret is missing.");
+            googleOptions.ClientId = authSettings.GoogleClientId ?? throw new InvalidOperationException("Google ClientId is missing.");
+            googleOptions.ClientSecret = authSettings.GoogleClientSecret ?? throw new InvalidOperationException("Google ClientSecret is missing.");
             googleOptions.ClaimActions.MapJsonKey("picture", "picture");
         })
         .AddMicrosoftAccount(microsoftOptions =>
         {
-            microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]
-              ?? throw new InvalidOperationException("Microsoft ClientId is missing.");
-            microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]
-              ?? throw new InvalidOperationException("Microsoft ClientSecret is missing.");
+            microsoftOptions.ClientId = authSettings.MicrosoftClientId ?? throw new InvalidOperationException("Microsoft ClientId is missing.");
+            microsoftOptions.ClientSecret = authSettings.MicrosoftClientSecret ?? throw new InvalidOperationException("Microsoft ClientSecret is missing.");
             microsoftOptions.ClaimActions.MapJsonKey("urn:microsoftaccount:picture", "picture");
         })
         /// TODO:
@@ -158,8 +163,8 @@ public class Program
             );
         #endregion
         #region Policy
-        builder.Services.AddAuthorization(options =>
-        {
+            builder.Services.AddAuthorization(options =>
+            {
             options.AddPolicy("AdminPolicy", policy =>
                 policy.RequireClaim("Department", "HQ"));
 
@@ -175,8 +180,9 @@ public class Program
             options.AddPolicy("RoleWatchClaim", policy =>
                 policy.RequireClaim("CanRoleWatch", "true"));
 
+            //var age = builder.Configuration.GetValue<int>("AgeRestriction:MinAge");
             options.AddPolicy("OverAge", policy =>
-                policy.Requirements.Add(new MinimumAgeRequirement(7))); // TODO: Use environment variable 
+                policy.Requirements.Add(new MinimumAgeRequirement(builder.Configuration.GetValue<int>("AgeRestriction:MinAge"))));  
         });
         #endregion
 #if DEBUG

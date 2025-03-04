@@ -23,6 +23,13 @@
                 <label asp-for="Input.Email" class="form-label"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
+            <p class="mt-3">To access the website, please enter your age.</p>
+            <p>Note that the site is not available for people younger than 8 years old!</p>
+            <div class="form-group mb-3">
+                <label asp-for="Input.YearOfBirth" class="control-label"></label>
+                <select asp-for="Input.YearOfBirth" asp-items="@(new SelectList(Model.Years))" class="form-control"></select>
+                <span asp-validation-for="Input.YearOfBirth" class="text-danger"></span>
+            </div>
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>
     </div>

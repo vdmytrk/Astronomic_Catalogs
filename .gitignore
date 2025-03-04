@@ -381,5 +381,5 @@ _ActualDate.cshtml
 _ActualDateTable.cshtml
 
 # Style
-wwwroot\less\themes.css
-wwwroot\less\themes.less
+/wwwroot/less/themes.css
+/wwwroot/less/themes.less
