@@ -49,6 +49,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<AspNetUserLogin> UserLogins { get; set; } = null!;
     public DbSet<AspNetUserToken> UserTokens { get; set; } = null!;
 
+    public DbSet<UserLog> UserLogs { get; set; }
     public DbSet<RequestLog> RequestLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -60,6 +61,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<SourceType>().HasNoKey();
 
         modelBuilder.ApplyConfiguration(new RequestLogConfiguration());
+        modelBuilder.ApplyConfiguration(new UsersLogConfiguration());
 
         #region Identity
         modelBuilder.Entity<AspNetUserRole>().HasKey(ur => new { ur.UserId, ur.RoleId });

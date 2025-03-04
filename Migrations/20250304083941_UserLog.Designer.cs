@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Astronomic_Catalogs.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250303172316_RequestLog")]
-    partial class RequestLog
+    [Migration("20250304083941_UserLog")]
+    partial class UserLog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2249,7 +2249,7 @@ namespace Astronomic_Catalogs.Migrations
                     b.ToTable("NameObject", (string)null);
                 });
 
-            modelBuilder.Entity("Astronomic_Catalogs.Models.Services.UsersLog", b =>
+            modelBuilder.Entity("Astronomic_Catalogs.Models.Services.RequestLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2296,6 +2296,95 @@ namespace Astronomic_Catalogs.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RequestLogs", (string)null);
+                });
+
+            modelBuilder.Entity("Astronomic_Catalogs.Models.Services.UsersLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BlockedHeaders")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BrowserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ErrorMessage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HttpMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsMobile")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastRequestTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MaxRequests")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OsName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Referer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RequestTimeUtc")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSDATETIME()");
+
+                    b.Property<string>("Route")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StatusCode")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TimeWindowMinutes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserLogs", (string)null);
                 });
 
             modelBuilder.Entity("Astronomic_Catalogs.Models.SourceType", b =>

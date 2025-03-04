@@ -237,6 +237,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.UseMiddleware<UserLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
 
         app.MapStaticAssets();
