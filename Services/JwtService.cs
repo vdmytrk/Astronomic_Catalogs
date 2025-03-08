@@ -12,13 +12,11 @@ namespace Astronomic_Catalogs.Services;
 
 public class JwtService
 {
-    private readonly IConfiguration _config;
     private readonly UserManager<AspNetUser> _userManager;
     private readonly AuthenticationSettingsProvider _authSettings;
 
-    public JwtService(IConfiguration config, UserManager<AspNetUser> userManager, AuthenticationSettingsProvider authSettings)
+    public JwtService(UserManager<AspNetUser> userManager, AuthenticationSettingsProvider authSettings)
     {
-        _config = config;
         _userManager = userManager;
         _authSettings = authSettings;
     }

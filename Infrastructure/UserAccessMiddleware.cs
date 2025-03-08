@@ -9,6 +9,10 @@ using System.Text.Json;
 
 namespace Astronomic_Catalogs.Infrastructure;
 
+
+/// <summary>
+/// This middleware restricts a registered user's access to a resource based on the administrator's actions.
+/// </summary>
 public class UserAccessMiddleware(
         RequestDelegate next,
         IServiceScopeFactory serviceScopeFactory)

@@ -8,12 +8,8 @@ public class ConnectionStringProvider
 
     public ConnectionStringProvider(IConfiguration configuration)
     {
-        var azureConnectionString = Environment.GetEnvironmentVariable("DefaultConnectionAzure");
-
-        if (!string.IsNullOrEmpty(azureConnectionString))
-            ConnectionString = azureConnectionString;
-        else
-            ConnectionString = configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        ConnectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
     }
+
 }

@@ -1,26 +1,25 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models.Services;
+using Astronomic_Catalogs.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Astronomic_Catalogs.Infrastructure;
 
-public class RequestLoggingMiddleware
+/// <summary>
+/// This middleware logs REQUESTS to the resource.
+/// </summary>
+public class RequestLoggingMiddleware (RequestDelegate next, ILogger<RequestLoggingMiddleware> logger, PublicIpService publicIpService)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<RequestLoggingMiddleware> _logger;
-
-    public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
-    {
-        _next = next;
-        _logger = logger;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly ILogger<RequestLoggingMiddleware> _logger = logger;
+    private readonly PublicIpService _publicIpService = publicIpService;
 
     public async Task InvokeAsync(HttpContext context, ApplicationDbContext dbContext)
     {
         var log = new RequestLog
         {
-            IpAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown",
+            IpAddress = context.Items["PublicIp"]!.ToString()!,
             UserAgent = context.Request.Headers["User-Agent"].ToString(),
             RequestTime = DateTime.UtcNow,
             UserName = context.User.Identity?.IsAuthenticated == true ? context.User.Identity.Name ?? "Unknown" : "Anonymous",

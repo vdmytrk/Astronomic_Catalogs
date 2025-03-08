@@ -13,9 +13,18 @@ public class MinimumAgeHandler : AuthorizationHandler<MinimumAgeRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumAgeRequirement requirement)
     {
+        if (!context.User.Identity?.IsAuthenticated ?? true)
+        {
+            context.Succeed(requirement);
+            return Task.CompletedTask;
+        }
+
         var birthDateClaim = context.User.FindFirst(ClaimTypes.DateOfBirth);
         if (birthDateClaim == null)
+        {
+            context.Fail();
             return Task.CompletedTask;
+        }
 
         int birthDate = int.Parse(birthDateClaim.Value);
         var age = DateTime.Today.Year - birthDate;

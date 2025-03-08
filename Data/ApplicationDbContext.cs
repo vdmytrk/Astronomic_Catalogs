@@ -6,11 +6,9 @@ using Astronomic_Catalogs.Models.Configuration.Identity;
 using Astronomic_Catalogs.Models.Configuration.Services;
 using Astronomic_Catalogs.Models.Connection;
 using Astronomic_Catalogs.Models.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-//using Astronomic_Catalogs.Areas.Admin.Models;
 
 namespace Astronomic_Catalogs.Data;
 

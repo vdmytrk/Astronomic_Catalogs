@@ -23,5 +23,7 @@ public class UserLog
     public int TimeWindowMinutes { get; set; }
     public string BlockedHeaders { get; set; } = string.Empty;
     public string ErrorMessage { get; set; } = string.Empty;
+    public string Latitude { get; set; } = string.Empty;
+    public string Longitude { get; set; } = string.Empty;
 }
 
