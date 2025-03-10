@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Astronomic_Catalogs", "Astronomic_Catalogs\Astronomic_Catalogs.csproj", "{6A9BE3CA-6914-4499-85FF-0C1DBFF5B20B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACUnitTests.Tests", "ACUnitTests.Tests\ACUnitTests.Tests.csproj", "{3AE15077-4DC0-1A59-5DB7-029212D7FD29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6A9BE3CA-6914-4499-85FF-0C1DBFF5B20B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A9BE3CA-6914-4499-85FF-0C1DBFF5B20B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A9BE3CA-6914-4499-85FF-0C1DBFF5B20B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AE15077-4DC0-1A59-5DB7-029212D7FD29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AE15077-4DC0-1A59-5DB7-029212D7FD29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AE15077-4DC0-1A59-5DB7-029212D7FD29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AE15077-4DC0-1A59-5DB7-029212D7FD29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
