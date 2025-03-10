@@ -1,10 +1,9 @@
-using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.Models;
-using Astronomic_Catalogs.Services.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Astronomic_Catalogs.Models;
+using Microsoft.AspNetCore.Authorization;
+using Astronomic_Catalogs.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Astronomic_Catalogs.Controllers;
 
@@ -25,7 +24,6 @@ public class HomeController(
 
     public IActionResult Privacy()
     {
-        _logger.LogInformation("Privacy action invoked");
         return View();
     }
 

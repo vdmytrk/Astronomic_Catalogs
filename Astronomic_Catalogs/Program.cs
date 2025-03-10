@@ -1,4 +1,4 @@
-ï»¿using Astronomic_Catalogs.Areas.Services;
+using Astronomic_Catalogs.Areas.Services;
 using Astronomic_Catalogs.Authorization;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
@@ -121,11 +121,11 @@ public class Program
     {
         builder.Services.AddAuthentication(options =>
         {
-            // Main scheme â€“ Identity wich contein Coocies scheme.  
+            // Main scheme – Identity wich contein Coocies scheme.  
             options.DefaultScheme = IdentityConstants.ApplicationScheme;
             // Redirects to the login page by default  
             options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-            // If access is denied â€“ redirects to AccessDenied 
+            // If access is denied – redirects to AccessDenied 
             options.DefaultForbidScheme = IdentityConstants.ApplicationScheme;
         })
         #region Cookies and JWT
@@ -263,16 +263,16 @@ public class Program
             };
 
             options.GlobalLimiter = PartitionedRateLimiter.CreateChained(
-                #region For registered users
+            #region For registered users
                 CreateFixedWindowLimiter(),
                 CreateSlidingWindowLimiter(90, TimeSpan.FromMinutes(10), 2),
                 CreateSlidingWindowLimiter(600, TimeSpan.FromHours(1), 4),
-                #endregion
-                #region For unregistered useers
+            #endregion
+            #region For unregistered useers
                 CreateTokenBucketLimiter(10, 1, TimeSpan.FromSeconds(10), 1),
                 CreateTokenBucketLimiter(70, 0, TimeSpan.FromMinutes(10), 1),
-                CreateTokenBucketLimiter(400, 0, TimeSpan.FromHours(1), 1) 
-                #endregion
+                CreateTokenBucketLimiter(400, 0, TimeSpan.FromHours(1), 1)
+            #endregion
             );
         });
         #endregion
@@ -285,7 +285,7 @@ public class Program
             if (context.User.Identity?.IsAuthenticated ?? false)
             {
                 string user = GetUserKey(context);
-                return RateLimitPartition.GetFixedWindowLimiter(user, _ => new FixedWindowRateLimiterOptions 
+                return RateLimitPartition.GetFixedWindowLimiter(user, _ => new FixedWindowRateLimiterOptions
                 {
                     PermitLimit = 15,
                     QueueLimit = 2,
