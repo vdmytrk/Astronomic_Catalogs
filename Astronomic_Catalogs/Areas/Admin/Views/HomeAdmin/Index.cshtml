@@ -9,8 +9,9 @@
 
 @try
 {
-    @await Html.PartialAsync("~/Areas/Admin/Views/HomeAdmin/_ActualDate.cshtml")
+    @await Html.PartialAsync("~/Areas/Admin/Views/HomeAdmin/_ActualDate.cshtml", Model)
 }
-catch
+catch (Exception ex)
 {
+    <p style="color:red;"></p>
 }

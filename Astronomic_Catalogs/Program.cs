@@ -2,6 +2,7 @@ using Astronomic_Catalogs.Areas.Services;
 using Astronomic_Catalogs.Authorization;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
+using Astronomic_Catalogs.Infrastructure.Interfaces;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Astronomic_Catalogs.Models.Services;
 using Astronomic_Catalogs.Services;
@@ -56,7 +57,7 @@ public class Program
 #if !DEBUG
         builder.Logging.ClearProviders();
 #elif (DEBUG)
-        if (builder.Environment.IsDevelopment())
+        if (builder.Environment.IsDevelopment())   
             TestNLogFileCreating();
 #endif
         builder.Host.UseNLog();
@@ -66,7 +67,7 @@ public class Program
     {
         builder.Services.AddHttpClient();
         builder.Services.AddTransient<PublicIpService>();
-        builder.Services.AddSingleton<ConnectionStringProvider>();
+        builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddScoped<DatabaseInitializer>();
@@ -85,7 +86,7 @@ public class Program
     {
         builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
-            var connectionStringProvider = serviceProvider.GetRequiredService<ConnectionStringProvider>();
+            var connectionStringProvider = serviceProvider.GetRequiredService<IConnectionStringProvider>();
             string connectionString = connectionStringProvider.ConnectionString;
             options.UseSqlServer(connectionString);
 #if DEBUG

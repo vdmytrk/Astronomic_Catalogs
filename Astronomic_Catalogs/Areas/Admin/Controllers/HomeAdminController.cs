@@ -1,5 +1,6 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
+using Astronomic_Catalogs.Infrastructure.Interfaces;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +26,7 @@ public class HomeAdminController : Controller
     public HomeAdminController(
         ApplicationDbContext context,
         ILogger<DatabaseInitializer> logger,
-        ConnectionStringProvider connectionStringProvider)
+        IConnectionStringProvider connectionStringProvider)
     {
         _logger = logger;
         _context = context;
@@ -36,12 +37,12 @@ public class HomeAdminController : Controller
     // GET: ActualDates
     public async Task<IActionResult> Index()
     {
-        return View(await _context.ActualDates.ToListAsync());
+        var actualDate = await _context.ActualDates.ToListAsync();
+        return View(actualDate);
     }
 
     public IActionResult Privacy()
     {
-        _logger.LogInformation("Privacy action invoked");
         return View();
     }
 

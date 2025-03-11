@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Astronomic_Catalogs.Infrastructure.Interfaces;
+using NLog;
 using NLog.Targets;
 
 namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
@@ -8,11 +9,11 @@ namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 public class NLogConfigProvider : INLogConfigProvider
 {
     private readonly INLogConfiguration _nlogConfiguration;
-    private readonly ConnectionStringProvider _connectionStringProvider;
+    private readonly IConnectionStringProvider _connectionStringProvider;
     private readonly string _nlogConfigFile;
 
     public NLogConfigProvider(INLogConfiguration nlogConfiguration,
-                       ConnectionStringProvider connectionStringProvider,
+                       IConnectionStringProvider connectionStringProvider,
                        IWebHostEnvironment environment)
     {
         _nlogConfiguration = nlogConfiguration;
@@ -37,7 +38,6 @@ public class NLogConfigProvider : INLogConfigProvider
         {
             databaseTarget.ConnectionString = connectionString;
         }
-        Console.WriteLine($"\n\nNLogService connection string in {_nlogConfigFile}:\n{connectionString}\n\n");
         LogManager.ReconfigExistingLoggers();
     }
 }
