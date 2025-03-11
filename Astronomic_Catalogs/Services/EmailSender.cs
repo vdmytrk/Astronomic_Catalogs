@@ -25,7 +25,7 @@ public class EmailSender : ICustomEmailSender
     }
 
 
-    public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+    public virtual async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
         using (var client = new SmtpClient("smtp.gmail.com", 587))
         {
@@ -43,7 +43,7 @@ public class EmailSender : ICustomEmailSender
 
             try
             {
-                await client.SendMailAsync(mailMessage);
+                await SendEmailInternalAsync(mailMessage);
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ public class EmailSender : ICustomEmailSender
     /// <param name="userId">For registration email</param>
     /// <param name="registrationEmail"></param>
     /// <returns></returns>
-    public async Task SendEmailAsync(string email, string subject, string htmlMessage, string? userId = null)
+    public virtual async Task SendEmailAsync(string email, string subject, string htmlMessage, string? userId = null)
     {
         using (var client = new SmtpClient("smtp.gmail.com", 587))
         {
@@ -89,13 +89,23 @@ public class EmailSender : ICustomEmailSender
 
             try
             {
-                await client.SendMailAsync(mailMessage);
+                await SendEmailInternalAsync(mailMessage);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error occurred during sending the email to {_options.Email}.");
                 throw;
             }
+        }
+    }
+
+    public virtual async Task SendEmailInternalAsync(MailMessage mailMessage)
+    {
+        using (var client = new SmtpClient("smtp.gmail.com", 587))
+        {
+            client.Credentials = new NetworkCredential(_options.Email, _options.Password);
+            client.EnableSsl = true;
+            await client.SendMailAsync(mailMessage);
         }
     }
 }

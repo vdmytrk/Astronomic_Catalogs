@@ -1,22 +1,10 @@
-﻿using NUnit.Framework;
-using Astronomic_Catalogs.Areas.Admin.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Astronomic_Catalogs.Data;
-using Microsoft.Extensions.Logging;
-using Astronomic_Catalogs.Infrastructure;
-using FakeItEasy;
-using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Models.Connection;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure.Interfaces;
-using NUnit.Framework.Interfaces;
-using Astronomic_Catalogs.Models;
-using System.Diagnostics;
+using Astronomic_Catalogs.Models.Connection;
+using FakeItEasy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers.Tests;
 
