@@ -28,6 +28,10 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Planets\Controllers\" />
+    <Folder Include="Areas\Planets\Data\" />
+    <Folder Include="Areas\Planets\Models\" />
+    <Folder Include="Areas\Planets\Views\" />
     <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
