@@ -36,8 +36,19 @@
                         </li>
                         @if (User.IsInRole("OwnerAdministratorPower"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">Administration</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Administration
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <li><a class="dropdown-item text-dark" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">Admin panel</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="RoleClaims" asp-action="Index">Role Claims</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Roles" asp-action="Index">Roles</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="UserClaims" asp-action="Index">User Claims</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="UserLogins" asp-action="Index">User Logins</a></li>
+                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="UserTokens" asp-action="Index">User Tokens</a></li>
+                                </ul>
                             </li>
                         }
                     </ul>
