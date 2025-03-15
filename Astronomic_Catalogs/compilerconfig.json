@@ -2,5 +2,13 @@
   {
     "outputFile": "wwwroot/less/themes.css",
     "inputFile": "wwwroot/less/themes.less"
+  },
+  {
+    "outputFile": "wwwroot/less/StyleSheet.css",
+    "inputFile": "wwwroot/less/StyleSheet.less"
+  },
+  {
+    "outputFile": "wwwroot/less/site.css",
+    "inputFile": "wwwroot/less/site.less"
   }
 ]

@@ -122,7 +122,7 @@ public class NASAExoplanetCatalogConfiguration : IEntityTypeConfiguration<NASAEx
         builder.Property(e => e.PlOrbEccen).HasColumnName("Pl_orbeccen");
         builder.Property(e => e.PlOrbEccenErr1).HasColumnName("Pl_orbeccenerr1");
         builder.Property(e => e.PlOrbEccenErr2).HasColumnName("Pl_orbeccenerr2");
-        builder.Property(e => e.PlOrbeccenlim).HasColumnName("Pl_orbeccenlim");
+        builder.Property(e => e.PlOrbeccenLim).HasColumnName("Pl_orbeccenlim");
 
         builder.Property(e => e.PlInsol).HasColumnName("Pl_insol");
         builder.Property(e => e.PlInsolErr1).HasColumnName("Pl_insolerr1");

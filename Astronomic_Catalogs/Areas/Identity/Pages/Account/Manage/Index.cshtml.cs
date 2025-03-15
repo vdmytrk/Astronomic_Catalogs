@@ -38,7 +38,7 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account.Manage
 
         public List<AspNetUserClaim> UserClaims { get; set; } = new();
         public List<AspNetRoleClaim> RoleClaims { get; set; } = new();
-        public List<AspNetRole>? Roles { get; set; }
+        public List<AspNetRole> Roles { get; set; }
 
 
         /// <summary>

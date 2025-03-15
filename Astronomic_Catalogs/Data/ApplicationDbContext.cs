@@ -35,6 +35,9 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<CollinderCatalog> CollinderCatalog { get; set; } = null!;
     public DbSet<NGCICOpendatasoft> NGCIC_Catalog { get; set; } = null!;
     public DbSet<NGCICOpendatasoftExtension> NGCICOpendatasoft_E { get; set; } = null!;
+    public DbSet<NASAExoplanetCatalog> PlanetsCatalog { get; set; } = null!;
+
+
     public DbSet<LogProcFunc> LogProcFuncs { get; set; } = null!;
     public DbSet<TestConnectionForNLog> TestConnectionForNLogs { get; set; } = null!;
     public DbSet<NLogApplicationCode> NLogApplicationCodes { get; set; } = null!;

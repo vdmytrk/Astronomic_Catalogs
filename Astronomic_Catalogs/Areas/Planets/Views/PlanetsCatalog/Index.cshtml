@@ -1,0 +1,1611 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Models.NASAExoplanetCatalog>
+@using Astronomic_Catalogs.Helpers
+@using DocumentFormat.OpenXml.EMMA
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="planetCatalogHeader">
+    <h1>Index</h1>
+
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+
+    <form class="pb-3 mb-3" method="post" asp-action="ImportData_OpenXml" asp-controller="PlanetsCatalog">
+        <button type="submit" class="btn btn-primary">Import planet data</button>
+    </form>
+</div>
+
+<table class="table-responsive table-toFixColumns table-toFixRows table-plantes">
+    <thead class="table table-bordered thead-toFixHeader">
+        <tr class="tr-oun-style">
+            <th>
+                @Html.DisplayNameFor(model => model.RowId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hostname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlLetter)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HdName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HipName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TicId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GaiaId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DefaultFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SySnum)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyPnum)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyMnum)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CbFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscoveryMethod)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscYear)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscRefName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscPubDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscLocale)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscFacility)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscTelescope)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DiscInstrument)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RvFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PulFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PtvFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TranFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AstFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ObmFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MicroFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EtvFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImaFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DkinFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SolType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlControvFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlRefName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlOrbPer)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlOrbSmax)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlRade)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlRadJ)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlMasse)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlMassJ)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlMsiniE)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlMsiniJ)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlCMasse)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlCMassJ)
+            </th>            
+            <th>
+                @Html.DisplayNameFor(model => model.PlBmasse)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlBmassJ)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlBmassProv)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlDens)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlOrbEccen)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlInsol)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlEqt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlOrbincl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlTranmid)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlTsystemref)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TtvFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlImppar)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlTrandep)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlTrandur)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlRatdor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlRatror)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlOccdep)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlOrbtper)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlOrblper)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlRvamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlProjobliq)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlTrueobliq)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StRefname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StSpectype)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StTeff)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StRad)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StMass)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StMet)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StMetratio)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StLum)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StLogg)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StAge)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StDens)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StVsin)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StRotp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StRadv)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyRefName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rastr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ra)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Decstr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dec)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Glat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Glon)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Elat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Elon)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyPm)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyPmRa)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyPmDec)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyDist)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyPlx)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyBmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyVmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyJmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyHmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyKmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyUmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyGmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyRmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyImag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyZmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyW1mag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyW2mag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyW3mag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyW4mag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyGaiaMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyIcmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyTmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SyKepmag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rowupdate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlPubdate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Releasedate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlNnotes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StNphot)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StNrvc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StNspec)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlNespec)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlNtranspec)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlNdispec)
+            </th>
+            <th>Actions</th>
+            @if (User.IsInRole("OwnerAdministratorPower"))
+            {
+                <th>Admin actions</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RowId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlName) &nbsp;
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Hostname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlLetter)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HdName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HipName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TicId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GaiaId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DefaultFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SySnum)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SyPnum)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SyMnum)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CbFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscoveryMethod)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscYear)
+                </td>
+                <td>
+                    @Html.Raw(HtmlHelperExtensions.FixReferences(item.DiscRefName))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscPubDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscLocale)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscFacility)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscTelescope)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DiscInstrument)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RvFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PulFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PtvFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TranFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AstFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ObmFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MicroFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EtvFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ImaFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DkinFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SolType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlControvFlag)
+                </td>
+                <td>
+                    @Html.Raw(HtmlHelperExtensions.FixReferences(item.PlRefName))
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlOrbPerLim == -1 || item.PlOrbPerLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlOrbPerLim == -1 ? ">" : item.PlOrbPerLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlOrbPer)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlOrbPerErr1)</span><br>
+                            <span>@(item.PlOrbPerErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlOrbPerErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlOrbSmaxLim == -1 || item.PlOrbSmaxLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlOrbSmaxLim == -1 ? ">" : item.PlOrbSmaxLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlOrbSmax)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlOrbSmaxErr1)</span><br>
+                            <span>@(item.PlOrbSmaxErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlOrbSmaxErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlRadeLim == -1 || item.PlRadeLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlRadeLim == -1 ? ">" : item.PlRadeLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlRade)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlRadeErr1)</span><br>
+                            <span>@(item.PlRadeErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlRadeErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlRadJLim == -1 || item.PlRadJLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlRadJLim == -1 ? ">" : item.PlRadJLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlRadJ)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlRadJErr1)</span><br>
+                            <span>@(item.PlRadJErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlRadJErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlMasseLim == -1 || item.PlMasseLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlMasseLim == -1 ? ">" : item.PlMasseLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlMasse)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlMasseErr1)</span><br>
+                            <span>@(item.PlMasseErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlMasseErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlMassJLim == -1 || item.PlMassJLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlMassJLim == -1 ? ">" : item.PlMassJLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlMassJ)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlMassJErr1)</span><br>
+                            <span>@(item.PlMassJErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlMassJErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlMsiniELim == -1 || item.PlMsiniELim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlMsiniELim == -1 ? ">" : item.PlMsiniELim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlMsiniE)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlMsiniEErr1)</span><br>
+                            <span>@(item.PlMsiniEErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlMsiniEErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlMsiniJLim == -1 || item.PlMsiniJLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlMsiniJLim == -1 ? ">" : item.PlMsiniJLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlMsiniJ)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlMsiniJErr1)</span><br>
+                            <span>@(item.PlMsiniJErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlMsiniJErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlCMasseLim == -1 || item.PlCMasseLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlCMasseLim == -1 ? ">" : item.PlCMasseLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlCMasse)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlCMasseErr1)</span><br>
+                            <span>@(item.PlCMasseErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlCMasseErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlCMassJLim == -1 || item.PlCMassJLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlCMassJLim == -1 ? ">" : item.PlCMassJLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlCMassJ)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlCMassJErr1)</span><br>
+                            <span>@(item.PlCMassJErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlCMassJErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlBmasseLim == -1 || item.PlBmasseLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlBmasseLim == -1 ? ">" : item.PlBmasseLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlBmasse)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlBmasseErr1)</span><br>
+                            <span>@(item.PlBmasseErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlBmasseErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlBmassJLim == -1 || item.PlBmassJLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlBmassJLim == -1 ? ">" : item.PlBmassJLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlBmassJ)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlBmassJErr1)</span><br>
+                            <span>@(item.PlBmassJErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlBmassJErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlBmassProv)
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlDensLim == -1 || item.PlDensLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlDensLim == -1 ? ">" : item.PlDensLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlDens)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlDensErr1)</span><br>
+                            <span>@(item.PlDensErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlDensErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlOrbeccenLim == -1 || item.PlOrbeccenLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlOrbeccenLim == -1 ? ">" : item.PlOrbeccenLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlOrbEccen)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlOrbEccenErr1)</span><br>
+                            <span>@(item.PlOrbEccenErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlOrbEccenErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlInsolLim == -1 || item.PlInsolLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlInsolLim == -1 ? ">" : item.PlInsolLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlInsol)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlInsolErr1)</span><br>
+                            <span>@(item.PlInsolErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlInsolErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlEqtLim == -1 || item.PlEqtLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlEqtLim == -1 ? ">" : item.PlEqtLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlEqt)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlEqtErr1)</span><br>
+                            <span>@(item.PlEqtErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlEqtErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlOrbinclLim == -1 || item.PlOrbinclLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlOrbinclLim == -1 ? ">" : item.PlOrbinclLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlOrbincl)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlOrbinclErr1)</span><br>
+                            <span>@(item.PlOrbinclErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlOrbinclErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlTranmidLim == -1 || item.PlTranmidLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlTranmidLim == -1 ? ">" : item.PlTranmidLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlTranmid)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlTranmidErr1)</span><br>
+                            <span>@(item.PlTranmidErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlTranmidErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlTsystemref)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TtvFlag)
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlImpparLim == -1 || item.PlImpparLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlImpparLim == -1 ? ">" : item.PlImpparLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlImppar)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlImpparErr1)</span><br>
+                            <span>@(item.PlImpparErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlImpparErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlTrandepLim == -1 || item.PlTrandepLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlTrandepLim == -1 ? ">" : item.PlTrandepLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlTrandep)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlTrandepErr1)</span><br>
+                            <span>@(item.PlTrandepErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlTrandepErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlTrandurLim == -1 || item.PlTrandurLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlTrandurLim == -1 ? ">" : item.PlTrandurLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlTrandur)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlTrandurErr1)</span><br>
+                            <span>@(item.PlTrandurErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlTrandurErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlRatdorLim == -1 || item.PlRatdorLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlRatdorLim == -1 ? ">" : item.PlRatdorLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlRatdor)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlRatdorErr1)</span><br>
+                            <span>@(item.PlRatdorErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlRatdorErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlRatrorLim == -1 || item.PlRatrorLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlRatrorLim == -1 ? ">" : item.PlRatrorLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlRatror)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlRatrorErr1)</span><br>
+                            <span>@(item.PlRatrorErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlRatrorErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlOccdepLim == -1 || item.PlOccdepLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlOccdepLim == -1 ? ">" : item.PlOccdepLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlOccdep)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlOccdepErr1)</span><br>
+                            <span>@(item.PlOccdepErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlOccdepErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlOrbtperLim == -1 || item.PlOrbtperLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlOrbtperLim == -1 ? ">" : item.PlOrbtperLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlOrbtper)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlOrbtperErr1)</span><br>
+                            <span>@(item.PlOrbtperErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlOrbtperErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlOrblperLim == -1 || item.PlOrblperLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlOrblperLim == -1 ? ">" : item.PlOrblperLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlOrblper)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlOrblperErr1)</span><br>
+                            <span>@(item.PlOrblperErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlOrblperErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlRvampLim == -1 || item.PlRvampLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlRvampLim == -1 ? ">" : item.PlRvampLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlRvamp)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlRvampErr1)</span><br>
+                            <span>@(item.PlRvampErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlRvampErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlProjobliqLim == -1 || item.PlProjobliqLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlProjobliqLim == -1 ? ">" : item.PlProjobliqLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlProjobliq)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlProjobliqErr1)</span><br>
+                            <span>@(item.PlProjobliqErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlProjobliqErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.PlTrueobliqLim == -1 || item.PlTrueobliqLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.PlTrueobliqLim == -1 ? ">" : item.PlTrueobliqLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.PlTrueobliq)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.PlTrueobliqErr1)</span><br>
+                            <span>@(item.PlTrueobliqErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.PlTrueobliqErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.Raw(HtmlHelperExtensions.FixReferences(item.StRefname))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StSpectype)
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StTeffLim == -1 || item.StTeffLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StTeffLim == -1 ? ">" : item.StTeffLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StTeff)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StTeffErr1)</span><br>
+                            <span>@(item.StTeffErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StTeffErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StRadLim == -1 || item.StRadLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StRadLim == -1 ? ">" : item.StRadLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StRad)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StRadErr1)</span><br>
+                            <span>@(item.StRadErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StRadErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StMassLim == -1 || item.StMassLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StMassLim == -1 ? ">" : item.StMassLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StMass)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StMassErr1)</span><br>
+                            <span>@(item.StMassErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StMassErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StMetLim == -1 || item.StMetLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StMetLim == -1 ? ">" : item.StMetLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StMet)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StMetErr1)</span><br>
+                            <span>@(item.StMetErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StMetErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StMetratio)
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StLumLim == -1 || item.StLumLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StLumLim == -1 ? ">" : item.StLumLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StLum)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StLumErr1)</span><br>
+                            <span>@(item.StLumErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StLumErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StLoggLim == -1 || item.StLoggLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StLoggLim == -1 ? ">" : item.StLoggLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StLogg)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StLoggErr1)</span><br>
+                            <span>@(item.StLoggErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StLoggErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StAgeLim == -1 || item.StAgeLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StAgeLim == -1 ? ">" : item.StAgeLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StAge)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StAgeErr1)</span><br>
+                            <span>@(item.StAgeErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StAgeErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StDensLim == -1 || item.StDensLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StDensLim == -1 ? ">" : item.StDensLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StDens)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StDensErr1)</span><br>
+                            <span>@(item.StDensErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StDensErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StVsinLim == -1 || item.StVsinLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StDensLim == -1 ? ">" : item.StDensLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StVsin)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StVsinErr1)</span><br>
+                            <span>@(item.StVsinErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StVsinErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StRotpLim == -1 || item.StRotpLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StRotpLim == -1 ? ">" : item.StRotpLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StRotp)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StRotpErr1)</span><br>
+                            <span>@(item.StRotpErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StRotpErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            @if (item.StRadvLim == -1 || item.StRadvLim == 1)
+                            {
+                                <div class="comparison-sign-on">@(item.StRadvLim == -1 ? ">" : item.StRadvLim == 1 ? "<" : "")</div>
+                            }
+                            else
+                            {
+                                <div class="comparison-sign-off"></div>
+                            }
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.StRadv)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.StRadvErr1)</span><br>
+                            <span>@(item.StRadvErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.StRadvErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.Raw(HtmlHelperExtensions.FixReferences(item.SyRefName))
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rastr)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ra)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Decstr)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dec)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Glat)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Glon)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Elat)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Elon)
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyPm)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyPmErr1)</span><br>
+                            <span>@(item.SyPmErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyPmErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyPmRa)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyPmRaErr1)</span><br>
+                            <span>@(item.SyPmRaErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyPmRaErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyPmDec)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyPmDecErr1)</span><br>
+                            <span>@(item.SyPmDecErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyPmDecErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyDist)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyDistErr1)</span><br>
+                            <span>@(item.SyDistErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyDistErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyPlx)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyPlxErr1)</span><br>
+                            <span>@(item.SyPlxErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyPlxErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyBmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyBmagErr1)</span><br>
+                            <span>@(item.SyBmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyBmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyVmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyVmagErr1)</span><br>
+                            <span>@(item.SyVmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyVmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyJmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyJmagErr1)</span><br>
+                            <span>@(item.SyJmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyJmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyHmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyHmagErr1)</span><br>
+                            <span>@(item.SyHmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyHmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyKmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyKmagErr1)</span><br>
+                            <span>@(item.SyKmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyKmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyUmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyUmagErr1)</span><br>
+                            <span>@(item.SyUmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyUmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyGmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyGmagErr1)</span><br>
+                            <span>@(item.SyGmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyGmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyRmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyRmagErr1)</span><br>
+                            <span>@(item.SyRmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyRmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyImag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyImagErr1)</span><br>
+                            <span>@(item.SyImagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyImagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyZmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyZmagErr1)</span><br>
+                            <span>@(item.SyZmagErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyZmagErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyW1mag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyW1magErr1)</span><br>
+                            <span>@(item.SyW1magErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyW1magErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyW2mag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyW2magErr1)</span><br>
+                            <span>@(item.SyW2magErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyW2magErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyW3mag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyW3magErr1)</span><br>
+                            <span>@(item.SyW3magErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyW3magErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyW4mag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyW4magErr1)</span><br>
+                            <span>@(item.SyW4magErr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyW4magErr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyGaiaMag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyGaiamagerr1)</span><br>
+                            <span>@(item.SyGaiamagerr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyGaiamagerr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyIcmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyIcmagerr1)</span><br>
+                            <span>@(item.SyIcmagerr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyIcmagerr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyTmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyTmagerr1)</span><br>
+                            <span>@(item.SyTmagerr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyTmagerr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="planetPropErr1">
+                            <div class="comparison-main-intagers">@Html.DisplayFor(modelItem => item.SyKepmag)</div>
+                        </div>
+                        <div class="planetPropErr2">
+                            <span>+@Html.DisplayFor(modelItem => item.SyKepmagerr1)</span><br>
+                            <span>@(item.SyKepmagerr2 == 0 ? "-" : "")@Html.DisplayFor(modelItem => item.SyKepmagerr2)</span>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rowupdate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlPubdate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Releasedate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlNnotes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StNphot)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StNrvc)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StNspec)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlNespec)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlNtranspec)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PlNdispec)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.RowId">Details</a>
+                </td>
+                @if (User.IsInRole("OwnerAdministratorPower"))
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.RowId">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.RowId">Delete</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+

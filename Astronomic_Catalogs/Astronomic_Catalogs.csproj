@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Azure.Security.KeyVault" Version="9.1.0" />
+    <PackageReference Include="DocumentFormat.OpenXmlSDK" Version="2.0.0" />
+    <PackageReference Include="ExcelDataReader" Version="3.7.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.3" />
@@ -26,14 +28,13 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" />
     <PackageReference Include="NLog.Schema" Version="5.4.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.4.0" />
+    <PackageReference Include="System.IO.Packaging" Version="9.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
-    <Folder Include="Areas\Planets\Controllers\" />
     <Folder Include="Areas\Planets\Data\" />
     <Folder Include="Areas\Planets\Models\" />
-    <Folder Include="Areas\Planets\Views\" />
     <Folder Include="Data\Migrations\" />
   </ItemGroup>
 

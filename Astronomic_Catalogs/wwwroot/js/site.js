@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
     RefreshAutofillStyles();
     ForceAutofillFix();
 
-    // On load pages
+    // Set a delay on page load.
     (function () {
         setTimeout(function () {
             if (document.readyState === "loading") {
@@ -164,9 +164,131 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    /////////////////////////////////////////////
+    // Start outer functions
+    /////////////////////////////////////////////
     FixSelectBehavior();
     AlertUnauthorizedAccess();
+    updateFixedColumnLeftOffset();
+    adjustTableSize();
+    //updateTableHeaderOffset();
 });
+
+
+/////////////////////////////////////////////
+// Table block
+/////////////////////////////////////////////
+// Set the margin for the table header row so that it does not overlap with the page header.
+function updateTableHeaderOffset() {
+    const header = document.querySelector('.toFixLayoutHeader');
+    const tableHeader = document.querySelector('table.table-toFixRows.table-plantes thead');
+
+    if (header && tableHeader) {
+        const headerHeight = header.offsetHeight; // Getting the height of the header
+        tableHeader.style.top = `${headerHeight}px`;
+    }
+}
+
+// Setting left offset for the 2nd and subsequent fixed columns:
+function updateFixedColumnLeftOffset() {
+    const fixedColumns = 2; // Number of fixed columns.
+    let offset = 0; // Left offset.
+
+    // Getting the value of 1em in pixels.
+    let emInPixels = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    let reductionStep = 0.1 * emInPixels; // 0.1em in pixels.
+    let totalReduction = 0; 
+
+    for (let i = 1; i <= fixedColumns; i++) {
+        let cells = document.querySelectorAll(`th:nth-child(${i}), td:nth-child(${i})`);
+        if (cells.length > 0) {
+            let width = cells[0].offsetWidth; // Getting the column width.
+            offset += width; 
+
+            // Setting left for each column, subtracting cumulative reduction.
+            cells.forEach(cell => {
+                cell.style.left = `${offset - width - totalReduction}px`;
+            });
+
+            totalReduction += reductionStep; // Increasing the reduction for the next column.
+        }
+    }
+}
+
+// Table size adjustment function:
+function adjustTableSize() {
+    const header = document.querySelector(".toFixLayoutHeader");
+    const footer = document.querySelector("footer");
+    const main = document.querySelector(".main-RenderBody-container");
+    const tableContainer = document.querySelector(".table-plantes");
+    const pageContent = document.querySelector(".planetCatalogHeader");
+
+    if (!tableContainer || !header || !footer || !main || !pageContent) return;
+
+    requestAnimationFrame(() => {
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+
+        const headerHeight = header.offsetHeight;
+        const footerHeight = footer.offsetHeight;
+
+        const mainStyles = getComputedStyle(main);
+        const mainPaddingV = parseFloat(mainStyles.paddingTop) + parseFloat(mainStyles.paddingBottom);
+        const mainMarginV = parseFloat(mainStyles.marginTop) + parseFloat(mainStyles.marginBottom);
+
+        const mainPaddingH = parseFloat(mainStyles.paddingLeft) + parseFloat(mainStyles.paddingRight);
+        const mainMarginH = parseFloat(mainStyles.marginLeft) + parseFloat(mainStyles.marginRight);
+
+        const pageContentH = pageContent.offsetHeight;
+
+        let emInPixels = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const extreHeight = 6 * emInPixels; // Unclear missing space.
+        const extraPadding = 0 * emInPixels; // Backup margin.
+
+        const tableHeight = windowHeight - (headerHeight + footerHeight + mainPaddingV + mainMarginV + pageContentH + extraPadding + extreHeight);
+        const tableWidth = windowWidth - (mainPaddingH + mainMarginH + extraPadding);
+
+        //console.log({
+        //    emInPixels,
+        //    windowHeight,
+        //    headerHeight,
+        //    footerHeight,
+        //    mainPaddingV,
+        //    mainMarginV,
+        //    mainPaddingH,
+        //    mainMarginH,
+        //    //otherContentHeight,
+        //    pageContentH,
+        //    tableHeight,
+        //    tableWidth
+        //});
+
+        tableContainer.style.height = `${tableHeight}px`;
+        tableContainer.style.width = `${tableWidth}px`;
+
+    });
+}
+
+
+//// Executing on window resize.
+function handleResize() {
+    //updateTableHeaderOffset();
+    updateFixedColumnLeftOffset();
+    adjustTableSize();
+}
+window.addEventListener("resize", handleResize);
+
+// ***** Tracking size changes in header, footer, and main. *****
+const resizeObserver = new ResizeObserver(adjustTableSize);
+resizeObserver.observe(document.querySelector(".toFixLayoutHeader"));
+resizeObserver.observe(document.querySelector("footer"));
+resizeObserver.observe(document.querySelector(".main-RenderBody-container"));
+
+
+
+
+
+
 
 
 /////////////////////////////////////////////

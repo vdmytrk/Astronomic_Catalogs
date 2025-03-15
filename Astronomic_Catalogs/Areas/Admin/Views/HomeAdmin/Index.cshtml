@@ -12,5 +12,8 @@
 }
 catch (Exception ex)
 {
-    <p style="color:red;"></p>
+    @if (!string.IsNullOrEmpty(ex.Message))
+    {
+        <p hidden style="color:red;">ex.Message</p>
+    }
 }

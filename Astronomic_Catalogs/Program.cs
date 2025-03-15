@@ -71,6 +71,7 @@ public class Program
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddScoped<DatabaseInitializer>();
+        builder.Services.AddScoped<IExcelImport, ExcelImportService_OpenXml>(); 
     }
 
     private static IConfiguration LoadConfiguration()

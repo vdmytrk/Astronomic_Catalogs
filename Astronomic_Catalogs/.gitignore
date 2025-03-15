@@ -371,15 +371,22 @@ nlog-internal*.xml
 NLog.config.Debug.xml
 NLogLocalConfigurations.cs
 
-# C#
-DatabaseInitializer_extended.cs
+# Folders
 Database Scripts/Data
 Areas/Admin/Models
+wwwroot/Excel
+
+# C#
+ExcelImportService_OpenXml_extended.cs
+DatabaseInitializer_extended.cs
 
 # html
 _ActualDate.cshtml
 _ActualDateTable.cshtml
 
 # Style
-/wwwroot/less/themes.css
-/wwwroot/less/themes.less
+wwwroot/less/themes.css
+wwwroot/less/themes.less
+wwwroot/less/site.css
+wwwroot/less/site.less
+
