@@ -383,3 +383,7 @@ _ActualDateTable.cshtml
 # Style
 /wwwroot/less/themes.css
 /wwwroot/less/themes.less
+/Astronomic_Catalogs/wwwroot/js/site.js
+/Astronomic_Catalogs/wwwroot/js/main.js.map
+/Astronomic_Catalogs/tsconfig.json
+/Astronomic_Catalogs/wwwroot/js/main.js
