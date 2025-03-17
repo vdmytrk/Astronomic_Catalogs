@@ -390,3 +390,12 @@ wwwroot/less/themes.less
 wwwroot/less/site.css
 wwwroot/less/site.less
 
+# js + typescript
+package.json
+package-lock.json
+webpack.config.js
+wwwroot/js/*.js.map
+wwwroot/js/main.js
+wwwroot/js/site.js
+wwwroot/js/theme.js
+
