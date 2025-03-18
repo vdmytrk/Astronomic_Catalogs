@@ -365,27 +365,37 @@ FodyWeavers.xsd
 # appsettings
 appsettings.Development.json
 appsettings.AzureDevelopment.json
-
+ 
 # NLog local files
 nlog-internal*.xml
 NLog.config.Debug.xml
 NLogLocalConfigurations.cs
-
-# C#
-DatabaseInitializer_extended.cs
+ 
+# Folders
 Database Scripts/Data
 Areas/Admin/Models
-
+wwwroot/Excel
+ 
+# C#
+ExcelImportService_OpenXml_extended.cs
+DatabaseInitializer_extended.cs
+ 
 # html
 _ActualDate.cshtml
 _ActualDateTable.cshtml
-
+ 
 # Style
-/wwwroot/less/themes.css
-/wwwroot/less/themes.less
-/Astronomic_Catalogs/wwwroot/js/site.js
-/Astronomic_Catalogs/wwwroot/js/main.js.map
-/Astronomic_Catalogs/tsconfig.json
-/Astronomic_Catalogs/wwwroot/js/main.js
-/Astronomic_Catalogs/wwwroot/js/site.js
-/Astronomic_Catalogs/wwwroot/js/site.js
+wwwroot/less/themes.css
+wwwroot/less/themes.less
+wwwroot/less/site.css
+wwwroot/less/site.less
+ 
+# js + typescript
+package.json
+package-lock.json
+webpack.config.js
+wwwroot/js/*.js.map
+wwwroot/js/main.js
+wwwroot/js/site.js
+wwwroot/js/theme.js
+Scripts/ts/main.ts

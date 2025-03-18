@@ -10,9 +10,8 @@ trigger:
       - master
 
 variables:
-  # solution: '**/*.sln'
-  solution: '**/Astornomic Solution.sln' # Оновлено шлях до нового рішення
-  projectPath: 'Astornomic Solution/Astronomic Catalogs/Astronomic_Catalogs.csproj' # Оновлено шлях до проекту
+  solution: '**/Astornomic Solution.sln'
+  projectPath: 'Astornomic Solution/Astronomic Catalogs/Astronomic_Catalogs.csproj' 
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -30,7 +29,7 @@ stages:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
-        projects: '$(projectPath)' # Використання змінної для точного вказання проекту
+        projects: '$(projectPath)' 
         publishWebProjects: true
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     - script: dir $(Build.ArtifactStagingDirectory) /s

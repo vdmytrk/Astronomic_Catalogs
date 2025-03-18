@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmitOnError": true,
+    "noImplicitAny": false,
+    "outDir": "./wwwroot/js",
+    "rootDir": "./Scripts/ts",
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "ES5",
+    "types": [ "node", "jquery" ]
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ],
+  "include": [ "Scripts/ts/**/*" ]
+}
