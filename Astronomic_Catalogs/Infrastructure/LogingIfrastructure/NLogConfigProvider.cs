@@ -1,4 +1,5 @@
 ﻿using Astronomic_Catalogs.Infrastructure.Interfaces;
+using Astronomic_Catalogs.Infrastructure.LogingIfrastructure;
 using NLog;
 using NLog.Targets;
 
@@ -19,9 +20,11 @@ public class NLogConfigProvider : INLogConfigProvider
         _nlogConfiguration = nlogConfiguration;
         _connectionStringProvider = connectionStringProvider;
 
-        _nlogConfigFile = environment.IsDevelopment()
+        _nlogConfigFile = Path.Combine(AppContext.BaseDirectory, environment.IsDevelopment()
             ? "NLog.config.Debug.xml"
-            : "NLog.config.Release.xml";
+            : "NLog.config.Release.xml");
+
+        FileLogService.WriteLogInFile("\n\nDEBUG", $"{FileLogService.GetKyivTime()} NLog config path: ", $"{_nlogConfigFile}\n\n");
     }
 
     public void ConfigureLogger()

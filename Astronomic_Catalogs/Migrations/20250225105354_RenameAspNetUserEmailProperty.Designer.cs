@@ -1848,7 +1848,7 @@ namespace Astronomic_Catalogs.Migrations
                     b.Property<string>("OtherNames")
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)")
-                        .HasColumnName("Ohter_names");
+                        .HasColumnName("Other_names");
 
                     b.Property<int?>("PageCount")
                         .HasColumnType("int");
@@ -2100,7 +2100,7 @@ namespace Astronomic_Catalogs.Migrations
                     b.Property<string>("OtherNames")
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)")
-                        .HasColumnName("Ohter_names");
+                        .HasColumnName("Other_names");
 
                     b.Property<int?>("PositionAngle")
                         .ValueGeneratedOnAdd()

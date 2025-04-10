@@ -1,0 +1,24 @@
+{
+  "author": "",
+  "description": "",
+  "devDependencies": {
+    "@types/jquery": "^3.5.32",
+    "terser-webpack-plugin": "^5.3.14",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.2",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "main": "webpack.config.js",
+  "name": "astronomic_catalogs",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --watch"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "jquery": "^3.7.1"
+  }
+}

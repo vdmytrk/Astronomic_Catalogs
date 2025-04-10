@@ -41,14 +41,15 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<LogProcFunc> LogProcFuncs { get; set; } = null!;
     public DbSet<TestConnectionForNLog> TestConnectionForNLogs { get; set; } = null!;
     public DbSet<NLogApplicationCode> NLogApplicationCodes { get; set; } = null!;
+    public DbSet<DatabaseInitialization> DatabaseInitialization { get; set; } = null!;
 
     
-    public DbSet<AspNetRole> Roles { get; set; } = null!;
-    public DbSet<AspNetRoleClaim> RoleClaims { get; set; } = null!;
-    public DbSet<AspNetUser> Users { get; set; } = null!;
-    public DbSet<AspNetUserClaim> UserClaims { get; set; } = null!;
-    public DbSet<AspNetUserLogin> UserLogins { get; set; } = null!;
-    public DbSet<AspNetUserToken> UserTokens { get; set; } = null!;
+    public override DbSet<AspNetRole> Roles { get; set; } = null!;
+    public override DbSet<AspNetRoleClaim> RoleClaims { get; set; } = null!;
+    public override DbSet<AspNetUser> Users { get; set; } = null!;
+    public override DbSet<AspNetUserClaim> UserClaims { get; set; } = null!;
+    public override DbSet<AspNetUserLogin> UserLogins { get; set; } = null!;
+    public override DbSet<AspNetUserToken> UserTokens { get; set; } = null!;
 
     public DbSet<UserLog> UserLogs { get; set; }
     public DbSet<RequestLog> RequestLogs { get; set; }

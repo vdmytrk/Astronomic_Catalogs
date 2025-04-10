@@ -3,10 +3,12 @@ using Astronomic_Catalogs.Authorization;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.Interfaces;
+using Astronomic_Catalogs.Infrastructure.LogingIfrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Astronomic_Catalogs.Models.Services;
 using Astronomic_Catalogs.Services;
 using Astronomic_Catalogs.Services.Interfaces;
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -26,8 +28,9 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         var configuration = LoadConfiguration();
+        builder.Configuration.AddConfiguration(configuration);
 
-        ConfigureLogging(builder);
+        ConfigureLogging(builder, configuration);
         AddServices(builder);
         AddDatabaseServices(builder);
         AddIdentityServices(builder, configuration);
@@ -42,17 +45,18 @@ public class Program
         ConfigureMiddleware(app, builder);
         ConfigureRoutes(app);
 
-        await InitializeDatabaseAsync(app);
+        await InitializeDatabaseAsync(app, configuration);
         await app.RunAsync();
     }
 
 
-    private static void ConfigureLogging(WebApplicationBuilder builder)
+    private static void ConfigureLogging(WebApplicationBuilder builder, IConfiguration configuration)
     {
 #if !DEBUG
         builder.Logging.ClearProviders();
 #elif (DEBUG)
-        if (builder.Environment.IsDevelopment())   
+        FileLogService.LogAllConfiguration(configuration);
+        if (builder.Environment.IsDevelopment())
             TestNLogFileCreating();
 #endif
         builder.Host.UseNLog();
@@ -66,16 +70,30 @@ public class Program
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddScoped<DatabaseInitializer>();
-        builder.Services.AddScoped<IExcelImport, ExcelImportService_OpenXml>(); 
+        builder.Services.AddScoped<IExcelImport, ExcelImportService_OpenXml>();
     }
 
     private static IConfiguration LoadConfiguration()
     {
-        return new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        var builder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true)
             .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
+            .AddEnvironmentVariables();
+        string? keyVaultUrl = Environment.GetEnvironmentVariable("AZURE_KEYVAULT_URL");
+
+        if (!string.IsNullOrEmpty(keyVaultUrl))
+        {
+            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                ExcludeVisualStudioCredential = true, // Since VS does not work in production
+                ExcludeAzureCliCredential = true, // Azure CLI doesn't work either
+                ExcludeAzurePowerShellCredential = true // PowerShell is not needed either
+            });
+
+            builder.AddAzureKeyVault(new Uri(keyVaultUrl), credential);
+        }
+
+        return builder.Build();
     }
 
     private static void AddDatabaseServices(WebApplicationBuilder builder)
@@ -86,7 +104,7 @@ public class Program
             string connectionString = connectionStringProvider.ConnectionString;
             options.UseSqlServer(connectionString);
 #if DEBUG
-            LogEnvironmentDetails(builder.Environment, connectionString);
+            LogEnvironmentConnectionString(builder.Environment, connectionString);
 #endif
         });
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -145,7 +163,7 @@ public class Program
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = authSettings.JwtIssuer,
                 ValidAudience = authSettings.JwtAudience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.JwtKey))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.JwtKey)),
             };
         })
         #endregion
@@ -165,7 +183,7 @@ public class Program
         /// TODO:
         ///.AddApple(appleOptions =>
         ///{
-        ///    appleOptions.ClientId = authSettings.Apple:ClientId"];
+        ///    appleOptions.ClientId = configuration.Apple:ClientId"];
         ///    appleOptions.ClientSecret = builder.Configuration["Authentication:Apple:ClientSecret"];
         ///})
         ///.AddOAuth("Phone", options =>
@@ -216,6 +234,7 @@ public class Program
         {
             options.Email = authSettings.AuthMessageSenderOptions.Email;
             options.Password = authSettings.AuthMessageSenderOptions.Password;
+
         });
     }
 
@@ -358,11 +377,13 @@ public class Program
         }
     }
 
-    private static async Task InitializeDatabaseAsync(WebApplication app)
+    private static async Task InitializeDatabaseAsync(WebApplication app, IConfiguration configuration)
     {
         using var scope = app.Services.CreateScope();
+        var restoreDatabase = configuration.GetValue<bool>("RestoreDatabase");
         var dbInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-        await dbInitializer.InitializeDatabaseAsync();
+        if (restoreDatabase)
+            await dbInitializer.InitializeDatabaseAsync();
     }
 
     private static void ConfigureMiddleware(WebApplication app, WebApplicationBuilder builder)
@@ -397,15 +418,11 @@ public class Program
         app.UseMiddleware<UserLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<UserAccessMiddleware>();
-
-
     }
 
     private static void ConfigureRoutes(WebApplication app)
     {
         app.MapControllers();
-
-
         app.MapStaticAssets();
         app.MapControllerRoute(
             name: "areas",
@@ -426,7 +443,7 @@ public class Program
 #endif
     }
 
-    private static void LogEnvironmentDetails(IWebHostEnvironment environment, string connectionString)
+    private static void LogEnvironmentConnectionString(IWebHostEnvironment environment, string connectionString)
     {
         Console.WriteLine($"\n\n  USING ENVIRONMENT NAME: {environment.EnvironmentName}");
         Console.WriteLine($"\n\n  USING CONNECTION STRING: {connectionString} \n\n");
@@ -459,4 +476,5 @@ public class Program
         }
         Console.WriteLine("\n\n");
     }
+
 }

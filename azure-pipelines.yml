@@ -1,17 +1,13 @@
-# ASP.NET
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
-
 trigger:
-  batch: 'true'
+  batch: true
   branches:
     include:
       - master
 
 variables:
-  solution: '**/Astornomic Solution.sln'
-  projectPath: 'Astornomic Solution/Astronomic Catalogs/Astronomic_Catalogs.csproj' 
+  solution: 'Astornomic_Solution.sln'
+  projectPath: 'Astronomic_Catalogs\Astronomic_Catalogs.csproj' 
+  workingDirectory: '$(Build.SourcesDirectory)\Astronomic_Catalogs'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -26,19 +22,72 @@ stages:
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
+
+    - script: |
+        echo "Solution directory: $(solution)"
+        echo "Project path: $(Build.SourcesDirectory)\$(projectPath)"
+        echo "Working directory: $(workingDirectory)"
+      displayName: 'Check Variables'
+    - script: dir $(workingDirectory)
+      displayName: 'List working_directory files'
+
+    - task: UseNode@1
+      inputs:
+        version: '22.14.0'
+    - script: node -v
+      displayName: 'Check Node.js Version'
+
+    - task: Cache@2
+      inputs:
+        key: 'npm | "$(Agent.OS)" | $(Build.SourcesDirectory)/Astronomic_Catalogs/package-lock.json'
+        path: '$(Build.SourcesDirectory)/Astronomic_Catalogs/node_modules'
+      displayName: 'Cache npm packages'
+
+    - script:  |
+        npm ci
+      displayName: 'Install npm packages'
+      workingDirectory: '$(Build.SourcesDirectory)/Astronomic_Catalogs'
+    - script: npm run build
+      displayName: 'Build npm'
+      workingDirectory: '$(Build.SourcesDirectory)/Astronomic_Catalogs'
+
+    - script: npm list
+      displayName: 'Check installed npm'
+      workingDirectory: '$(Build.SourcesDirectory)/Astronomic_Catalogs'
+    - script: npx webpack -v
+      displayName: 'Check Webpack version'
+      workingDirectory: '$(Build.SourcesDirectory)/Astronomic_Catalogs'
+    - script: |
+        echo Current directory:
+        cd
+        echo Listing contents of node_modules:
+        dir /S /B node_modules
+      displayName: 'List node_modules contents'
+      workingDirectory: '$(Build.SourcesDirectory)/Astronomic_Catalogs'
+
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '9.0.x'
+        installationPath: $(Agent.ToolsDirectory)/dotnet
     - task: DotNetCoreCLI@2
       inputs:
         command: 'publish'
-        projects: '$(projectPath)' 
-        publishWebProjects: true
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        projects: '$(Build.SourcesDirectory)/$(projectPath)'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --self-contained true --runtime win-x86'
+
     - script: dir $(Build.ArtifactStagingDirectory) /s
       displayName: 'List files in staging directory'
+    - script: dotnet --info
+      displayName: 'Show .NET SDK info'
+
     - task: PublishBuildArtifacts@1
       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: 'drop'
         publishLocation: 'Container'
+
+
 
 - stage: Deploy
   dependsOn: Build
@@ -52,8 +101,9 @@ stages:
         deploy:
           steps:
           - task: AzureWebApp@1
+            displayName: 'Deploy ZIP to App Service'
             inputs:
               azureSubscription: 'Azure subscription for voldmytc'
               appType: 'webApp'
               appName: 'NewAstroCatalogs'
-              package: "$(Pipeline.Workspace)/drop/s.zip"
+              package: "$(Pipeline.Workspace)/drop/Astronomic_Catalogs.zip"

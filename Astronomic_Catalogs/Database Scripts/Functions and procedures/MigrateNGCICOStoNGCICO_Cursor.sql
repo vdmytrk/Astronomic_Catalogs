@@ -1,4 +1,7 @@
 
+--=======================================================================================================================================--
+--==========================================================  STORED PRCEDURE  ==========================================================--
+--=======================================================================================================================================--
 
 
 
@@ -80,7 +83,6 @@ BEGIN
         IF @trancount = 0
 			BEGIN
 				BEGIN TRANSACTION NGC_IC_Opendatasoft_C_Tran;
-				SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 			END;
         ELSE
 			BEGIN
@@ -162,7 +164,7 @@ BEGIN
 		ON T1.NGC_IC + CAST(T1.[Name] AS VARCHAR) = RTRIM(T2.Catalog) + CAST(LTRIM(RTRIM(T2.Namber_name)) AS VARCHAR);
 			   		 
 		UPDATE NGCICOpendatasoft
-		SET Ohter_names = T3.Ohter_names,
+		SET Other_names = T3.Other_names,
 			Object_type = T3.Object_type
 		FROM NGCICOpendatasoft AS T1
 		JOIN NGCWikipedia_TemporarilySource AS T3

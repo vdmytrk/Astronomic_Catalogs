@@ -5,13 +5,6 @@
 -------------------------------------------------------------------------------------------------------------------------------------------
 --================================================  INSET DATA INTO NGCICOpendatasoft  ================================================--
 -------------------------------------------------------------------------------------------------------------------------------------------
-use AstroCatalogsDB;
-go
-
-
-
-
-
 CREATE OR ALTER PROC InsertNGCICOpendatasoft
     @TableName NVARCHAR(100), 
     @Id INT,
@@ -49,7 +42,6 @@ BEGIN
 	SET NOCOUNT ON; 
 
     DECLARE @SQL NVARCHAR(MAX);
-	DECLARE @FuncProc AS VARCHAR(50), @Line AS INT, @ErrorNumber AS INT, @ErrorMessage VARCHAR(MAX), @ErrorSeverity INT, @ErrorState INT;
 
 	-- For error hendling
 	DECLARE @FuncProc AS VARCHAR(50), 

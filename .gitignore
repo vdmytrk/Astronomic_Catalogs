@@ -372,30 +372,34 @@ NLog.config.Debug.xml
 NLogLocalConfigurations.cs
  
 # Folders
-Database Scripts/Data
-Areas/Admin/Models
-wwwroot/Excel
- 
+Astronomic_Catalogs/Database Scripts/Data
+Astronomic_Catalogs/Areas/Admin/Models
+Astronomic_Catalogs/wwwroot/Excel
+
+# SQL
+Astronomic_Catalogs/Database Scripts/Tables/RequestLog.sql
+Astronomic_Catalogs/Database Scripts/Tables/UsertLog.sql
+
 # C#
 ExcelImportService_OpenXml_extended.cs
 DatabaseInitializer_extended.cs
- 
+
 # html
 _ActualDate.cshtml
 _ActualDateTable.cshtml
- 
+
 # Style
-wwwroot/less/themes.css
-wwwroot/less/themes.less
-wwwroot/less/site.css
-wwwroot/less/site.less
- 
+Astronomic_Catalogs/wwwroot/less/themes.css
+Astronomic_Catalogs/wwwroot/less/themes.less
+Astronomic_Catalogs/wwwroot/less/site.css
+Astronomic_Catalogs/wwwroot/less/site.less
+
 # js + typescript
-package.json
-package-lock.json
-webpack.config.js
-wwwroot/js/*.js.map
-wwwroot/js/main.js
-wwwroot/js/site.js
-wwwroot/js/theme.js
-Scripts/ts/main.ts
+Astronomic_Catalogs/wwwroot/js/*.js.map
+Astronomic_Catalogs/wwwroot/js/main.js
+Astronomic_Catalogs/wwwroot/js/mainC.js
+Astronomic_Catalogs/wwwroot/js/site.js
+Astronomic_Catalogs/wwwroot/js/site.min.js
+Astronomic_Catalogs/wwwroot/js/themeC.js
+Astronomic_Catalogs/Scripts/ts/mainC.ts
+Astronomic_Catalogs/wwwroot/js/main.js

@@ -1,6 +1,7 @@
 ﻿using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services;
 using Astronomic_Catalogs.Services.Constants;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -15,15 +16,16 @@ public class DatabaseInitializer
     private readonly RoleControllerService _roleService;
     private readonly RoleManager<AspNetRole> _roleManager;
     private readonly UserManager<AspNetUser> _userManager;
-    private readonly string _scriptsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Database Scripts");
+    private readonly IWebHostEnvironment _env;
+    private readonly string _scriptsDirectory;
 
     public DatabaseInitializer(
         ApplicationDbContext context,
         ILogger<DatabaseInitializer> logger,
         RoleControllerService roleService,
         RoleManager<AspNetRole> roleManager,
-        UserManager<AspNetUser> userManager
-
+        UserManager<AspNetUser> userManager,
+        IWebHostEnvironment env
         )
     {
         _context = context;
@@ -31,22 +33,25 @@ public class DatabaseInitializer
         _roleService = roleService;
         _roleManager = roleManager;
         _userManager = userManager;
+        _env = env;
+        _scriptsDirectory = Path.Combine(env.ContentRootPath, "Database Scripts");
     }
 
     public async Task InitializeDatabaseAsync()
     {
         try
         {
-            if (!await _context.Database.CanConnectAsync())
+            bool isConnectDb = await _context.Database.CanConnectAsync();
+
+            await (_env.EnvironmentName switch
             {
-                _logger.LogWarning("Database not found. Creating...");
-                if (await CreateDatabaseAsync())
-                {
-                    await ExecuteAllSqlScriptsAsync();
-                    await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
-                    await EnsureIdentityDataAsync();
-                }
-            }
+                "Development" => InitializeDevelopmentAsync(isConnectDb),
+                "AzureDevelopment" => InitializeAzureDevelopmentAsync(isConnectDb),
+                _ => throw new InvalidOperationException($"Unknown environment: {_env.EnvironmentName}")
+            });
+
+            if (isConnectDb)
+                await EnsureIdentityDataAsync();
         }
         catch (Exception ex)
         {
@@ -166,11 +171,121 @@ public class DatabaseInitializer
     #endregion
 
     #region Create and fill database
+    private async Task InitializeDevelopmentAsync(bool isConnectDb)
+    {
+        if (isConnectDb)
+            await _context.Database.EnsureDeletedAsync();
+
+        if (await CreateDatabaseAsync())
+        {
+            await ExecuteAllSqlScriptsAsync();
+            await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
+        }
+
+    }
+
+    private async Task InitializeAzureDevelopmentAsync(bool isConnectDb)
+    {
+        if (isConnectDb)
+        {
+            _logger.LogWarning("Database is found. Applying migrations...");
+            bool success = await ClearDatabase();
+            await ApplyMigrationsAsync();
+            await ExecuteAllSqlScriptsAsync();
+            await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
+        }
+        else
+        {
+            _logger.LogWarning("Database does not exist in Azure.");
+        }
+    }
+
+    /// <summary>
+    /// Truncate table which are not created by script.
+    /// </summary>
+    public async Task<bool> ClearDatabase()
+    {
+        bool success = true;
+        string[] tabels = [
+                "CollinderCatalog",
+                "Constellation",
+                "NameObject",
+                "NGCICOpendatasoft",
+                "NGCICOpendatasoft_Extension",
+                "SourceType",
+                "DatabaseInitialization"
+            ];
+
+        var existingTables = await GetExistingTablesAsync(tabels);
+
+        if (!existingTables.Any())
+        {
+            _logger.LogWarning("No tables found to truncate.");
+            return success;
+        }
+
+        List<string> failedTables = new();
+        foreach (string table in existingTables)
+        {
+            try
+            {
+                string sql = $"TRUNCATE TABLE {table}";
+                await _context.Database.ExecuteSqlRawAsync(sql);
+            }
+            catch (Exception ex)
+            {
+                failedTables.Add(table);
+                _logger.LogError(ex, $"The table {table} was not truncated with exception: {ex.Message}.");
+            }
+        }
+
+        if (failedTables.Any())
+        {
+            success = false;
+            throw new Exception($"Failed to delete the following tabels: {string.Join(", ", failedTables)}");
+        }
+
+        return success;
+    }
+
+    private async Task<List<string>> GetExistingTablesAsync(string[] tabels)
+    {
+        List<string> existingTables = new();
+
+        //using var connection0 = _context.Database.GetDbConnection();
+        using var connection = new SqlConnection(_context.Database.GetConnectionString()); // Використовуємо нове з'єднання
+        await connection.OpenAsync();
+
+        try
+        {
+            string joinedTableNames = string.Join(", ", tabels.Select(t => $"'{t}'"));
+            string query = $@"
+            SELECT TABLE_NAME 
+            FROM INFORMATION_SCHEMA.TABLES 
+            WHERE TABLE_NAME IN ({joinedTableNames})";
+
+            using var command = connection.CreateCommand();
+            command.CommandText = query;
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                existingTables.Add(reader.GetString(0));
+            }
+        }
+        finally
+        {
+            await connection.CloseAsync();
+        }
+
+        return existingTables;
+    }
+
     private async Task<bool> CreateDatabaseAsync()
     {
         try
         {
-            await _context.Database.EnsureCreatedAsync();
+            await _context.Database.EnsureCreatedAsync(); 
             _logger.LogDebug("Database created successfully.");
             return true;
         }
@@ -181,12 +296,25 @@ public class DatabaseInitializer
         }
     }
 
+    private async Task ApplyMigrationsAsync()
+    {
+        try
+        {
+            await _context.Database.MigrateAsync();
+            _logger.LogInformation("Database migrations applied successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to apply database migrations.");
+            throw;
+        }
+    }
+
     private async Task ExecuteStoredProcedureAsync(string storedProcedure)
     {
         try
         {
             await _context.Database.ExecuteSqlRawAsync("EXEC {0}", storedProcedure);
-
             _logger.LogDebug($"Stored procedure {storedProcedure} executed successfully.");
         }
         catch (DbUpdateException dbEx)
@@ -206,42 +334,77 @@ public class DatabaseInitializer
         }
     }
 
-    private async Task ExecuteSqlScriptAsync(string scriptName)
+    private async Task<bool> ExecuteSqlScriptAsync(string scriptName)
     {
-        string scriptPath = $"{_scriptsDirectory}/{scriptName}"; 
+        string scriptPath = $"{_scriptsDirectory}/{scriptName}";
 
         if (!File.Exists(scriptPath))
         {
             _logger.LogError($"Script file {scriptPath} not found. Skipping.");
-            return;
+            return false;
         }
 
         int? defaultTimeout = null;
-        try
+        using (var transaction = await _context.Database.BeginTransactionAsync())
         {
-            var sql = await File.ReadAllTextAsync(scriptPath);
-            if (!string.IsNullOrWhiteSpace(sql))
+            try
             {
+                var sql = await File.ReadAllTextAsync(scriptPath);
+                if (string.IsNullOrWhiteSpace(sql))
+                {
+                    _logger.LogWarning($"Script {scriptPath} is empty. Skipping.");
+                    return false;
+                }
+
                 _logger.LogDebug($"Executing script: {scriptPath}");
 
-                if (scriptPath.EndsWith("NGC2000_UKTemporarily.sql"))
+                if (scriptPath.EndsWith("Data/NGC2000_UKTemporarily.sql"))
                 {
                     defaultTimeout = _context.Database.GetCommandTimeout();
                     _context.Database.SetCommandTimeout(600);
                 }
+
                 await _context.Database.ExecuteSqlRawAsync(sql);
+                await transaction.CommitAsync();
+                return true;
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred during migration.");
-        }
-        finally
-        {
-            if (defaultTimeout.HasValue)
+            catch (Exception ex)
             {
-                _context.Database.SetCommandTimeout(defaultTimeout.Value);
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, $"Error executing script {scriptPath}. Rolling back transaction.");
+                return false;
             }
+            finally
+            {
+                if (defaultTimeout.HasValue)
+                {
+                    _context.Database.SetCommandTimeout(defaultTimeout.Value);
+                }
+            }
+        }
+    }
+
+    private async Task ExecuteSqlScriptIfNeededAsync(string scriptPath, string propertyName, DatabaseInitialization initStatus)
+    {
+        var prop = typeof(DatabaseInitialization).GetProperty(propertyName);
+        if (prop == null)
+        {
+            _logger.LogError($"Property {propertyName} not found in DatabaseInitialization model.");
+            return;
+        }
+
+        bool isExecuted = (bool)(prop.GetValue(initStatus) ?? false);
+        if (isExecuted)
+        {
+            _logger.LogInformation($"Skipping execution of {scriptPath} because it's already executed.");
+            return;
+        }
+
+        bool success = await ExecuteSqlScriptAsync(scriptPath);
+        if (success)
+        {
+            prop.SetValue(initStatus, true);
+            await _context.SaveChangesAsync();
         }
     }
     #endregion
@@ -250,14 +413,13 @@ public class DatabaseInitializer
     private async Task ExecuteAllSqlScriptsAsync()
     {
         await ExecuteCreateTableSqlScriptsAsync();
-        await ExecuteCreateProcedureFunctionSqlScriptsAsync();
         await ExecuteInsertDataSqlScriptsAsync();
+        await ExecuteCreateProcedureFunctionSqlScriptsAsync();
     }
 
     /// <summary>
-    /// Create tables that do not have a model.
+    /// Create tabels that do not have a model.
     /// </summary>
-    /// <returns></returns>
     private async Task ExecuteCreateTableSqlScriptsAsync()
     {
         await ExecuteSqlScriptAsync($"Tables/NGC2000_UKTemporarilySource.sql");
@@ -266,6 +428,33 @@ public class DatabaseInitializer
         await ExecuteSqlScriptAsync($"Tables/NGCWikipedia_TemporarilySource.sql");
         await ExecuteSqlScriptAsync($"Tables/NGCWikipedia_ExtensionTemporarilySource.sql");
         await ExecuteSqlScriptAsync($"Tables/NGCICOpendatasoft_Source.sql");
+        await ExecuteSqlScriptAsync($"Tables/NLogApplicationCode.sql");
+        await ExecuteSqlScriptAsync($"Tables/LogProcFunc.sql");
+        await ExecuteSqlScriptAsync($"Tables/RequestLog.sql");
+        await ExecuteSqlScriptAsync($"Tables/UsertLog.sql");
+    }
+
+    private async Task ExecuteInsertDataSqlScriptsAsync()
+    {
+        var initStatus = await _context.DatabaseInitialization.FirstOrDefaultAsync(x => x.Id == 1);
+
+        if (initStatus == null)
+        {
+            initStatus = new DatabaseInitialization { };
+            _context.DatabaseInitialization.Add(initStatus);
+            await _context.SaveChangesAsync();
+        }
+
+        await ExecuteSqlScriptIfNeededAsync("Data/SourceType.sql", nameof(initStatus.Is_SourceType_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarilySource.sql", nameof(initStatus.Is_NGC2000_UKTemporarilySource_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NameObject.sql", nameof(initStatus.Is_NameObject_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/Constellation.sql", nameof(initStatus.Is_Constellation_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarily.sql", nameof(initStatus.Is_NGC2000_UKTemporarily_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog_Temporarily.sql", nameof(initStatus.Is_CollinderCatalog_Temporarily_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog.sql", nameof(initStatus.Is_CollinderCatalog_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_TemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_TemporarilySource_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_ExtensionTemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_ExtensionTemporarilySource_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGCICOpendatasoft_Source.sql", nameof(initStatus.Is_NGCICOpendatasoft_Source_Executed), initStatus);
     }
 
     private async Task ExecuteCreateProcedureFunctionSqlScriptsAsync()
@@ -278,19 +467,6 @@ public class DatabaseInitializer
         await ExecuteSqlScriptAsync($"Functions and procedures/GetActualDate.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/CreateNewDate.sql");
     }
-
-    private async Task ExecuteInsertDataSqlScriptsAsync()
-    {
-        await ExecuteSqlScriptAsync($"Data/SourceType.sql");
-        await ExecuteSqlScriptAsync($"Data/NGC2000_UKTemporarilySource.sql");
-        await ExecuteSqlScriptAsync($"Data/NameObject.sql");
-        await ExecuteSqlScriptAsync($"Data/Constellation.sql");
-        await ExecuteSqlScriptAsync($"Data/NGC2000_UKTemporarily.sql");
-        await ExecuteSqlScriptAsync($"Data/CollinderCatalog_Temporarily.sql");
-        await ExecuteSqlScriptAsync($"Data/CollinderCatalog.sql");
-        await ExecuteSqlScriptAsync($"Data/NGCWikipedia_TemporarilySource.sql"); // !
-        await ExecuteSqlScriptAsync($"Data/NGCWikipedia_ExtensionTemporarilySource.sql");
-        await ExecuteSqlScriptAsync($"Data/NGCICOpendatasoft_Source.sql");
-    }
     #endregion
+
 }

@@ -8,8 +8,10 @@
     "rootDir": "./Scripts/ts",
     "removeComments": false,
     "sourceMap": true,
-    "target": "ES5",
-    "types": [ "node", "jquery" ]
+    "target": "ES6",
+    "types": [ "node", "jquery" ],
+    "typeRoots": [ "node_modules/@types" ]
+
   },
   "exclude": [
     "node_modules",

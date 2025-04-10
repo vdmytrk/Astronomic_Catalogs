@@ -13,12 +13,14 @@ namespace Astronomic_Catalogs.Services;
 public class JwtService
 {
     private readonly UserManager<AspNetUser> _userManager;
-    private readonly AuthenticationSettingsProvider _authSettings;
+    //private readonly AuthenticationSettingsProvider _authSettings;
+    private readonly IConfiguration _configuration;
 
-    public JwtService(UserManager<AspNetUser> userManager, AuthenticationSettingsProvider authSettings)
+    //public JwtService(UserManager<AspNetUser> userManager, AuthenticationSettingsProvider authSettings)
+    public JwtService(UserManager<AspNetUser> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
-        _authSettings = authSettings;
+        _configuration = configuration;
     }
 
     public async Task<string> AuthenticateToken(HttpContext httpContext, AspNetUser user, bool rememberMe)
@@ -51,14 +53,22 @@ public class JwtService
 
     public string GenerateJwtToken(List<Claim> claims)
     {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_authSettings.JwtKey));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]
+                ?? throw new ArgumentNullException("JwtSettings:Key", "JwtSettings Key can't be null.")));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _authSettings.JwtIssuer,
-            audience: _authSettings.JwtAudience,
+            //issuer: _authSettings.JwtIssuer,
+            issuer: _configuration["JwtSettings:Issuer"] 
+                ?? throw new ArgumentNullException("JwtSettings:Issuer", "JwtSettings Issuer can't be null."),
+            //audience: _authSettings.JwtAudience,
+            audience: _configuration["JwtSettings:Audience"]
+                ?? throw new ArgumentNullException("JwtSettings:Audience", "JwtSettings Audience can't be null."),
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_authSettings.JwtExpireMinutes),
+            //expires: DateTime.UtcNow.AddMinutes(_authSettings.JwtExpireMinutes),
+            expires: DateTime.UtcNow.AddMinutes(int.TryParse(_configuration["JwtSettings:ExpireMinutes"], out var expireMinutes)
+                ? expireMinutes
+                : throw new ArgumentNullException("JwtSettings:ExpireMinutes", "JwtSettings ExpireMinutes can't be null.")),
             signingCredentials: credentials
         );
 

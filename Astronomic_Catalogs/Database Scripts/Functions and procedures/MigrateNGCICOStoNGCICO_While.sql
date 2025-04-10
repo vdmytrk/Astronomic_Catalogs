@@ -1,7 +1,9 @@
 
+--=======================================================================================================================================--
+--==========================================================  STORED PRCEDURE  ==========================================================--
+--=======================================================================================================================================--
 
 
---DROP PROCEDURE MigrateNGCICOStoNGCICO_W;
 CREATE OR ALTER PROC MigrateNGCICOStoNGCICO_W
 AS
 BEGIN
@@ -85,11 +87,10 @@ BEGIN
         IF @trancount = 0
 			BEGIN	            
 				BEGIN TRANSACTION NGC_IC_Opendatasoft_W_Tran;
-				SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 			END;
         ELSE
 			BEGIN
-				COMMIT TRANSACTION OuterTransaction;
+				COMMIT TRANSACTION NGC_IC_Opendatasoft_W_Tran;
 				THROW 50001, 'There was an error becose there is more then one open transaction.', 1;
 			END;
 		
@@ -178,7 +179,7 @@ BEGIN
 		ON T1.NGC_IC + CAST(T1.[Name] AS VARCHAR) = RTRIM(T2.Catalog) + CAST(LTRIM(RTRIM(T2.Namber_name)) AS VARCHAR);
 			   		 
 		UPDATE NGCICOpendatasoft
-		SET Ohter_names = T3.Ohter_names,
+		SET Other_names = T3.Other_names,
 			Object_type = T3.Object_type
 		FROM NGCICOpendatasoft AS T1
 		JOIN NGCWikipedia_TemporarilySource AS T3
