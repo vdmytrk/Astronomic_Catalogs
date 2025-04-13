@@ -57,10 +57,8 @@ public class JwtService
         var addMinute = _authSettings.JwtExpireMinutes == 0 ? 10 : _authSettings.JwtExpireMinutes;
 
         var token = new JwtSecurityToken(
-            issuer: _authSettings.JwtIssuer 
-                ?? throw new ArgumentNullException("JwtSettings:Issuer", "JwtSettings Issuer can't be null."),
-            audience: _authSettings.JwtAudience
-                ?? throw new ArgumentNullException("JwtSettings:Audience", "JwtSettings Audience can't be null."),
+            issuer: _authSettings.JwtIssuer ?? throw new ArgumentNullException("JwtSettings:Issuer", "JwtSettings Issuer can't be null."),
+            audience: _authSettings.JwtAudience ?? throw new ArgumentNullException("JwtSettings:Audience", "JwtSettings Audience can't be null."),
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(addMinute),
             signingCredentials: credentials
@@ -68,6 +66,5 @@ public class JwtService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
 
 }

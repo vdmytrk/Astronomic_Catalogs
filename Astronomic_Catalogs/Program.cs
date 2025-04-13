@@ -69,6 +69,7 @@ public class Program
     private static void AddServices(WebApplicationBuilder builder)
     {
         builder.Services.AddTransient<PublicIpService>();
+        builder.Services.AddSingleton<IImportCancellationService, ImportCancellationService>();
         builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
         builder.Services.AddSingleton<NLogConfigProvider>();

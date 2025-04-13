@@ -24,20 +24,23 @@ public class ExcelImportService_OpenXml : IExcelImport
     private readonly string _filePath;
     private readonly ILogger<ExcelImportService_OpenXml> _logger;
     private readonly IHubContext<ProgressHub> _hub;
+    private readonly IImportCancellationService _importCancellationService;
     private int rowNumber = 0;
 
     public ExcelImportService_OpenXml(
         IDbContextFactory<ApplicationDbContext> contextFactory,
         ILogger<ExcelImportService_OpenXml> logger,
-        IHubContext<ProgressHub> hub)
+        IHubContext<ProgressHub> hub,
+        IImportCancellationService importCancellationService)
     {
         _contextFactory = contextFactory;
         _filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Excel", "PS_2025.03.13_23.08.05 - Converted – Clear.xlsx");
         _logger = logger;
         _hub = hub;
+        _importCancellationService = importCancellationService;
     }
 
-    public async Task ImportDataAsync(string jobId)
+    public async Task ImportDataAsync(string jobId, CancellationToken cancellationToken)
     {
         if (!File.Exists(_filePath))
         {
@@ -63,8 +66,7 @@ public class ExcelImportService_OpenXml : IExcelImport
 
         using (var context = _contextFactory.CreateDbContext())
         {
-            context.PlanetsCatalog.RemoveRange(context.PlanetsCatalog);
-            await context.SaveChangesAsync();
+            await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [NASAExoplanetCatalog]");
             _logger.LogInformation("Table NASAExoplanetCatalog cleared before import.");
         }
 
@@ -77,17 +79,19 @@ public class ExcelImportService_OpenXml : IExcelImport
             var taskIndex = i;
             var subset = rows.Skip(i * rowsPerTask).Take(rowsPerTask).ToList();
 
-            await semaphore.WaitAsync();
+            await semaphore.WaitAsync(cancellationToken);
 
             var task = Task.Run(async () =>
             {
                 try
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     _logger.LogInformation($"[Task with index: {taskIndex}] START at {FileLogService.GetKyivTime()}");
-
                     var localList = new List<NASAExoplanetCatalog>();
+
                     foreach (var row in subset)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         var planet = MapRowToModel<NASAExoplanetCatalog>(row, sharedStrings);
                         localList.Add(planet);
 
@@ -95,13 +99,13 @@ public class ExcelImportService_OpenXml : IExcelImport
                         if (localProcessed % progressUpdateInterval == 0)
                         {
                             //Debugger.Break();
-                            await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", (int)((double)localProcessed / totalRows * 100));
+                            await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", (int)((double)localProcessed / totalRows * 100), cancellationToken);
                         }
                     }
 
-                    await using var context = await _contextFactory.CreateDbContextAsync();
+                    await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
                     context.PlanetsCatalog.AddRange(localList);
-                    await context.SaveChangesAsync();
+                    await context.SaveChangesAsync(cancellationToken);
 
                     Interlocked.Add(ref savedRows, localList.Count);
                     _logger.LogInformation($"Saved {savedRows} rows by task {taskIndex} at {FileLogService.GetKyivTime()}");
@@ -110,7 +114,7 @@ public class ExcelImportService_OpenXml : IExcelImport
                 {
                     semaphore.Release();
                 }
-            });
+            }, cancellationToken);
 
             tasks.Add(task);
         }
@@ -119,8 +123,7 @@ public class ExcelImportService_OpenXml : IExcelImport
         try
         {
             await Task.WhenAll(tasks);
-            await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", 100);
-            //await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", 100, cancellationToken);
+            await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", 100, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -128,7 +131,7 @@ public class ExcelImportService_OpenXml : IExcelImport
         }
         finally
         {
-            //_importCancellationService.Remove(jobId);
+            _importCancellationService.Remove(jobId);
         }
 
         _logger.LogInformation($"[IMPORT FINISH] Kyiv Time: {FileLogService.GetKyivTime()} | Total Saved: {savedRows}");

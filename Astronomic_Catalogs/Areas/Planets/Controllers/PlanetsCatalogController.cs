@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
+using Astronomic_Catalogs.Services;
 
 namespace Astronomic_Catalogs.Areas.Planets.Controllers;
 
@@ -15,14 +16,17 @@ namespace Astronomic_Catalogs.Areas.Planets.Controllers;
 public class PlanetsCatalogController : Controller
 {
     private readonly ApplicationDbContext _context;
-    private readonly IExcelImport _excelImport_OpenXml;
+    private readonly IExcelImport _excelImportService;
+    private readonly IImportCancellationService _importCancellationService; 
 
     public PlanetsCatalogController(
         ApplicationDbContext context, 
-        IExcelImport excelImport_OpenXml)
+        IExcelImport excelImport_OpenXml,
+        IImportCancellationService importCancellationService)
     {
         _context = context;
-        _excelImport_OpenXml = excelImport_OpenXml;
+        _excelImportService = excelImport_OpenXml;
+        _importCancellationService = importCancellationService;
     }
 
     // GET: Planets/PlanetsCatalog
@@ -216,8 +220,30 @@ public class PlanetsCatalogController : Controller
     [HttpPost]
     public async Task<IActionResult> ImportData_OpenXml(string jobId)
     {
-        await _excelImport_OpenXml.ImportDataAsync(jobId);
-        TempData["Message"] = "Import completed successfully!";
-        return RedirectToAction("Index");
+        var cts = _importCancellationService.GetOrCreateToken(jobId);
+
+        try
+        {
+            await _excelImportService.ImportDataAsync(jobId, cts.Token);
+            TempData["Message"] = "Import completed successfully!";
+            return Ok();
+        }
+        catch (OperationCanceledException)
+        {
+            return StatusCode(499); // Non-standard "Client Closed Request"
+        }
+    }
+
+    [HttpPost]
+    public IActionResult CancelImport(string jobId)
+    {
+        _importCancellationService.Cancel(jobId);
+        return Ok();
+    }
+
+    public async Task<IActionResult> GetPlanetsTable()
+    {
+        var planets = await _context.PlanetsCatalog.Take(300).ToListAsync();
+        return PartialView("_PlanetsTable", planets);
     }
 }
