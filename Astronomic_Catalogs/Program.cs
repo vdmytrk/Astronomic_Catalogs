@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using NLog.Web;
@@ -36,7 +37,9 @@ public class Program
         AddIdentityServices(builder, configuration);
         ConfigureRateLimiting(builder);
 
+        builder.Services.AddHttpClient();
         builder.Services.AddControllersWithViews();
+        builder.Services.AddSignalR();
         builder.Services.AddRazorPages();
 
         var app = builder.Build();
@@ -44,6 +47,7 @@ public class Program
         ConfigureServices(app, builder);
         ConfigureMiddleware(app, builder);
         ConfigureRoutes(app);
+
 
         await InitializeDatabaseAsync(app, configuration);
         await app.RunAsync();
@@ -64,7 +68,6 @@ public class Program
 
     private static void AddServices(WebApplicationBuilder builder)
     {
-        builder.Services.AddHttpClient();
         builder.Services.AddTransient<PublicIpService>();
         builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
@@ -98,6 +101,7 @@ public class Program
 
     private static void AddDatabaseServices(WebApplicationBuilder builder)
     {
+        /// The usual context for controllers and services
         builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
             var connectionStringProvider = serviceProvider.GetRequiredService<IConnectionStringProvider>();
@@ -106,6 +110,15 @@ public class Program
 #if DEBUG
             LogEnvironmentConnectionString(builder.Environment, connectionString);
 #endif
+        });
+
+        builder.Services.AddScoped<IDbContextFactory<ApplicationDbContext>>(sp =>
+        {
+            var connectionStringProvider = sp.GetRequiredService<IConnectionStringProvider>();
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseSqlServer(connectionStringProvider.ConnectionString);
+
+            return new PooledDbContextFactory<ApplicationDbContext>(optionsBuilder.Options);
         });
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
     }
@@ -424,6 +437,7 @@ public class Program
     {
         app.MapControllers();
         app.MapStaticAssets();
+        app.MapHub<ProgressHub>("/progressHub");
         app.MapControllerRoute(
             name: "areas",
             pattern: "{area:exists}/{controller=HomeAdmin}/{action=Index}/{id?}"

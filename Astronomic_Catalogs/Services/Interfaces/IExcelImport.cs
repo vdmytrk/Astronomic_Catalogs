@@ -5,7 +5,7 @@ namespace Astronomic_Catalogs.Services.Interfaces;
 
 public interface IExcelImport
 {
-    Task ImportDataAsync();
+    Task ImportDataAsync(string jobId);
     T MapRowToModel<T>(Row row, SharedStringTable? sharedStrings) where T : new();
     string GetCellValue(Cell cell, Type? propertyType, SharedStringTable? sharedStrings);
 }

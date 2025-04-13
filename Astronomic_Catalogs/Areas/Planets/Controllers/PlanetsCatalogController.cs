@@ -214,9 +214,9 @@ public class PlanetsCatalogController : Controller
 
 
     [HttpPost]
-    public async Task<IActionResult> ImportData_OpenXml()
+    public async Task<IActionResult> ImportData_OpenXml(string jobId)
     {
-        await _excelImport_OpenXml.ImportDataAsync();
+        await _excelImport_OpenXml.ImportDataAsync(jobId);
         TempData["Message"] = "Import completed successfully!";
         return RedirectToAction("Index");
     }

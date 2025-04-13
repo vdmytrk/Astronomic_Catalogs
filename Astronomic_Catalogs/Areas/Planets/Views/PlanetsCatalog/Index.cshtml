@@ -2,25 +2,35 @@
 @using Astronomic_Catalogs.Helpers
 @using DocumentFormat.OpenXml.EMMA
 
-@{
-    ViewData["Title"] = "Index";
-}
-
 <div class="planetCatalogHeader">
-    <h1>Index</h1>
+    <h1 class="mb-5">Exoplanets of NASA catalog.</h1>
 
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-
-    @if (TempData["Message"] != null)
+    @if (User.IsInRole("OwnerAdministratorPower"))
     {
-        <div class="alert alert-success">@TempData["Message"]</div>
-    }
+        <p class="my-1 mx-3">
+            <a asp-action="Create">Create New</a>
+        </p>
 
-    <form class="pb-3 mb-3" method="post" asp-action="ImportData_OpenXml" asp-controller="PlanetsCatalog">
-        <button type="submit" class="btn btn-primary">Import planet data</button>
-    </form>
+        @if (TempData["Message"] != null)
+        {
+            <div class="m-3 alert alert-success">@TempData["Message"]</div>
+        }
+
+        <div class="m-3 row">
+            <div class="col-auto me-4 mb-4">
+                <button id="importPlanetDataButton" type="button" onclick="startImport()" class="btn btn-primary">Import planet data</button>
+            </div>
+            <div class="col-auto">
+                <button id="stopImportingPlanetDataButton" type="button" onclick="stopImport()" class="btn btn-primary" style="display:none">Stop importing planet data</button>
+            </div>
+        </div>
+
+        <div class="m-3">
+            <div id="progressContainer" class="progress" style="height: 2.5em; display:none;">
+                <div id="importProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="height: 2.5em; width: 0%">0%</div>
+            </div>
+        </div>
+    }
 </div>
 
 <table class="table-responsive table-toFixColumns table-toFixRows table-plantes">
@@ -157,7 +167,7 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PlCMassJ)
-            </th>            
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.PlBmasse)
             </th>
@@ -1609,3 +1619,78 @@
 </table>
 
 
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/progresshub")
+        .build();
+
+    const jobId = crypto.randomUUID();
+
+    connection.start().then(() => {
+        connection.invoke("JoinJobGroup", jobId);
+    }).catch(err => console.error(err.toString()));
+
+    connection.on("ReceiveProgress", function (progress) {
+        document.getElementById("importProgress").style.width = progress + "%";
+        document.getElementById("importProgress").innerText = progress + "%";
+
+        if (progress >= 100) {
+            resetUI();
+        }
+    });
+
+    // function startImport() {
+    //     const button = document.getElementById("importPlanetDataButton");
+    //     button.disabled = true;
+    //     //button.style.display = 'block';
+    //     const button = document.getElementById("stopImportingPlanetDataButton");
+    //     button.disabled = false;
+
+    //     fetch(`/Planets/PlanetsCatalog/ImportData_OpenXml?jobId=${jobId}`, {
+    //         method: 'POST'
+    //     });
+    //     document.getElementById("progressContainer").style.display = 'block'; 
+    // }
+
+
+    function startImport() {
+        document.getElementById("importPlanetDataButton").disabled = true;
+        const stopButton = document.getElementById("stopImportingPlanetDataButton");
+        stopButton.disabled = false;
+        stopButton.style.display = 'inline-block';
+
+        document.getElementById("progressContainer").style.display = 'block';
+        abortController = new AbortController();
+
+        fetch(`/Planets/PlanetsCatalog/ImportData_OpenXml?jobId=${jobId}`, {
+            method: 'POST',
+            signal: abortController.signal
+        }).catch(error => {
+            if (error.name === 'AbortError') {
+                console.log('Import aborted by user');
+            } else {
+                console.error('Import error:', error);
+            }
+            resetUI();
+        });
+    }
+
+    function stopImport() {
+        if (abortController) {
+            abortController.abort();
+        }
+    }
+
+    function resetUI() {
+        const importButton = document.getElementById("importPlanetDataButton");
+        const stopButton = document.getElementById("stopImportingPlanetDataButton");
+        const progress = document.getElementById("progressContainer");
+
+        importButton.disabled = false;
+        stopButton.disabled = true;
+        stopButton.style.display = 'none';
+        progress.style.display = 'none';
+        document.getElementById("importProgress").style.width = "0%";
+        document.getElementById("importProgress").innerText = "0%";
+    }
+</script>

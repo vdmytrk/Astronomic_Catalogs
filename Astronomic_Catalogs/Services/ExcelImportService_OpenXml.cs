@@ -1,82 +1,137 @@
 ﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Infrastructure.LogingIfrastructure;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
+using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using ExcelDataReader;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
+using System.Threading;
 
 
 namespace Astronomic_Catalogs.Services;
 
 public class ExcelImportService_OpenXml : IExcelImport
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
     private readonly string _filePath;
     private readonly ILogger<ExcelImportService_OpenXml> _logger;
+    private readonly IHubContext<ProgressHub> _hub;
     private int rowNumber = 0;
 
-    public ExcelImportService_OpenXml(ApplicationDbContext context, ILogger<ExcelImportService_OpenXml> logger)
+    public ExcelImportService_OpenXml(
+        IDbContextFactory<ApplicationDbContext> contextFactory,
+        ILogger<ExcelImportService_OpenXml> logger,
+        IHubContext<ProgressHub> hub)
     {
-        _context = context;
-        _filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Excel", "PS_2025.03.13_23.08.05 - Converted – Clear.xlsx");
+        _contextFactory = contextFactory;
+        _filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Excel", "PS_2025.03.13_23.08.05 - Converted – Clear.xlsx");
         _logger = logger;
+        _hub = hub;
     }
 
-    public async Task ImportDataAsync()
+    public async Task ImportDataAsync(string jobId)
     {
         if (!File.Exists(_filePath))
         {
             throw new FileNotFoundException("Excel file not found", _filePath);
         }
 
+        const int rowsPerTask = 300; // It should be less than 1% of the total number of rows to allow for a smooth display of execution progress (so that the change can be shown for each percentage of work completed).
+        int savedRows = 0;
         using var document = SpreadsheetDocument.Open(_filePath, false);
-        var sheet = document.WorkbookPart.Workbook.Sheets.GetFirstChild<Sheet>();
-        if (sheet == null) throw new Exception("No sheets found in the Excel file.");
-
+        var sheet = document.WorkbookPart!.Workbook.Sheets!.GetFirstChild<Sheet>() ?? throw new Exception("No sheets found in the Excel file.");
         var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheet.Id!);
-        var rows = worksheetPart.Worksheet.GetFirstChild<SheetData>()?.Elements<Row>();
-        if (rows == null) throw new Exception("No rows found in the Excel sheet.");
-
-        var headerRow = rows.FirstOrDefault();
-
-        var planets = new List<NASAExoplanetCatalog>();
-        bool isHeaderSkipped = false;
         var sharedStrings = document.WorkbookPart.SharedStringTablePart?.SharedStringTable;
-        int countAll = 0;
-        int countInsert = 1;
-        const int batchSize = 300;
+        var rows = worksheetPart.Worksheet.GetFirstChild<SheetData>()?.Elements<Row>().ToList() ?? [];
 
-        _logger.LogDebug($"START AT: {DateTime.Now}"); 
-        foreach (var row in rows)
+        rows = rows.Skip(1).ToList();
+
+        int totalRows = rows.Count;
+        int partitionCount = (int)Math.Ceiling((double)totalRows / rowsPerTask);
+        int progressUpdateInterval = Math.Max(1, totalRows / 100);
+        int processed = 0;
+
+        _logger.LogInformation($"[IMPORT START] Kyiv Time: {FileLogService.GetKyivTime()} | Total rows: {totalRows}");
+
+        using (var context = _contextFactory.CreateDbContext())
         {
-            if (!isHeaderSkipped)
-            {
-                isHeaderSkipped = true;
-                continue;
-            }
-
-            var planet = MapRowToModel<NASAExoplanetCatalog>(row, sharedStrings);
-            planets.Add(planet);
-
-            if (planets.Count >= batchSize)
-            {
-                _context.PlanetsCatalog.AddRange(planets);
-            await _context.SaveChangesAsync();
-            countAll += batchSize;
-            _logger.LogDebug($"{countInsert} Count of saved rows is: {countAll}. Last saving occured at: {DateTime.Now}");
-                countInsert += 1;
-            planets.Clear(); 
-            }
+            context.PlanetsCatalog.RemoveRange(context.PlanetsCatalog);
+            await context.SaveChangesAsync();
+            _logger.LogInformation("Table NASAExoplanetCatalog cleared before import.");
         }
 
-        if (planets.Count > 0)
+        var tasks = new List<Task>();
+        var semaphore = new SemaphoreSlim(4);
+        var globalStopwatch = Stopwatch.StartNew();
+
+        for (int i = 0; i < partitionCount; i++)
         {
-            _context.PlanetsCatalog.AddRange(planets);
-            await _context.SaveChangesAsync();
-            _logger.LogDebug($"{countInsert} Count of saved rows is: {countAll + planets.Count}.");
-            _logger.LogDebug($"FINISH AT: {DateTime.Now}");
+            var taskIndex = i;
+            var subset = rows.Skip(i * rowsPerTask).Take(rowsPerTask).ToList();
+
+            await semaphore.WaitAsync();
+
+            var task = Task.Run(async () =>
+            {
+                try
+                {
+                    _logger.LogInformation($"[Task with index: {taskIndex}] START at {FileLogService.GetKyivTime()}");
+
+                    var localList = new List<NASAExoplanetCatalog>();
+                    foreach (var row in subset)
+                    {
+                        var planet = MapRowToModel<NASAExoplanetCatalog>(row, sharedStrings);
+                        localList.Add(planet);
+
+                        int localProcessed = Interlocked.Increment(ref processed);
+                        if (localProcessed % progressUpdateInterval == 0)
+                        {
+                            //Debugger.Break();
+                            await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", (int)((double)localProcessed / totalRows * 100));
+                        }
+                    }
+
+                    await using var context = await _contextFactory.CreateDbContextAsync();
+                    context.PlanetsCatalog.AddRange(localList);
+                    await context.SaveChangesAsync();
+
+                    Interlocked.Add(ref savedRows, localList.Count);
+                    _logger.LogInformation($"Saved {savedRows} rows by task {taskIndex} at {FileLogService.GetKyivTime()}");
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+
+            tasks.Add(task);
         }
+
+
+        try
+        {
+            await Task.WhenAll(tasks);
+            await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", 100);
+            //await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", 100, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogWarning("Import cancelled.");
+        }
+        finally
+        {
+            //_importCancellationService.Remove(jobId);
+        }
+
+        _logger.LogInformation($"[IMPORT FINISH] Kyiv Time: {FileLogService.GetKyivTime()} | Total Saved: {savedRows}");
     }
 
     public T MapRowToModel<T>(Row row, SharedStringTable? sharedStrings) where T : new()
@@ -85,7 +140,7 @@ public class ExcelImportService_OpenXml : IExcelImport
         var properties = typeof(T).GetProperties().ToArray();
         var cells = row.Elements<Cell>().ToList();
         int cellIndex = 0;
-                    
+
         rowNumber += 1;
 
         for (int i = 0; i < properties.Length; i++)
@@ -93,7 +148,7 @@ public class ExcelImportService_OpenXml : IExcelImport
             if (cellIndex < cells.Count)
             {
                 var cell = cells[cellIndex];
-                int columnIndex = GetColumnIndex(cell); 
+                int columnIndex = GetColumnIndex(cell);
                 if (columnIndex > i)
                 {
                     // Skip missing cells (Excel does not save empty ones)
@@ -117,11 +172,11 @@ public class ExcelImportService_OpenXml : IExcelImport
                             Type t when t == typeof(double) || t == typeof(double?) => double.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out double doubleValue) ? doubleValue : null,
                             Type t when t == typeof(int) || t == typeof(int?) => int.TryParse(cellValue, out int intValue) ? intValue : null,
                             Type t when t == typeof(bool) || t == typeof(bool?) => bool.TryParse(cellValue, out bool boolValue) ? boolValue : null,
-                            Type t when t == typeof(float) || t == typeof(float?) => float.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float floatValue) ? floatValue : null, 
-                            _ => null 
+                            Type t when t == typeof(float) || t == typeof(float?) => float.TryParse(cellValue, NumberStyles.Any, CultureInfo.InvariantCulture, out float floatValue) ? floatValue : null,
+                            _ => null
                         };
                         property.SetValue(model, value);
-                        _logger.LogTrace(
+                        _logger.LogDebug(
                             $"Property {property.Name} with vaule {value} from cell that has №{cellIndex} FOR {rowNumber} ROW was seted.");
                     }
                     catch (Exception ex)
@@ -129,7 +184,7 @@ public class ExcelImportService_OpenXml : IExcelImport
                         Console.WriteLine($"Error filling in the field {property.Name}: {ex.Message}");
                     }
 
-                cellIndex++; 
+                cellIndex++;
             }
         }
 
@@ -143,7 +198,7 @@ public class ExcelImportService_OpenXml : IExcelImport
             result = DateTime.MinValue;
             return false;
         }
-        string[] formats = { "yyyy-MM", "dd.MM.yyyy", "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy" }; 
+        string[] formats = { "yyyy-MM", "dd.MM.yyyy", "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy" };
         bool TryParseResult = DateTime.TryParseExact(input, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
         int a = 2;
         return TryParseResult;
@@ -162,7 +217,7 @@ public class ExcelImportService_OpenXml : IExcelImport
             columnIndex = (columnIndex * 26) + (c - 'A' + 1);
         }
 
-        return columnIndex - 1; 
+        return columnIndex - 1;
     }
 
     public string GetCellValue(Cell cell, Type? propertyType, SharedStringTable? sharedStrings)
@@ -180,11 +235,11 @@ public class ExcelImportService_OpenXml : IExcelImport
         }
 
         if ((propertyType == typeof(int) || propertyType == typeof(float) || propertyType == typeof(double))
-            && (cell.DataType == null || cell.DataType.Value == CellValues.Number)) 
+            && (cell.DataType == null || cell.DataType.Value == CellValues.Number))
         {
             if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out double numericValue))
             {
-                return numericValue.ToString(CultureInfo.InvariantCulture); 
+                return numericValue.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -192,7 +247,7 @@ public class ExcelImportService_OpenXml : IExcelImport
         {
             if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out double numericValue))
             {
-                DateTime baseDate = new DateTime(1899, 12, 30); 
+                DateTime baseDate = new DateTime(1899, 12, 30);
                 return baseDate.AddDays(numericValue).ToString("dd.MM.yyyy");
             }
         }
