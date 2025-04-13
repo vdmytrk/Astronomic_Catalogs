@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 
 namespace Astronomic_Catalogs.Services;
@@ -40,15 +41,14 @@ public class ExcelImportService_OpenXml : IExcelImport
         _importCancellationService = importCancellationService;
     }
 
+
     public async Task ImportDataAsync(string jobId, CancellationToken cancellationToken)
     {
         if (!File.Exists(_filePath))
-        {
             throw new FileNotFoundException("Excel file not found", _filePath);
-        }
 
         const int rowsPerTask = 300; // It should be less than 1% of the total number of rows to allow for a smooth display of execution progress (so that the change can be shown for each percentage of work completed).
-        int savedRows = 0;
+
         using var document = SpreadsheetDocument.Open(_filePath, false);
         var sheet = document.WorkbookPart!.Workbook.Sheets!.GetFirstChild<Sheet>() ?? throw new Exception("No sheets found in the Excel file.");
         var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheet.Id!);
@@ -61,18 +61,14 @@ public class ExcelImportService_OpenXml : IExcelImport
         int partitionCount = (int)Math.Ceiling((double)totalRows / rowsPerTask);
         int progressUpdateInterval = Math.Max(1, totalRows / 100);
         int processed = 0;
+        int savedRows = 0;
 
         _logger.LogInformation($"[IMPORT START] Kyiv Time: {FileLogService.GetKyivTime()} | Total rows: {totalRows}");
 
-        using (var context = _contextFactory.CreateDbContext())
-        {
-            await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [NASAExoplanetCatalog]");
-            _logger.LogInformation("Table NASAExoplanetCatalog cleared before import.");
-        }
+        await TruncateTableAsync();
 
         var tasks = new List<Task>();
         var semaphore = new SemaphoreSlim(4);
-        var globalStopwatch = Stopwatch.StartNew();
 
         for (int i = 0; i < partitionCount; i++)
         {
@@ -97,10 +93,7 @@ public class ExcelImportService_OpenXml : IExcelImport
 
                         int localProcessed = Interlocked.Increment(ref processed);
                         if (localProcessed % progressUpdateInterval == 0)
-                        {
-                            //Debugger.Break();
                             await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", (int)((double)localProcessed / totalRows * 100), cancellationToken);
-                        }
                     }
 
                     await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
@@ -118,7 +111,6 @@ public class ExcelImportService_OpenXml : IExcelImport
 
             tasks.Add(task);
         }
-
 
         try
         {
@@ -179,8 +171,7 @@ public class ExcelImportService_OpenXml : IExcelImport
                             _ => null
                         };
                         property.SetValue(model, value);
-                        _logger.LogDebug(
-                            $"Property {property.Name} with vaule {value} from cell that has №{cellIndex} FOR {rowNumber} ROW was seted.");
+                        _logger.LogDebug($"Property {property.Name} with vaule {value} from cell that has №{cellIndex} FOR {rowNumber} ROW was seted.");
                     }
                     catch (Exception ex)
                     {
@@ -203,7 +194,6 @@ public class ExcelImportService_OpenXml : IExcelImport
         }
         string[] formats = { "yyyy-MM", "dd.MM.yyyy", "yyyy-MM-dd", "dd-MM-yyyy", "dd/MM/yyyy" };
         bool TryParseResult = DateTime.TryParseExact(input, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
-        int a = 2;
         return TryParseResult;
     }
 
@@ -256,6 +246,13 @@ public class ExcelImportService_OpenXml : IExcelImport
         }
 
         return value;
+    }
+
+    private async Task TruncateTableAsync()
+    {
+        using var context = _contextFactory.CreateDbContext();
+        await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [NASAExoplanetCatalog]");
+        _logger.LogInformation("Table NASAExoplanetCatalog cleared before import.");
     }
 
 }

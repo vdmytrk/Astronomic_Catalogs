@@ -381,8 +381,7 @@ Astronomic_Catalogs/Database Scripts/Tables/RequestLog.sql
 Astronomic_Catalogs/Database Scripts/Tables/UsertLog.sql
 
 # C#
-ExcelImportService_OpenXml_extended.cs
-DatabaseInitializer_extended.cs
+*_extended.cs
 
 # html
 _ActualDate.cshtml
