@@ -1,15 +1,18 @@
 ﻿@model IEnumerable<Astronomic_Catalogs.Models.Constellation>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Constellation";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"] catalog.</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.IsInRole("OwnerAdministratorPower"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -31,7 +34,10 @@
             <th>
                 @Html.DisplayNameFor(model => model.NumberStars)
             </th>
-            <th></th>
+            @if (User.IsInRole("OwnerAdministratorPower"))
+            {
+                <th></th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -56,11 +62,14 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.NumberStars)
                 </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.ShortName">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ShortName">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ShortName">Delete</a>
-                </td>
+                @if (User.IsInRole("OwnerAdministratorPower"))
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.ShortName">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.ShortName">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ShortName">Delete</a>
+                    </td>
+                }
             </tr>
         }
     </tbody>

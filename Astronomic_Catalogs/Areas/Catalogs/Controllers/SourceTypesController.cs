@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Services.Constants;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
 {
@@ -27,6 +29,9 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         }
 
         // GET: Catalogs/SourceTypes/Details/5
+        [Authorize(Roles = RoleNames.Admin)]
+        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UsersAccessClaim")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,6 +50,9 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         }
 
         // GET: Catalogs/SourceTypes/Create
+        [Authorize(Roles = RoleNames.Admin)]
+        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UsersAccessClaim")]
         public IActionResult Create()
         {
             return View();
@@ -53,6 +61,9 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         // POST: Catalogs/SourceTypes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = RoleNames.Admin)]
+        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UsersAccessClaim")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Count,Code,Meaning")] SourceType sourceType)
@@ -67,6 +78,9 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         }
 
         // GET: Catalogs/SourceTypes/Edit/5
+        [Authorize(Roles = RoleNames.Admin)]
+        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UsersAccessClaim")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -85,6 +99,9 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         // POST: Catalogs/SourceTypes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = RoleNames.Admin)]
+        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UsersAccessClaim")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Count,Code,Meaning")] SourceType sourceType)
@@ -118,6 +135,9 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         }
 
         // GET: Catalogs/SourceTypes/Delete/5
+        [Authorize(Roles = RoleNames.Admin)]
+        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UsersAccessClaim")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -136,6 +156,9 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         }
 
         // POST: Catalogs/SourceTypes/Delete/5
+        [Authorize(Roles = RoleNames.Admin)]
+        [Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "UsersAccessClaim")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
