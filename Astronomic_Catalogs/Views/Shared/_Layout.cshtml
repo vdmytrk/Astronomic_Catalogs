@@ -22,27 +22,42 @@
     <header class="toFixLayoutHeader">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Astronomic_Catalogs</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Astronomic Catalogs</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Telescopes
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="" asp-action="">Field of View Calculator</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Planets" asp-controller="PlanetsCatalog" asp-action="Index">Planets</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Astronomic сatalogs
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="Planets" asp-controller="PlanetsCatalog" asp-action="Index">Planets</a></li>
+                                <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="NGCICOpendatasofts" asp-action="Index">NGC/IC Catalogs</a></li>
+                                <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="CollinderCatalogs" asp-action="Index">Collinder Catalog</a></li>
+                                <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="Constellations" asp-action="Index">Constellations</a></li>
+                                <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="NameObjects" asp-action="Index">Objects Name</a></li>
+                                <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="SourceTypes" asp-action="Index">Source Types</a></li>
+                            </ul>
                         </li>
                         @if (User.IsInRole("OwnerAdministratorPower"))
                         {
-                            <li class="nav-item dropdown admin-li">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Administration
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item text-dark" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">Admin panel</a></li>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item text-dark" asp-area="Admin" asp-controller="HomeAdmin" asp-action="Index">Admin Panel</a></li>
                                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="RoleClaims" asp-action="Index">Role Claims</a></li>
                                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="Roles" asp-action="Index">Roles</a></li>
                                     <li><a class="dropdown-item" asp-area="Admin" asp-controller="Users" asp-action="Index">Users</a></li>

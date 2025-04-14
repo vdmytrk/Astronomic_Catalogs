@@ -1,0 +1,312 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Models.NGCICOpendatasoft>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NGC_IC)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubObject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Messier)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name_UK)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OtherNames)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NGC)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IC)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ObjectTypeAbrev)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ObjectType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ObjectTypeFull)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SourceType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RA)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscension)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscensionH)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscensionM)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscensionS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DEC)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Declination)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeclinationD)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeclinationM)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeclinationS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Constellation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MajorAxis)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MinorAxis)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PositionAngle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AppMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AppMagFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.KMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SurfaceBrightness)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HubbleOnlyGalaxies)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CstarUMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CstarBMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CstarVMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CstarNames)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CommonNames)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NedNotes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OpenngcNotes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PageNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PageCount)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NGC_IC)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubObject)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Messier)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name_UK)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comment)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OtherNames)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NGC)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IC)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ObjectTypeAbrev)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ObjectType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ObjectTypeFull)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SourceType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RA)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscension)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscensionH)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscensionM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscensionS)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DEC)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Declination)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NS)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeclinationD)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeclinationM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeclinationS)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Constellation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MajorAxis)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MinorAxis)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PositionAngle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AppMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AppMagFlag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.KMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SurfaceBrightness)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HubbleOnlyGalaxies)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CstarUMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CstarBMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CstarVMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CstarNames)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CommonNames)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NedNotes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OpenngcNotes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Image)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PageNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PageCount)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

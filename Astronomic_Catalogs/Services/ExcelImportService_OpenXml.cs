@@ -144,6 +144,7 @@ public class ExcelImportService_OpenXml : IExcelImport
             {
                 var cell = cells[cellIndex];
                 int columnIndex = GetColumnIndex(cell);
+
                 if (columnIndex > i)
                 {
                     // Skip missing cells (Excel does not save empty ones)
@@ -152,7 +153,6 @@ public class ExcelImportService_OpenXml : IExcelImport
                 }
 
                 var property = properties[i];
-
                 var cellValue = GetCellValue(cell, property.PropertyType, sharedStrings);
 
                 if (property.Name == "RowId")

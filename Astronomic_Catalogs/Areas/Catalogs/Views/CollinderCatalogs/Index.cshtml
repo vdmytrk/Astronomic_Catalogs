@@ -1,0 +1,162 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Models.CollinderCatalog>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NamberName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NameOtherCat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Constellation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscension)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscensionH)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscensionM)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RightAscensionS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Declination)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeclinationD)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeclinationM)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeclinationS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AppMag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AppMagFlag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CountStars)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CountStarsToFinding)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AngDiameterOld)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AngDiameterNew)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Class)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PageNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PageCount)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NamberName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NameOtherCat)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Constellation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscension)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscensionH)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscensionM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RightAscensionS)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Declination)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NS)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeclinationD)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeclinationM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeclinationS)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AppMag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AppMagFlag)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CountStars)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CountStarsToFinding)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AngDiameterOld)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AngDiameterNew)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Class)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comment)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PageNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PageCount)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -25,9 +25,11 @@ public class ConstellationConfiguration : IEntityTypeConfiguration<Constellation
             .HasMaxLength(30)
             .IsRequired();
 
+        // You used `UseCollation` because changing the collation setting for the entire database didn’t work. For more details, see the SQL scripts!
         builder.Property(e => e.UkraineName)
             .HasColumnName("Ukraine_name")
-            .HasMaxLength(30)
+            .HasColumnType("nvarchar(30)")
+            .UseCollation("Cyrillic_General_CI_AS")
             .IsRequired();
 
         builder.Property(e => e.NumberStars).HasColumnName("Number_stars");

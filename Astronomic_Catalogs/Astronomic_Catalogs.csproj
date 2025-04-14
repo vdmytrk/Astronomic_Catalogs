@@ -48,6 +48,8 @@
 	
 	<ItemGroup>
 		<Folder Include="Areas\Admin\Data\" />
+		<Folder Include="Areas\Catalogs\Data\" />
+		<Folder Include="Areas\Catalogs\Models\" />
 		<Folder Include="Areas\Planets\Data\" />
 		<Folder Include="Areas\Planets\Models\" />
 		<Folder Include="Data\Migrations\" />

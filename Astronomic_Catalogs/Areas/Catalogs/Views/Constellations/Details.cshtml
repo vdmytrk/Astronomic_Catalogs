@@ -1,0 +1,49 @@
+﻿@model Astronomic_Catalogs.Models.Constellation
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Constellation</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LatineNameNominativeCase)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LatineNameNominativeCase)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LatineNameGenitiveCase)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LatineNameGenitiveCase)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UkraineName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UkraineName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Area)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Area)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NumberStars)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NumberStars)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.ShortName">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
