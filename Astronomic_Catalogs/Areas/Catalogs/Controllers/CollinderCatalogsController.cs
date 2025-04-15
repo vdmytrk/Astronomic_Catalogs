@@ -26,7 +26,14 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         // GET: Catalogs/CollinderCatalogs
         public async Task<IActionResult> Index()
         {
-            return View(await _context.CollinderCatalog.OrderBy(x => x.NamberName).ToListAsync());
+            var data = await _context.CollinderCatalog.ToListAsync();
+
+            var sorted = data
+                .OrderBy(x => ExtractLeadingNumber(x.NamberName))
+                .ThenBy(x => x.NamberName) // For identical numbers, sort by the rest of the string
+                .ToList();
+
+            return View(sorted);
         }
 
         // GET: Catalogs/CollinderCatalogs/Details/5

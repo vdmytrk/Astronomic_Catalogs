@@ -5,22 +5,25 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@ViewData["Title"] catalog.</h1>
+<div class="planetCatalogHeader">
+    <h1>@ViewData["Title"] catalog.</h1>
 
-@if (User.IsInRole("OwnerAdministratorPower"))
-{
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-}
-<table class="table">
+    @if (User.IsInRole("OwnerAdministratorPower"))
+    {
+        <p>
+            <a asp-action="Create">Create New</a>
+        </p>
+    }
+</div>
+
+<table class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Count)
-            </th>
+        <tr class="tr-oun-style">
             <th>
                 @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Count)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Meaning)
@@ -36,10 +39,10 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Count)
+                    @Html.DisplayFor(modelItem => item.Code)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Code)
+                    @Html.DisplayFor(modelItem => item.Count)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Meaning)
