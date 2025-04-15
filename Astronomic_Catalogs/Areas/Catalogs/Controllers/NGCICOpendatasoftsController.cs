@@ -25,7 +25,13 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         // GET: Catalogs/NGCICOpendatasofts
         public async Task<IActionResult> Index()
         {
-            return View(await _context.NGCIC_Catalog.OrderBy(x => x.Name).Take(500).ToListAsync()); // 100
+            var result = await _context.NGCIC_Catalog
+                .OrderBy(x => x.NGC_IC)
+                .ThenBy(x => x.Name)
+                .Take(1000) // 100
+                .ToListAsync();
+
+            return View(result);
         }
 
         // GET: Catalogs/NGCICOpendatasofts/Details/5

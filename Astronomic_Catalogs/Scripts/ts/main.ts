@@ -1,8 +1,11 @@
-﻿document.addEventListener("DOMContentLoaded", () => {
+﻿/// <reference types="jquery" />
+document.addEventListener("DOMContentLoaded", () => {
     /////////////////////////////////////////////
     // Style block
     /////////////////////////////////////////////
     // To solve problem with the background color of selected items in browser.
+
+
     function fixSelectBehavior(): void {
         let selects: NodeListOf<HTMLSelectElement> = document.querySelectorAll("select.form-select"); // Can be used with "select.form-control"
 
@@ -77,7 +80,7 @@
         }
     }
 
-
+    console.log("GLOBAL SCOPE");
 
     /////////////////////////////////////////////
     // Start outer functions
@@ -97,7 +100,7 @@
 // Set the margin for the table header row so that it does not overlap with the page header.
 function updateTableHeaderOffset(): void {
     const header = document.querySelector('.toFixLayoutHeader') as HTMLElement | null;
-    const tableHeader = document.querySelector('table.table-toFixRows.table-plantes thead') as HTMLElement | null;
+    const tableHeader = document.querySelector('table.table-toFixRows-1.table-fixed-headers thead') as HTMLElement | null;
 
     if (header && tableHeader) {
         const headerHeight = header.offsetHeight; // Getting the height of the header
@@ -107,6 +110,7 @@ function updateTableHeaderOffset(): void {
 
 // Setting left offset for the 2nd and subsequent fixed columns:
 function updateFixedColumnLeftOffset(): void {
+    console.log("FUNCTION: updateFixedColumnLeftOffset()");
     const fixedColumns = 2; // Number of fixed columns.
     let offset = 0; // Left offset.
 
@@ -133,11 +137,17 @@ function updateFixedColumnLeftOffset(): void {
 
 // Table size adjustment function:
 function adjustTableSize(): void {
+    console.log("FUNCTION: adjustTableSize()");
     const header = document.querySelector(".toFixLayoutHeader") as HTMLElement | null;
+    if (!header) console.log("ATTENTION!!!The header variable is null!");
     const footer = document.querySelector("footer") as HTMLElement | null;
+    if (!footer) console.log("ATTENTION!!! The footer variable is null!");
     const main = document.querySelector(".main-RenderBody-container") as HTMLElement | null;
-    const tableContainer = document.querySelector(".table-plantes") as HTMLElement | null;
+    if (!main) console.log("ATTENTION!!! The main variable is null!");
+    const tableContainer = document.querySelector(".table-set-size") as HTMLElement | null;
+    if (!tableContainer) console.log("ATTENTION!!! The tableContainer variable is null!");
     const pageContent = document.querySelector(".planetCatalogHeader") as HTMLElement | null;
+    if (!pageContent) console.log("ATTENTION!!! The pageContent variable is null!");
 
     if (!tableContainer || !header || !footer || !main || !pageContent) return;
 
@@ -166,6 +176,7 @@ function adjustTableSize(): void {
 
         console.log({
             emInPixels,
+            windowWidth,
             windowHeight,
             headerHeight,
             footerHeight,

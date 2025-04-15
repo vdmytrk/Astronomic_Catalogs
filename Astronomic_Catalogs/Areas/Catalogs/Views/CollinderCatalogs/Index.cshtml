@@ -5,17 +5,20 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>@ViewData["Title"] catalog.</h1>
+<div class="planetCatalogHeader">
+    <h1>@ViewData["Title"] catalog.</h1>
 
-@if (User.IsInRole("OwnerAdministratorPower"))
-{
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
-}
-<table class="table">
+    @if (User.IsInRole("OwnerAdministratorPower"))
+    {
+        <p>
+            <a asp-action="Create">Create New</a>
+        </p>
+    }
+</div>
+
+<table class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size">
     <thead>
-        <tr>
+        <tr class="tr-oun-style">
             <th>
                 @Html.DisplayNameFor(model => model.NamberName)
             </th>
