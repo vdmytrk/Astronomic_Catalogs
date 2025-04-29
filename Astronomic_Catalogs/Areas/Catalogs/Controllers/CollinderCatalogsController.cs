@@ -74,7 +74,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         [Authorize(Policy = "UsersAccessClaim")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameterOld,AngDiameterNew,Class,Comment,PageNumber,PageCount")] CollinderCatalog collinderCatalog)
+        public async Task<IActionResult> Create([Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameter,AngDiameterNew,Class,Comment,PageNumber,PageCount")] CollinderCatalog collinderCatalog)
         {
             if (ModelState.IsValid)
             {
@@ -112,7 +112,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         [Authorize(Policy = "UsersAccessClaim")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameterOld,AngDiameterNew,Class,Comment,PageNumber,PageCount")] CollinderCatalog collinderCatalog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameter,AngDiameterNew,Class,Comment,PageNumber,PageCount")] CollinderCatalog collinderCatalog)
         {
             if (id != collinderCatalog.Id)
             {

@@ -21,6 +21,8 @@ public class NGCICOpendatasoftConfiguration : IEntityTypeConfiguration<NGCICOpen
         builder.Property(e => e.OtherNames).HasColumnName("Other_names").HasMaxLength(400);
         builder.Property(e => e.NGC).HasMaxLength(14);
         builder.Property(e => e.IC).HasMaxLength(23);
+        builder.Property(e => e.LimitAngDiameter).HasColumnName("Limit_Ang_Diameter").HasMaxLength(1);
+        builder.Property(e => e.AngDiameter).HasColumnName("Ang_Diameter");
         builder.Property(e => e.ObjectTypeAbrev).HasMaxLength(21);
         builder.Property(e => e.ObjectType).HasMaxLength(26);
         builder.Property(e => e.ObjectTypeFull).HasColumnName("Object_type").HasMaxLength(60);

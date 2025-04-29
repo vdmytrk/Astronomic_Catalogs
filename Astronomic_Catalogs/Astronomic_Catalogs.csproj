@@ -40,6 +40,7 @@
 
 	<ItemGroup>
 		<Content Include="Scripts\ts\**\*.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\mainC.ts" />
 		<None Update="NLog.config.Release.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

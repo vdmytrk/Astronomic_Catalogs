@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Astronomic_Catalogs.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250304083941_UserLog")]
-    partial class UserLog
+    [Migration("20250422101545_AddEnglishNameToConstallatin")]
+    partial class AddEnglishNameToConstallatin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -247,14 +247,14 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float?>("AngDiameterNew")
-                        .HasColumnType("real")
-                        .HasColumnName("Ang_Diameter_Max");
-
                     b.Property<string>("AngDiameter")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
                         .HasColumnName("Ang_Diameter");
+
+                    b.Property<float?>("AngDiameterNew")
+                        .HasColumnType("real")
+                        .HasColumnName("Ang_Diameter_Max");
 
                     b.Property<float?>("AppMag")
                         .HasColumnType("real")
@@ -406,6 +406,11 @@ namespace Astronomic_Catalogs.Migrations
                     b.Property<int>("Area")
                         .HasColumnType("int");
 
+                    b.Property<string>("EnglishName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("English_name");
+
                     b.Property<string>("LatineNameGenitiveCase")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -424,13 +429,53 @@ namespace Astronomic_Catalogs.Migrations
 
                     b.Property<string>("UkraineName")
                         .IsRequired()
-                        .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)")
-                        .HasColumnName("Ukraine_name");
+                        .HasColumnName("Ukraine_name")
+                        .UseCollation("Cyrillic_General_CI_AS");
 
                     b.HasKey("ShortName");
 
                     b.ToTable("Constellation", (string)null);
+                });
+
+            modelBuilder.Entity("Astronomic_Catalogs.Models.DatabaseInitialization", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Is_CollinderCatalog_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_CollinderCatalog_Temporarily_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_Constellation_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_NGC2000_UKTemporarilySource_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_NGC2000_UKTemporarily_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_NGCICOpendatasoft_Source_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_NGCWikipedia_ExtensionTemporarilySource_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_NGCWikipedia_TemporarilySource_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_NameObject_Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_SourceType_Executed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DatabaseInitialization");
                 });
 
             modelBuilder.Entity("Astronomic_Catalogs.Models.LogProcFunc", b =>
@@ -610,8 +655,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_bmassjerr2");
 
-                    b.Property<float>("PlBmassJLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlBmassJLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_bmassjlim");
 
                     b.Property<string>("PlBmassProv")
@@ -631,8 +676,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_bmasseerr2");
 
-                    b.Property<float>("PlBmasseLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlBmasseLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_bmasselim");
 
                     b.Property<float>("PlCMassJ")
@@ -647,8 +692,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_cmassjerr2");
 
-                    b.Property<float>("PlCMassJLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlCMassJLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_cmassjlim");
 
                     b.Property<float>("PlCMasse")
@@ -663,8 +708,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_cmasseerr2");
 
-                    b.Property<float>("PlCMasseLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlCMasseLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_cmasselim");
 
                     b.Property<int>("PlControvFlag")
@@ -683,8 +728,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_denserr2");
 
-                    b.Property<float>("PlDensLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlDensLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_denslim");
 
                     b.Property<float>("PlEqt")
@@ -699,8 +744,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_eqterr2");
 
-                    b.Property<float>("PlEqtLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlEqtLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_eqtlim");
 
                     b.Property<float>("PlImppar")
@@ -715,8 +760,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_impparerr2");
 
-                    b.Property<float>("PlImpparLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlImpparLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_impparlim");
 
                     b.Property<float>("PlInsol")
@@ -731,8 +776,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_insolerr2");
 
-                    b.Property<float>("PlInsolLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlInsolLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_insollim");
 
                     b.Property<string>("PlLetter")
@@ -752,8 +797,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_massjerr2");
 
-                    b.Property<float>("PlMassJLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlMassJLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_massjlim");
 
                     b.Property<float>("PlMasse")
@@ -768,8 +813,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_masseerr2");
 
-                    b.Property<float>("PlMasseLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlMasseLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_masselim");
 
                     b.Property<float>("PlMsiniE")
@@ -784,8 +829,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_msinieerr2");
 
-                    b.Property<float>("PlMsiniELim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlMsiniELim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_msinielim");
 
                     b.Property<float>("PlMsiniJ")
@@ -800,8 +845,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_msinijerr2");
 
-                    b.Property<float>("PlMsiniJLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlMsiniJLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_msinijlim");
 
                     b.Property<string>("PlName")
@@ -837,8 +882,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_occdeperr2");
 
-                    b.Property<float>("PlOccdepLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlOccdepLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_occdeplim");
 
                     b.Property<float>("PlOrbEccen")
@@ -865,8 +910,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_orbpererr2");
 
-                    b.Property<float>("PlOrbPerLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlOrbPerLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_orbperlim");
 
                     b.Property<float>("PlOrbSmax")
@@ -881,12 +926,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_orbsmaxerr2");
 
-                    b.Property<float>("PlOrbSmaxLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlOrbSmaxLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_orbsmaxlim");
 
-                    b.Property<float>("PlOrbeccenlim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlOrbeccenLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_orbeccenlim");
 
                     b.Property<float>("PlOrbincl")
@@ -901,25 +946,24 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_orbinclerr2");
 
-                    b.Property<float>("PlOrbinclLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlOrbinclLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_orbincllim");
 
                     b.Property<float>("PlOrblper")
                         .HasColumnType("real")
                         .HasColumnName("Pl_orblper");
 
-                    b.Property<string>("PlOrblperErr1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<float>("PlOrblperErr1")
+                        .HasColumnType("real")
                         .HasColumnName("Pl_orblpererr1");
 
                     b.Property<float>("PlOrblperErr2")
                         .HasColumnType("real")
                         .HasColumnName("Pl_orblpererr2");
 
-                    b.Property<float>("PlOrblperLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlOrblperLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_orblperlim");
 
                     b.Property<float>("PlOrbtper")
@@ -934,8 +978,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_orbtpererr2");
 
-                    b.Property<float>("PlOrbtperLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlOrbtperLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_orbtperlim");
 
                     b.Property<float>("PlProjobliq")
@@ -950,8 +994,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_projobliqerr2");
 
-                    b.Property<float>("PlProjobliqLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlProjobliqLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_projobliqlim");
 
                     b.Property<DateTime>("PlPubdate")
@@ -972,8 +1016,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_radjerr2");
 
-                    b.Property<float>("PlRadJLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlRadJLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_radjlim");
 
                     b.Property<float>("PlRade")
@@ -988,8 +1032,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_radeerr2");
 
-                    b.Property<float>("PlRadeLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlRadeLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_radelim");
 
                     b.Property<float>("PlRatdor")
@@ -1004,8 +1048,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_ratdorerr2");
 
-                    b.Property<float>("PlRatdorLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlRatdorLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_ratdorlim");
 
                     b.Property<float>("PlRatror")
@@ -1020,8 +1064,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_ratrorerr2");
 
-                    b.Property<float>("PlRatrorLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlRatrorLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_ratrorlim");
 
                     b.Property<string>("PlRefName")
@@ -1041,8 +1085,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_rvamperr2");
 
-                    b.Property<float>("PlRvampLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlRvampLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_rvamplim");
 
                     b.Property<float>("PlTrandep")
@@ -1057,8 +1101,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_trandeperr2");
 
-                    b.Property<float>("PlTrandepLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlTrandepLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_trandeplim");
 
                     b.Property<float>("PlTrandur")
@@ -1073,8 +1117,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_trandurerr2");
 
-                    b.Property<float>("PlTrandurLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlTrandurLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_trandurlim");
 
                     b.Property<float>("PlTranmid")
@@ -1089,8 +1133,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_tranmiderr2");
 
-                    b.Property<float>("PlTranmidLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlTranmidLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_tranmidlim");
 
                     b.Property<float>("PlTrueobliq")
@@ -1105,8 +1149,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("Pl_trueobliqerr2");
 
-                    b.Property<float>("PlTrueobliqLim")
-                        .HasColumnType("real")
+                    b.Property<int>("PlTrueobliqLim")
+                        .HasColumnType("int")
                         .HasColumnName("Pl_trueobliqlim");
 
                     b.Property<string>("PlTsystemref")
@@ -1164,8 +1208,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_ageerr2");
 
-                    b.Property<float>("StAgeLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StAgeLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_agelim");
 
                     b.Property<float>("StDens")
@@ -1180,13 +1224,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_denserr2");
 
-                    b.Property<float>("StDensLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StDensLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_denslim");
 
-                    b.Property<string>("StLogg")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<float>("StLogg")
+                        .HasColumnType("real")
                         .HasColumnName("St_logg");
 
                     b.Property<float>("StLoggErr1")
@@ -1197,8 +1240,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_loggerr2");
 
-                    b.Property<float>("StLoggLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StLoggLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_logglim");
 
                     b.Property<float>("StLum")
@@ -1213,13 +1256,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_lumerr2");
 
-                    b.Property<float>("StLumLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StLumLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_lumlim");
 
-                    b.Property<string>("StMass")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<float>("StMass")
+                        .HasColumnType("real")
                         .HasColumnName("St_mass");
 
                     b.Property<float>("StMassErr1")
@@ -1230,8 +1272,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_masserr2");
 
-                    b.Property<float>("StMassLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StMassLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_masslim");
 
                     b.Property<float>("StMet")
@@ -1246,8 +1288,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_meterr2");
 
-                    b.Property<float>("StMetLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StMetLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_metlim");
 
                     b.Property<string>("StMetratio")
@@ -1267,9 +1309,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("int")
                         .HasColumnName("St_nspec");
 
-                    b.Property<string>("StRad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<float>("StRad")
+                        .HasColumnType("real")
                         .HasColumnName("St_rad");
 
                     b.Property<float>("StRadErr1")
@@ -1280,13 +1321,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_raderr2");
 
-                    b.Property<float>("StRadLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StRadLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_radlim");
 
-                    b.Property<string>("StRadv")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<float>("StRadv")
+                        .HasColumnType("real")
                         .HasColumnName("St_radv");
 
                     b.Property<float>("StRadvErr1")
@@ -1297,8 +1337,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_radverr2");
 
-                    b.Property<float>("StRadvLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StRadvLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_radvlim");
 
                     b.Property<string>("StRefname")
@@ -1306,9 +1346,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("St_refname");
 
-                    b.Property<string>("StRotp")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<float>("StRotp")
+                        .HasColumnType("real")
                         .HasColumnName("St_rotp");
 
                     b.Property<float>("StRotpErr1")
@@ -1319,8 +1358,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_rotperr2");
 
-                    b.Property<float>("StRotpLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StRotpLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_rotplim");
 
                     b.Property<string>("StSpectype")
@@ -1340,13 +1379,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_tefferr2");
 
-                    b.Property<float>("StTeffLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StTeffLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_tefflim");
 
-                    b.Property<string>("StVsin")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<float>("StVsin")
+                        .HasColumnType("real")
                         .HasColumnName("St_vsin");
 
                     b.Property<float>("StVsinErr1")
@@ -1357,8 +1395,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("real")
                         .HasColumnName("St_vsinerr2");
 
-                    b.Property<float>("StVsinLim")
-                        .HasColumnType("real")
+                    b.Property<int>("StVsinLim")
+                        .HasColumnType("int")
                         .HasColumnName("St_vsinlim");
 
                     b.Property<float>("SyBmag")
@@ -1680,6 +1718,10 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AngDiameter")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Ang_Diameter");
+
                     b.Property<double?>("AppMag")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
@@ -1792,6 +1834,11 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("float")
                         .HasDefaultValue(0.0)
                         .HasColumnName("k_mag");
+
+                    b.Property<string>("LimitAngDiameter")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)")
+                        .HasColumnName("Limit_Ang_Diameter");
 
                     b.Property<double?>("MajorAxis")
                         .ValueGeneratedOnAdd()
@@ -1932,6 +1979,10 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AngDiameter")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Ang_Diameter");
+
                     b.Property<double?>("AppMag")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
@@ -2044,6 +2095,11 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("float")
                         .HasDefaultValue(0.0)
                         .HasColumnName("k_mag");
+
+                    b.Property<string>("LimitAngDiameter")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)")
+                        .HasColumnName("Limit_Ang_Diameter");
 
                     b.Property<double?>("MajorAxis")
                         .ValueGeneratedOnAdd()
@@ -2298,7 +2354,7 @@ namespace Astronomic_Catalogs.Migrations
                     b.ToTable("RequestLogs", (string)null);
                 });
 
-            modelBuilder.Entity("Astronomic_Catalogs.Models.Services.UsersLog", b =>
+            modelBuilder.Entity("Astronomic_Catalogs.Models.Services.UserLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -2339,6 +2395,14 @@ namespace Astronomic_Catalogs.Migrations
 
                     b.Property<DateTime>("LastRequestTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Latitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Longitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MaxRequests")
                         .HasColumnType("int");

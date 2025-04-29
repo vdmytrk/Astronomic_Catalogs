@@ -40,8 +40,8 @@ public class CollinderCatalogConfiguration : IEntityTypeConfiguration<CollinderC
 
         builder.Property(e => e.CountStars).HasMaxLength(10);
         builder.Property(e => e.CountStarsToFinding).HasColumnName("CountStars_ToFinding");
-        builder.Property(e => e.AngDiameterOld).HasMaxLength(10).HasColumnName("Ang_Diameter_OLD");
-        builder.Property(e => e.AngDiameterNew).HasColumnName("Ang_Diameter_NEW");
+        builder.Property(e => e.AngDiameter).HasMaxLength(10).HasColumnName("Ang_Diameter");
+        builder.Property(e => e.AngDiameterNew).HasColumnName("Ang_Diameter_Max");
         builder.Property(e => e.Class).HasMaxLength(10);
 
 

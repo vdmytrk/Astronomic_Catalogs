@@ -6,7 +6,7 @@
 --================================================  INSET DATA INTO NGCICOpendatasoft  ================================================--
 -------------------------------------------------------------------------------------------------------------------------------------------
 CREATE OR ALTER PROC InsertNGCICOpendatasoft
-    @TableName NVARCHAR(100), 
+    @TableName NVARCHAR(100),  
     @Id INT,
     @NGC_IC NVARCHAR(13),
     @Name INT,
@@ -14,6 +14,8 @@ CREATE OR ALTER PROC InsertNGCICOpendatasoft
     @Messier NVARCHAR(15),
     @NGC NVARCHAR(15),
     @IC NVARCHAR(23),
+	@Limit_Ang_Diameter NVARCHAR(1),
+	@Ang_Diameter FLOAT,
     @ObjectTypeAbrev NVARCHAR(21),
     @ObjectType NVARCHAR(26),
     @RA NVARCHAR(30),
@@ -53,69 +55,68 @@ BEGIN
 
 	BEGIN TRY
 		SET @SQL = 'INSERT INTO ' + QUOTENAME(@TableName) + ' (
-			NGC_IC, [Name], SubObject, Messier, NGC, IC, ObjectTypeAbrev, ObjectType, 
+			NGC_IC, [Name], SubObject, Messier, NGC, IC, Limit_Ang_Diameter, Ang_Diameter, ObjectTypeAbrev, ObjectType, 
 			RA, Right_ascension_H, Right_ascension_M, Right_ascension_S,
 			[DEC], NS, Declination_D, Declination_M, Declination_S,
 			Constellation, MajorAxis, MinorAxis, PositionAngle, b_mag, v_mag, j_mag, h_mag, k_mag, Surface_Brigthness,
 			Hubble_OnlyGalaxies, Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names, CommonNames, NedNotes, OpenngcNotes, [Image]
 		)
 		VALUES (
-			@NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, 
+			@NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, @ObjectType, 
 			@RA, 
 			REPLACE((SELECT RA_H
 					FROM (SELECT ID, VALUE AS RA_H, ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ID) AS RN 
 						  FROM NGCICOpendatasoft_Source
 						  CROSS APPLY STRING_SPLIT(@RA, '':'') AS VALUE
 						  WHERE VALUE <> '''') AS T2
-					WHERE T2.ID = @Id AND RN = 1), ''00'', 0), -- as Right_ascension_H, 
+					WHERE T2.ID = @Id AND RN = 1), ''00'', 0), 
 			REPLACE((SELECT RA_M
 					FROM (SELECT ID, VALUE AS RA_M, ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ID) AS RN 
 						  FROM NGCICOpendatasoft_Source
 						  CROSS APPLY STRING_SPLIT(@RA, '':'') AS VALUE
 						  WHERE VALUE <> '''') AS T2
-					WHERE T2.ID = @Id AND RN = 2), ''00'', 0), -- as Right_ascension_M,
+					WHERE T2.ID = @Id AND RN = 2), ''00'', 0), 
 			(SELECT RA_S
 				FROM (SELECT ID, VALUE AS RA_S, ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ID) AS RN 
 					  FROM NGCICOpendatasoft_Source
 					  CROSS APPLY STRING_SPLIT(@RA, '':'') AS VALUE
 					  WHERE VALUE <> '''') AS T2
-				WHERE T2.ID = @Id AND RN = 3), -- as Right_ascension_S,
+				WHERE T2.ID = @Id AND RN = 3), 
 			@DEC, 
-			LEFT(REPLACE(@DEC, CHAR(9), ''''), 1), --  AS NS,
+			LEFT(REPLACE(@DEC, CHAR(9), ''''), 1), 
 			REPLACE(REPLACE(REPLACE((SELECT D_H
 									FROM (SELECT ID, VALUE AS D_H, ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ID) AS RN 
 										  FROM NGCICOpendatasoft_Source
 										  CROSS APPLY STRING_SPLIT(@DEC, '':'') AS VALUE
 										  WHERE VALUE <> '''') AS T2
-									WHERE T2.ID = @Id AND RN = 1), ''+'', ''''), ''-'', ''''), ''00'', 0), -- as Declination_D, 
+									WHERE T2.ID = @Id AND RN = 1), ''+'', ''''), ''-'', ''''), ''00'', 0), 
 			REPLACE((SELECT D_M
 					FROM (SELECT ID, VALUE AS D_M, ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ID) AS RN 
 						  FROM NGCICOpendatasoft_Source
 						  CROSS APPLY STRING_SPLIT(@DEC, '':'') AS VALUE
 						  WHERE VALUE <> '''') AS T2
-					WHERE T2.ID = @Id AND RN = 2), ''00'', 0), -- as Declination_M,
+					WHERE T2.ID = @Id AND RN = 2), ''00'', 0), 
 			(SELECT D_S
 				FROM (SELECT ID, VALUE AS D_S, ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ID) AS RN 
 					  FROM NGCICOpendatasoft_Source
 					  CROSS APPLY STRING_SPLIT(@DEC, '':'') AS VALUE
 					  WHERE VALUE <> '''') AS T2
-				WHERE T2.ID = @Id AND RN = 3), -- as Declination_S, 
+				WHERE T2.ID = @Id AND RN = 3),
 			@Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness,
 			@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes, @Image
 		);';
 		
 		EXEC sp_executesql @SQL, 
 			N'@Id INT, @NGC_IC NVARCHAR(13), @Name INT, @SubObject NVARCHAR(15), @Messier NVARCHAR(15), @NGC NVARCHAR(15), @IC NVARCHAR(23),
+				@Limit_Ang_Diameter NVARCHAR(1), @Ang_Diameter FLOAT,
 			@ObjectTypeAbrev NVARCHAR(21), @ObjectType NVARCHAR(26), @RA NVARCHAR(30), @DEC NVARCHAR(31), @Constellation NVARCHAR(21), 
 			@MajorAxis FLOAT, @MinorAxis FLOAT, @PositionAngle INT, @b_mag FLOAT, @v_mag FLOAT, @j_mag FLOAT, @h_mag FLOAT, 
 			@k_mag FLOAT, @Surface_Brigthness FLOAT, @Hubble_OnlyGalaxies NVARCHAR(14), @Cstar_UMag FLOAT, @Cstar_BMag FLOAT, 
 			@Cstar_VMag FLOAT, @Cstar_Names NVARCHAR(255), @CommonNames NVARCHAR(255), @NedNotes NVARCHAR(255), 
 			@OpenngcNotes NVARCHAR(330), @Image NVARCHAR(MAX)',
-			@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, 
-			@ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, 
-			@MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, 
-			@k_mag, @Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, 
-			@Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, 
+			@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, 
+			@ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, 
+			@k_mag, @Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, 
 			@OpenngcNotes, @Image;		
 	END TRY
 	BEGIN CATCH						

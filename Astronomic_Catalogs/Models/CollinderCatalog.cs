@@ -27,7 +27,7 @@ public class CollinderCatalog
     public string? AppMagFlag { get; set; }
     public string? CountStars { get; set; }
     public int? CountStarsToFinding { get; set; }
-    public string? AngDiameterOld { get; set; }
+    public string? AngDiameter { get; set; }
     public float? AngDiameterNew { get; set; }
     public string? Class { get; set; }
     public string? Comment { get; set; }

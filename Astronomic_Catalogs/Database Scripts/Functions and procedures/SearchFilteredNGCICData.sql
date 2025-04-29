@@ -30,7 +30,7 @@ CREATE OR ALTER PROC SearchFilteredNGCICData
     @ChbAppMagFlag AS BIT,
     @ChbNGC AS BIT, 
     @ChbI AS BIT,
-    @SLRowOnPage AS int,
+    @RowOnPageCatalog AS int,
     @TypeGx AS BIT,
     @TypeOC AS BIT,
     @TypeGb AS BIT,
@@ -203,7 +203,7 @@ BEGIN TRY
 	SET @QUERY = 
 	N'SELECT RN, Id, Namber_name, Name, Comment, Source_Type, Right_ascension, Declination, LII, BII, Ref_Revision, Constellation, 
 		Limit_Ang_Diameter, Ang_Diameter, App_Mag, App_Mag_Flag, Description, Class, 
-		(COUNT(*) OVER() /  + ' + CAST (@SLRowOnPage AS VARCHAR) + ' + 1) AS PageCount, 
+		(COUNT(*) OVER() /  + ' + CAST (@RowOnPageCatalog AS VARCHAR) + ' + 1) AS PageCount, 
 		PageNumber 
 	FROM (
 		SELECT ROW_NUMBER() OVER (ORDER BY ID) AS RN, * 
@@ -214,10 +214,10 @@ BEGIN TRY
 		@TextAppMagminI + @TextAppMagmaxI + @ChbAppMagFlagI + @Catalogue + @AllFiltersSource_Type + 'Source_Type = ''1'' ) ' +
 		') as ST
 	ORDER BY Namber_name
-	OFFSET (' + CAST (@PAGEnUMBERI AS VARCHAR) + ' - 1) * ' + CAST (@SLRowOnPage AS VARCHAR) + 
-	' ROWS FETCH NEXT ' + CAST (@SLRowOnPage AS VARCHAR) + ' ROWS ONLY';
+	OFFSET (' + CAST (@PAGEnUMBERI AS VARCHAR) + ' - 1) * ' + CAST (@RowOnPageCatalog AS VARCHAR) + 
+	' ROWS FETCH NEXT ' + CAST (@RowOnPageCatalog AS VARCHAR) + ' ROWS ONLY';
 	INSERT INTO LOG_TABLE (ErrorMessage) VALUES ('@PAGEnUMBERI: ' + CAST (@PAGEnUMBERI AS VARCHAR) +
-													', @SLRowOnPage: ' + CAST (@SLRowOnPage AS VARCHAR) +
+													', @RowOnPageCatalog: ' + CAST (@RowOnPageCatalog AS VARCHAR) +
 													' | @TextNamberNameI: ' + @TextNamberNameI +
 													', @TextRefRevisionI: ' + @TextRefRevisionI + 
 													', @TextConstellationI: ' + @TextConstellationI + 
@@ -242,8 +242,8 @@ BEGIN TRY
 													);
 	INSERT INTO LOG_TABLE (ErrorMessage) VALUES ('@QUERY: ' + @QUERY);
 	EXECUTE sp_executesql @QUERY, 
-		N'@PAGEnUMBERI INT, @SLRowOnPage INT', 
-		@PAGEnUMBERI = @PAGEnUMBERI, @SLRowOnPage = @SLRowOnPage;
+		N'@PAGEnUMBERI INT, @RowOnPageCatalog INT', 
+		@PAGEnUMBERI = @PAGEnUMBERI, @RowOnPageCatalog = @RowOnPageCatalog;
 END TRY
 BEGIN  CATCH
 	DECLARE @FuncProc AS VARCHAR(50), @Line AS INT, @ErrorNumber AS INT, @ErrorMessage VARCHAR(MAX), @ErrorSeverity INT, @ErrorState INT;

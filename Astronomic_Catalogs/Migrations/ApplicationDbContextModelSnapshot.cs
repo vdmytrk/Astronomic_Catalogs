@@ -244,14 +244,14 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float?>("AngDiameterNew")
-                        .HasColumnType("real")
-                        .HasColumnName("Ang_Diameter_NEW");
-
-                    b.Property<string>("AngDiameterOld")
+                    b.Property<string>("AngDiameter")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
-                        .HasColumnName("Ang_Diameter_OLD");
+                        .HasColumnName("Ang_Diameter");
+
+                    b.Property<float?>("AngDiameterNew")
+                        .HasColumnType("real")
+                        .HasColumnName("Ang_Diameter_Max");
 
                     b.Property<float?>("AppMag")
                         .HasColumnType("real")
@@ -402,6 +402,11 @@ namespace Astronomic_Catalogs.Migrations
 
                     b.Property<int>("Area")
                         .HasColumnType("int");
+
+                    b.Property<string>("EnglishName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("English_name");
 
                     b.Property<string>("LatineNameGenitiveCase")
                         .IsRequired()
@@ -1710,6 +1715,10 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AngDiameter")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Ang_Diameter");
+
                     b.Property<double?>("AppMag")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
@@ -1822,6 +1831,11 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("float")
                         .HasDefaultValue(0.0)
                         .HasColumnName("k_mag");
+
+                    b.Property<string>("LimitAngDiameter")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)")
+                        .HasColumnName("Limit_Ang_Diameter");
 
                     b.Property<double?>("MajorAxis")
                         .ValueGeneratedOnAdd()
@@ -1962,6 +1976,10 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AngDiameter")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Ang_Diameter");
+
                     b.Property<double?>("AppMag")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
@@ -2074,6 +2092,11 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("float")
                         .HasDefaultValue(0.0)
                         .HasColumnName("k_mag");
+
+                    b.Property<string>("LimitAngDiameter")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)")
+                        .HasColumnName("Limit_Ang_Diameter");
 
                     b.Property<double?>("MajorAxis")
                         .ValueGeneratedOnAdd()

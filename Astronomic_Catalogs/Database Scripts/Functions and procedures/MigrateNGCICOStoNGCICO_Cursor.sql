@@ -15,6 +15,8 @@ BEGIN
 	DECLARE @Messier varchar(15);
     DECLARE @NGC varchar(14);
     DECLARE @IC varchar(23);
+	DECLARE @Limit_Ang_Diameter NVARCHAR(1);
+	DECLARE @Ang_Diameter FLOAT;
     DECLARE @ObjectTypeAbrev varchar(21);
     DECLARE @ObjectType	varchar(26);
     DECLARE @RA varchar(30);
@@ -51,6 +53,10 @@ BEGIN
 	DECLARE @trancount INT;
 	SET @trancount = @@TRANCOUNT; 
 
+
+	SET @Limit_Ang_Diameter = NULL;
+	SET @Ang_Diameter = 0;
+
 	SET NOCOUNT ON;	  
 
 	--The object which do not have base object
@@ -76,9 +82,8 @@ BEGIN
 	WHERE ST.RN = 1 AND ST.SubObject <> '';
 
 	TRUNCATE TABLE NGCICOpendatasoft;
-	TRUNCATE TABLE NGCICOpendatasoft_Extension;
-		
-		
+	TRUNCATE TABLE NGCICOpendatasoft_Extension;		
+	
 	BEGIN TRY
         IF @trancount = 0
 			BEGIN
@@ -97,13 +102,49 @@ BEGIN
 		END;
 
 		DECLARE NGCICOpendatasoft_Source_Cursor CURSOR LOCAL FOR
-			SELECT * FROM NGCICOpendatasoft_Source;		
+			SELECT DISTINCT 
+				O.ID, 
+				O.NGC_IC, 
+				O.Name, 
+				O.SubObject, 
+				O.Messier, 
+				O.NGC, 
+				O.IC,
+				T.Limit_Ang_Diameter, 
+				T.Ang_Diameter,
+                O.ObjectTypeAbrev, 
+				O.ObjectType, 
+				O.RA, 
+				O.DEC, 
+				O.Constellation, 
+				O.MajorAxis, 
+				O.MinorAxis, 
+				O.PositionAngle,
+                O.b_mag, 
+				O.v_mag, 
+				O.j_mag, 
+				O.h_mag, 
+				O.k_mag, 
+				O.Surface_Brigthness, 
+				O.Hubble_OnlyGalaxies, 
+				O.Cstar_UMag,
+                O.Cstar_BMag, 
+				O.Cstar_VMag, 
+				O.Cstar_Names, 
+				O.CommonNames, 
+				O.NedNotes, 
+				O.OpenngcNotes, 
+				O.Image
+			FROM NGCICOpendatasoft_Source AS O
+			LEFT JOIN NGC2000_UKTemporarily AS T -- Don’t use 'UPDATE NGCICOpendatasoft' as used below, since it updates both tables: NGCICOpendatasoft and NGCICOpendatasoft_Extension!
+				ON O.NGC_IC + ' ' + CAST(O.Name AS varchar) = RTRIM(T.Catalog) + ' ' + CAST(T.Namber_name AS varchar);
 
 		OPEN NGCICOpendatasoft_Source_Cursor;
 		
 		FETCH NEXT FROM NGCICOpendatasoft_Source_Cursor INTO
-			@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, @MajorAxis,
-			@MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag,
+			@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, 
+			@ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, 
+			@b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag,
 			@Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes, @Image;
 		
 		WHILE @@FETCH_STATUS = 0
@@ -116,34 +157,34 @@ BEGIN
 						
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
 					'NGCICOpendatasoft_Extension',
-					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, 
-					@MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, 
-					@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes,
-					@Image;
+					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
+					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
+					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
+					@NedNotes, @OpenngcNotes, @Image;
 				END;
 			ELSE IF (@SubObject IN ('A', 'B', 'C', 'D', 'E', 'F', 'N', 'NW', 'S', 'SE') OR @SubObject LIKE 'NED0%')
 				BEGIN
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
 					'NGCICOpendatasoft_Extension',
-					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, 
-					@MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, 
-					@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes,
-					@Image;
+					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
+					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
+					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
+					@NedNotes, @OpenngcNotes, @Image;
 				END;
 			ELSE
 				BEGIN
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
 					'NGCICOpendatasoft',
-					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, 
-					@MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, 
-					@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes,
-					@Image;
+					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
+					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
+					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
+					@NedNotes, @OpenngcNotes, @Image;
 				END;
    	  
 			FETCH NEXT FROM NGCICOpendatasoft_Source_Cursor INTO
-			@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, @MajorAxis,
-			@MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag,
-			@Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes, @Image;
+			@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, 
+			@Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, 
+			@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes, @Image;
 
 		END;
 
@@ -217,7 +258,7 @@ BEGIN
 
 		END TRY
 		BEGIN CATCH
-			PRINT 'An error occurred during handling error from NGC_IC_Opendatasoft_C_Tran transaction: ' + @ErrorMessage;
+			PRINT N'An error occurred during handling error from NGC_IC_Opendatasoft_C_Tran transaction: ' + @ErrorMessage;
 		END CATCH
 	END CATCH
 END;

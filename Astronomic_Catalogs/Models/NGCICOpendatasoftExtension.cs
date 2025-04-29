@@ -12,6 +12,8 @@ public class NGCICOpendatasoftExtension
     public string? OtherNames { get; set; }
     public string? NGC { get; set; }
     public string? IC { get; set; }
+    public string? LimitAngDiameter { get; set; }
+    public string? AngDiameter { get; set; }
     public string? ObjectTypeAbrev { get; set; }
     public string? ObjectType { get; set; }
     public string? ObjectTypeFull { get; set; }
@@ -58,4 +60,8 @@ public class NGCICOpendatasoftExtension
     public string? NedNotes { get; set; }
     public string? OpenngcNotes { get; set; }
     public string? Image { get; set; }
+
+
+    public int? PageNumber { get; set; }
+    public int? PageCount { get; set; }
 }

@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="planetCatalogHeader">
+<div class="catalogPagesHeader">
     <h1>@ViewData["Title"] catalog.</h1>
 
     @if (User.IsInRole("OwnerAdministratorPower"))
@@ -14,9 +14,15 @@
             <a asp-action="Create">Create New</a>
         </p>
     }
+    <p hidden>
+        Різниця в розмірах між каталогом Колінджера та NGC 2000 пов'язана з тим, що Колінджер рахував розмір об'єкту лише по зірках, а в NGC 2000 розмір може включати туманність та інші об'єкти або навпаки, не включати якісь зірки.
+    </p>
+    <p>
+        The difference in sizes between the Collinder catalog and NGC 2000 is due to the fact that Collinder calculated the object's size based only on stars, whereas in NGC 2000, the size may include the nebula and other objects, or conversely, may exclude some stars.
+    </p>
 </div>
 
-<table class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size">
+<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size">
     <thead>
         <tr class="tr-oun-style">
             <th>
@@ -68,7 +74,7 @@
                 @Html.DisplayNameFor(model => model.CountStarsToFinding)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AngDiameterOld)
+                @Html.DisplayNameFor(model => model.AngDiameter)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.AngDiameterNew)
@@ -144,7 +150,7 @@
                     @Html.DisplayFor(modelItem => item.CountStarsToFinding)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.AngDiameterOld)
+                    @Html.DisplayFor(modelItem => item.AngDiameter)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.AngDiameterNew)

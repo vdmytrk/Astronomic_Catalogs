@@ -1,0 +1,28 @@
+﻿@{
+    int RowOnPageCatalog = ViewBag.RowOnPageCatalog == null ? 50 : ViewBag.RowOnPageCatalog;
+    int rowCount = ViewBag.RowsCount == null ? 1 : ViewBag.RowsCount;
+    int pageCount = (int)Math.Ceiling((double)rowCount / RowOnPageCatalog);
+}
+
+
+<div class="paginationBodyBlock">
+    <div value="0" hidden>0</div>
+    <input class="ActualPegeNumber1" type="hidden" value="1" />
+    @for (var i = 1; i <= pageCount; i++)
+    {
+        @if (i < pageCount)
+        {
+            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="SelectPage(this)">
+                @i
+                <span class="borderBlock">|</span>
+            </div>
+        }
+        else
+        {
+            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="SelectPage(this)">
+                @i
+            </div>
+        }
+    }
+</div>
+

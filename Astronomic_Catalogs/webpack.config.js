@@ -6,6 +6,7 @@ module.exports = {
     entry: {
         main: "./Scripts/ts/main.ts",
         theme: "./wwwroot/js/theme.js",
+        NGCICOpendatasoft: "./wwwroot/js/AstroTableFilters.js",
     },
     output: {
         filename: "[name].min.js",

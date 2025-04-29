@@ -14,6 +14,8 @@ BEGIN
             @Messier VARCHAR(15),
             @NGC VARCHAR(14),
             @IC VARCHAR(23),
+			@Limit_Ang_Diameter NVARCHAR(1),
+			@Ang_Diameter FLOAT,
             @ObjectTypeAbrev VARCHAR(21),
             @ObjectType VARCHAR(26),
             @RA VARCHAR(30),
@@ -64,7 +66,6 @@ BEGIN
 
     SELECT * INTO ##IDTODUBLICATE FROM (
         SELECT 
-            DENSE_RANK() OVER(ORDER BY NGC_IC DESC, Name) AS DR,
             ROW_NUMBER() OVER(PARTITION BY NGC_IC + ' ' + CAST(Name AS VARCHAR) ORDER BY NGC_IC + ' ' + CAST(Name AS VARCHAR), SubObject) AS RN, 
             ID,
             NGC_IC,
@@ -74,14 +75,12 @@ BEGIN
         WHERE NGC_IC + ' ' + CAST(Name AS VARCHAR) IN (
             SELECT NGC_IC + ' ' + CAST(Name AS VARCHAR) 
             FROM NGCICOpendatasoft_Source 
-            WHERE SubObject <> ''
-        )
-    ) AS ST
+            WHERE SubObject <> '')
+		) AS ST
     WHERE ST.RN = 1 AND ST.SubObject <> '';		
 
     TRUNCATE TABLE NGCICOpendatasoft;
     TRUNCATE TABLE NGCICOpendatasoft_Extension;
-
 
     BEGIN TRY
         IF @trancount = 0
@@ -99,39 +98,43 @@ BEGIN
 
         WHILE @COUNTER <= @SUM_ROWS
         BEGIN
-            SELECT
-                @Id = ID,
-                @NGC_IC = NGC_IC,
-                @Name = Name,
-                @SubObject = SubObject,
-                @Messier = Messier,
-                @NGC = NGC,
-                @IC = IC,
-                @ObjectTypeAbrev = ObjectTypeAbrev,
-                @ObjectType = ObjectType,
-                @RA = RA,
-                @DEC = DEC,
-                @Constellation = Constellation,
-                @MajorAxis = MajorAxis,
-                @MinorAxis = MinorAxis,
-                @PositionAngle = PositionAngle,
-                @b_mag = b_mag,
-                @v_mag = v_mag,
-                @j_mag = j_mag,
-                @h_mag = h_mag,
-                @k_mag = k_mag,
-                @Surface_Brigthness = Surface_Brigthness,
-                @Hubble_OnlyGalaxies = Hubble_OnlyGalaxies,
-                @Cstar_UMag = Cstar_UMag,
-                @Cstar_BMag = Cstar_BMag,
-                @Cstar_VMag = Cstar_VMag,
-                @Cstar_Names = Cstar_Names,
-                @CommonNames = CommonNames,
-                @NedNotes = NedNotes,
-                @OpenngcNotes = OpenngcNotes,
-                @Image = Image
-            FROM NGCICOpendatasoft_Source
-			WHERE ID = @COUNTER;
+            SELECT 
+                @Id = O.ID,
+                @NGC_IC = O.NGC_IC,
+                @Name = O.Name,
+                @SubObject = O.SubObject,
+                @Messier = O.Messier,
+                @NGC = O.NGC,
+                @IC = O.IC,
+                @Limit_Ang_Diameter = T.Limit_Ang_Diameter,
+                @Ang_Diameter = T.Ang_Diameter,
+                @ObjectTypeAbrev = O.ObjectTypeAbrev,
+                @ObjectType = O.ObjectType,
+                @RA = O.RA,
+                @DEC = O.DEC,
+                @Constellation = O.Constellation,
+                @MajorAxis = O.MajorAxis,
+                @MinorAxis = O.MinorAxis,
+                @PositionAngle = O.PositionAngle,
+                @b_mag = O.b_mag,
+                @v_mag = O.v_mag,
+                @j_mag = O.j_mag,
+                @h_mag = O.h_mag,
+                @k_mag = O.k_mag,
+                @Surface_Brigthness = O.Surface_Brigthness,
+                @Hubble_OnlyGalaxies = O.Hubble_OnlyGalaxies,
+                @Cstar_UMag = O.Cstar_UMag,
+                @Cstar_BMag = O.Cstar_BMag,
+                @Cstar_VMag = O.Cstar_VMag,
+                @Cstar_Names = O.Cstar_Names,
+                @CommonNames = O.CommonNames,
+                @NedNotes = O.NedNotes,
+                @OpenngcNotes = O.OpenngcNotes,
+                @Image = O.Image
+            FROM NGCICOpendatasoft_Source AS O
+			LEFT JOIN NGC2000_UKTemporarily AS T -- Don’t use 'UPDATE NGCICOpendatasoft' as used below, since it updates both tables: NGCICOpendatasoft and NGCICOpendatasoft_Extension!
+				ON O.NGC_IC + ' ' + CAST(O.Name AS varchar) = RTRIM(T.Catalog) + ' ' + CAST(T.Namber_name AS varchar)
+			WHERE O.ID = @COUNTER;
 
 			SET @COUNTER += 1;
 		
@@ -143,28 +146,28 @@ BEGIN
 				
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
 					'NGCICOpendatasoft_Extension',
-					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, 
-					@MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, 
-					@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes,
-					@Image;
+					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
+					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
+					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
+					@NedNotes, @OpenngcNotes, @Image;
 				END;
             ELSE IF @SubObject IN ('A', 'B', 'C', 'D', 'E', 'F', 'N', 'NW', 'S', 'SE') OR @SubObject LIKE 'NED0%'
 				BEGIN
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
 					'NGCICOpendatasoft_Extension',
-					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, 
-					@MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, 
-					@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes,
-					@Image;
+					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
+					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
+					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
+					@NedNotes, @OpenngcNotes, @Image;
 				END;
 			ELSE
 				BEGIN
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
 					'NGCICOpendatasoft',
-					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, 
-					@MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness, 
-					@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes,
-					@Image;
+					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
+					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
+					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
+					@NedNotes, @OpenngcNotes, @Image;
 				END;
         END; 
 
