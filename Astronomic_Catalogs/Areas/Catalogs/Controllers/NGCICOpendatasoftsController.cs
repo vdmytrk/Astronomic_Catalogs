@@ -55,12 +55,13 @@ public class NGCICOpendatasoftsController : Controller
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
-        //ViewBag.RowOnPageCatalog = parameters[23] == "100" ? 100 : 50;
+        //string rowOnPageCatalog = parameters["RowOnPageCatalog"].ToString() ?? "";
+        //ViewBag.RowOnPageCatalog = rowOnPageCatalog == "100" ? 100 : 50;
         try
         {
             // Development block
             var parametersList = parameters.ToList();
-            var firstParam = parametersList[36]; 
+            var firstParam = parametersList[1]; 
             var firstParamKey = firstParam.Key;   
             var firstParamValue = firstParam.Value; 
 

@@ -454,16 +454,18 @@ function getCountChecked_fieldsCheckBoks_Checkbox(): number {
     return checkedCount + 2; // Becouse some columns have not chackbox
 }
 
-let columnCount: number = getCountChecked_fieldsCheckBoks_Checkbox();
-const tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement;
-const spinnerHTML = `
-        <tr>
+function createSpinnerHTML(): string  {
+    const columnCount: number = getCountChecked_fieldsCheckBoks_Checkbox();
+    const spinnerHTML = `
+        <tr id="spinnerTr">
             <td colspan="${columnCount}" class="text-center align-items-center" style="height: 20rem;">
                 <div id="spinner" class="spinner"> </div>
             </td>
         </tr>
     `;
 
+    return spinnerHTML;
+}
 
 
 
@@ -475,7 +477,8 @@ function serializeForm(rootElement: HTMLElement): FormData {
     const data: FormData = {};
 
     // Text inputs, selects (single & multiple), dropdowns
-    const inputs = rootElement.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select');
+    const inputs = rootElement.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input:not([type="hidden"]), select');
+
 
     inputs.forEach(input => {
         const name = input.name || input.id;
@@ -527,9 +530,10 @@ function serializeForm(rootElement: HTMLElement): FormData {
 async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partialSelector: string, spinnerSelector?: string) {
     console.log("FUNCTION: submitFormAndUpdatePartial()");
     const spinner = spinnerSelector ? document.querySelector(spinnerSelector) : null;
+    const tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement;
 
     // 1. Collect form data into JSON
-    const json = serializeForm(form); 
+    const json = serializeForm(form);
     console.log(json);
 
     try {
@@ -537,7 +541,15 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
         if (spinner) {
             spinner.classList.remove('hidden');
         } else {
-            tableBody.insertAdjacentHTML('afterbegin', spinnerHTML);
+            console.log(`Adding spinnerHTML.`);
+
+            // Видаляємо старий spinner, якщо є
+            const existingSpinnerTr = document.getElementById("spinnerTr");
+            if (existingSpinnerTr) {
+                existingSpinnerTr.remove();
+            }
+
+            tableBody.insertAdjacentHTML('afterbegin', createSpinnerHTML());
         }
 
         // 3. Send request
@@ -568,7 +580,12 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
         // 7. Hide spinner
         if (spinner) {
             spinner.classList.add('hidden');
-        } 
+        } else {
+            const spinnerTr = document.getElementById("spinnerTr");
+            if (spinnerTr) {
+                spinnerTr.remove();
+            }
+        }
     }
 }
 
@@ -577,7 +594,7 @@ function updateCatalogData() {
     if (!buttonApplyFilters) return;
 
     buttonApplyFilters.addEventListener('click', async (e) => {
-        const form = document.querySelector('.top_menu_filters_catalogs') as HTMLElement;
+        const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement;
         console.log(form);
 
         e.preventDefault();
