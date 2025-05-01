@@ -75,6 +75,7 @@ public class Program
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddScoped<DatabaseInitializer>();
         builder.Services.AddScoped<IExcelImport, ExcelImportService_OpenXml>();
+        builder.Services.AddScoped<INGCICFilterService, NGCICFilterService>();
     }
 
     private static IConfiguration LoadConfiguration()
