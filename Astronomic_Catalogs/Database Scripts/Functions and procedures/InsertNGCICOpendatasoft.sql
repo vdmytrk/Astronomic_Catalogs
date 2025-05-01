@@ -36,8 +36,8 @@ CREATE OR ALTER PROC InsertNGCICOpendatasoft
     @Cstar_VMag FLOAT,
     @Cstar_Names NVARCHAR(255),
     @CommonNames NVARCHAR(255),
-    @NedNotes NVARCHAR(255),
-    @OpenngcNotes NVARCHAR(330),
+    @NedNotes NVARCHAR(MAX),
+    @OpenngcNotes NVARCHAR(MAX),
     @Image NVARCHAR(MAX)
 AS
 BEGIN	
@@ -112,8 +112,8 @@ BEGIN
 			@ObjectTypeAbrev NVARCHAR(21), @ObjectType NVARCHAR(26), @RA NVARCHAR(30), @DEC NVARCHAR(31), @Constellation NVARCHAR(21), 
 			@MajorAxis FLOAT, @MinorAxis FLOAT, @PositionAngle INT, @b_mag FLOAT, @v_mag FLOAT, @j_mag FLOAT, @h_mag FLOAT, 
 			@k_mag FLOAT, @Surface_Brigthness FLOAT, @Hubble_OnlyGalaxies NVARCHAR(14), @Cstar_UMag FLOAT, @Cstar_BMag FLOAT, 
-			@Cstar_VMag FLOAT, @Cstar_Names NVARCHAR(255), @CommonNames NVARCHAR(255), @NedNotes NVARCHAR(255), 
-			@OpenngcNotes NVARCHAR(330), @Image NVARCHAR(MAX)',
+			@Cstar_VMag FLOAT, @Cstar_Names NVARCHAR(255), @CommonNames NVARCHAR(255), @NedNotes NVARCHAR(MAX), 
+			@OpenngcNotes NVARCHAR(MAX), @Image NVARCHAR(MAX)',
 			@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, 
 			@ObjectTypeAbrev, @ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, 
 			@k_mag, @Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, 

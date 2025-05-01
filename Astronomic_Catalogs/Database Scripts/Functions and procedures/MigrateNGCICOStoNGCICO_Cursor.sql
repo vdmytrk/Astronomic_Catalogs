@@ -37,8 +37,8 @@ BEGIN
     DECLARE @Cstar_VMag float;
     DECLARE @Cstar_Names varchar(21);
     DECLARE @CommonNames varchar(110);
-    DECLARE @NedNotes varchar(110);
-    DECLARE @OpenngcNotes varchar(330);
+    DECLARE @NedNotes varchar(max);
+    DECLARE @OpenngcNotes varchar(max);
     DECLARE @Image varchar(max);
 	
 	-- For error hendling

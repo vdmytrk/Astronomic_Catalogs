@@ -41,8 +41,8 @@ BEGIN
 		Cstar_VMag float default 0,
 		Cstar_Names varchar(21) default null,
 		CommonNames varchar(110) default null,
-		NedNotes varchar(110) default null,
-		OpenngcNotes varchar(330) default null,
+		NedNotes nvarchar(max) default null,
+		OpenngcNotes nvarchar(max) default null,
 		[Image] varchar(max) default null
 	);
 END

@@ -36,8 +36,8 @@ BEGIN
             @Cstar_VMag FLOAT,
             @Cstar_Names VARCHAR(21),
             @CommonNames VARCHAR(110),
-            @NedNotes VARCHAR(110),
-            @OpenngcNotes VARCHAR(330),
+            @NedNotes VARCHAR(MAX),
+            @OpenngcNotes VARCHAR(MAX),
             @Image VARCHAR(MAX);
 
 	DECLARE @COUNTER INT,
