@@ -174,7 +174,9 @@ public class DatabaseInitializer
     private async Task InitializeDevelopmentAsync(bool isConnectDb)
     {
         if (isConnectDb)
+        {
             await _context.Database.EnsureDeletedAsync();
+        }
 
         if (await CreateDatabaseAsync())
         {
@@ -461,6 +463,7 @@ public class DatabaseInitializer
     {
         await ExecuteSqlScriptAsync($"Functions and procedures/Log_NLogAddLogApplicationCode.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/InsertNGCICOpendatasoft.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/InsertNGCICOpendatasoft_Extension.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_Cursor.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_While.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/SearchFilteredNGCICData.sql");

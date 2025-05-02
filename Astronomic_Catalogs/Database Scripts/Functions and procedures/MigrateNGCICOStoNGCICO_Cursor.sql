@@ -153,10 +153,9 @@ BEGIN
 					   WHERE (@SubObject <> '' AND @SubObject = 'A')
 					     AND NGC_IC + CAST([Name] AS VARCHAR) = @NGC_IC + CAST(@Name AS VARCHAR) ) 
 				BEGIN					
-					INSERT INTO NGCICOpendatasoft (NGC_IC, [Name], SubObject) VALUES (@NGC_IC, @Name, 'DUPLICATE');
+					INSERT INTO NGCICOpendatasoft (NGC_IC, [Name], SubObject, SourceTable) VALUES (@NGC_IC, @Name, 'DUPLICATE', 'NGCICOpendatasoft');
 						
-					EXEC [dbo].[InsertNGCICOpendatasoft] 
-					'NGCICOpendatasoft_Extension',
+					EXEC [dbo].[InsertNGCICOpendatasoft_Extension] 
 					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
 					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
 					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
@@ -164,8 +163,7 @@ BEGIN
 				END;
 			ELSE IF (@SubObject IN ('A', 'B', 'C', 'D', 'E', 'F', 'N', 'NW', 'S', 'SE') OR @SubObject LIKE 'NED0%')
 				BEGIN
-					EXEC [dbo].[InsertNGCICOpendatasoft] 
-					'NGCICOpendatasoft_Extension',
+					EXEC [dbo].[InsertNGCICOpendatasoft_Extension] 
 					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
 					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
 					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
@@ -174,7 +172,6 @@ BEGIN
 			ELSE
 				BEGIN
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
-					'NGCICOpendatasoft',
 					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
 					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
 					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 

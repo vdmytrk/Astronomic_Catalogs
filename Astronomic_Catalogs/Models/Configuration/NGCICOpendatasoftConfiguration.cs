@@ -92,6 +92,7 @@ public class NGCICOpendatasoftConfiguration : IEntityTypeConfiguration<NGCICOpen
 
         builder.Property(e => e.PageNumber).IsRequired(false);
         builder.Property(e => e.PageCount).IsRequired(false);
+        builder.Property(e => e.SourceTable).IsRequired(false);
 
         builder.HasIndex(e => new { e.NGC_IC, e.Name })
             .IsUnique()

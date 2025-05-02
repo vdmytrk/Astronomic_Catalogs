@@ -2,7 +2,9 @@
 
 @foreach (var item in Model)
 {
-    <tr>
+    var rowClass = item.SourceTable == "NGCICOpendatasoft_Extension" ? "tableExtension" : "";
+
+    <tr class="@rowClass">
         <td>
             <div>@item.NGC_IC @item.Name</div>
         </td>

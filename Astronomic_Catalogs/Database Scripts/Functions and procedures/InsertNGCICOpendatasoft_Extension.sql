@@ -5,7 +5,7 @@
 -------------------------------------------------------------------------------------------------------------------------------------------
 --================================================  INSET DATA INTO NGCICOpendatasoft  ================================================--
 -------------------------------------------------------------------------------------------------------------------------------------------
-CREATE OR ALTER PROC InsertNGCICOpendatasoft
+CREATE OR ALTER PROC InsertNGCICOpendatasoft_Extension
     @Id INT,
     @NGC_IC NVARCHAR(13),
     @Name INT,
@@ -53,7 +53,7 @@ BEGIN
 			@ErrorState INT;
 
 	BEGIN TRY
-		INSERT INTO NGCICOpendatasoft (
+		INSERT INTO NGCICOpendatasoft_Extension (
 			NGC_IC, [Name], SubObject, Messier, NGC, IC, Limit_Ang_Diameter, Ang_Diameter, ObjectTypeAbrev, ObjectType, 
 			RA, Right_ascension_H, Right_ascension_M, Right_ascension_S,
 			[DEC], NS, Declination_D, Declination_M, Declination_S,
@@ -103,7 +103,7 @@ BEGIN
 				WHERE T2.ID = @Id AND RN = 3), 
 			@Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, @Surface_Brigthness,
 			@Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, @NedNotes, @OpenngcNotes, @Image,
-			'NGCICOpendatasoft'
+			'NGCICOpendatasoft_Extension'
 		);		
 	END TRY
 	BEGIN CATCH						

@@ -67,4 +67,6 @@ public class NGCICOpendatasoft
 
     public int? PageNumber { get; set; }
     public int? PageCount { get; set; }
+    public string? SourceTable { get; set; }
+
 }

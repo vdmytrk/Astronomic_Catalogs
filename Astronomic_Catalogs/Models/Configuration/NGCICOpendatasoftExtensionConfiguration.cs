@@ -92,6 +92,7 @@ public class NGCICOpendatasoftExtensionConfiguration : IEntityTypeConfiguration<
 
         builder.Ignore(e => e.PageNumber);
         builder.Ignore(e => e.PageCount);
+        builder.Property(e => e.SourceTable).IsRequired(false);
 
     }
 }
