@@ -4,6 +4,7 @@ using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using Astronomic_Catalogs.Utils;
 
 namespace Astronomic_Catalogs.Services;
 
@@ -19,8 +20,9 @@ public class NGCICFilterService : INGCICFilterService
     public async Task<List<NGCICOpendatasoft>> GetFilteredDataAsync(Dictionary<string, object> parameters)
     {
         string? name = parameters.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() : null;
-        string? constellationsJson = parameters.TryGetValue("constellations", out var constellationsObj)
-            ? JsonSerializer.Serialize(constellationsObj) : null;
+        var constellationsJson = parameters.TryGetValue("constellations", out var obj)
+            ? JsonSerializerAC.SerializeToNormalizedJson(obj)
+            : null;
 
         double? angDiameterMin = parameters.GetInt("Ang_Diameter_min");
         double? angDiameterMax = parameters.GetInt("Ang_Diameter_max");
@@ -58,7 +60,6 @@ public class NGCICFilterService : INGCICFilterService
         int? pageNumber = parameters.GetInt("PageNumberVaulue");
         int? rowOnPage = parameters.GetInt("RowOnPageCatalog");
 
-
         var result = await _context.NGCIC_Catalog
             .FromSqlInterpolated($@"
                 EXEC GetFilteredNGCICData 
@@ -92,5 +93,6 @@ public class NGCICFilterService : INGCICFilterService
 
         return result;
     }
+
 }
 

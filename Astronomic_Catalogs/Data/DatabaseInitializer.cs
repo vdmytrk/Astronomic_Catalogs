@@ -203,7 +203,7 @@ public class DatabaseInitializer
     }
 
     /// <summary>
-    /// Truncate table which are not created by script.
+    /// Truncate tables which are not created by script.
     /// </summary>
     public async Task<bool> ClearDatabase()
     {
@@ -254,7 +254,6 @@ public class DatabaseInitializer
     {
         List<string> existingTables = new();
 
-        //using var connection0 = _context.Database.GetDbConnection();
         using var connection = new SqlConnection(_context.Database.GetConnectionString()); // Використовуємо нове з'єднання
         await connection.OpenAsync();
 

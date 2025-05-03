@@ -30,7 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateFixedColumnLeftOffset();
     adjustTableSize(remInPixels);
     //updateTableHeaderOffset();
-    updateCatalogData()
 
     distributeItemsIntoColumns(".responsiveColumnsContainer", remInPixels);
 });
@@ -454,7 +453,7 @@ function getCountChecked_fieldsCheckBoks_Checkbox(): number {
     return checkedCount + 2; // Becouse some columns have not chackbox
 }
 
-function createSpinnerHTML(): string  {
+function createSpinnerHTML(): string {
     const columnCount: number = getCountChecked_fieldsCheckBoks_Checkbox();
     const spinnerHTML = `
         <tr id="spinnerTr">
@@ -509,6 +508,11 @@ function serializeForm(rootElement: HTMLElement): FormData {
         }
     });
 
+
+    // Retrieves a boolean value from checkboxes.
+    // Boolean values from checkboxes are used in the service that calls the stored procedure to generate a JSON list of selected the Object Types checkboxes.
+    // This approach requires separate handling of single checkboxes and the selection of the Constellations parameter in the service that
+    //   calls the stored procedure.
     for (const key in data) {
         // Clear arrays with a single element. 
         if (Array.isArray(data[key]) && data[key].length === 1) {
@@ -530,7 +534,9 @@ function serializeForm(rootElement: HTMLElement): FormData {
 async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partialSelector: string, spinnerSelector?: string) {
     console.log("FUNCTION: submitFormAndUpdatePartial()");
     const spinner = spinnerSelector ? document.querySelector(spinnerSelector) : null;
-    const tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement;
+    // const tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement;
+    const tableHeader = document.querySelector(partialSelector);
+    let tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement | null;
 
     // 1. Collect form data into JSON
     const json = serializeForm(form);
@@ -543,7 +549,7 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
         } else {
             console.log(`Adding spinnerHTML.`);
 
-            // Видаляємо старий spinner, якщо є
+            // Remove the old spinner, if it exists
             const existingSpinnerTr = document.getElementById("spinnerTr");
             if (existingSpinnerTr) {
                 existingSpinnerTr.remove();
@@ -566,11 +572,11 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
 
         // 5. Receive partial HTML
         const partialHtml = await response.text();
+        console.log(`response.text: ${partialHtml}`);
 
         // 6. Insert it into the DOM
-        const partialContainer = document.querySelector(partialSelector);
-        if (partialContainer) {
-            partialContainer.innerHTML = partialHtml;
+        if (tableHeader) {
+            tableHeader.innerHTML = partialHtml;
         } else {
             console.error(`Partial container with selector "${partialSelector}" not found.`);
         }
@@ -590,17 +596,15 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
 }
 
 function updateCatalogData() {
-    const buttonApplyFilters = document.getElementById('updateCatalogData')!;
-    if (!buttonApplyFilters) return;
+    const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement;
+    if (!form) return;
 
-    buttonApplyFilters.addEventListener('click', async (e) => {
-        const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement;
-        console.log(form);
+    console.log(form);
 
-        e.preventDefault();
-        await submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable');
-    });
+    submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable');
 }
+
+(window as any).updateCatalogData = updateCatalogData;
 
 
 

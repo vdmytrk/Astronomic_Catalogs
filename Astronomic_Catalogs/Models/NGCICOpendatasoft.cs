@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
-namespace Astronomic_Catalogs.Models;
+﻿namespace Astronomic_Catalogs.Models;
 
 public class NGCICOpendatasoft
 {

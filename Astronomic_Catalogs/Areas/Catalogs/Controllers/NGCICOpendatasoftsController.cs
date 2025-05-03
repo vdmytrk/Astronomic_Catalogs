@@ -59,30 +59,9 @@ public class NGCICOpendatasoftsController : Controller
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
-        //ViewBag.RowOnPageCatalog = parameters["RowOnPageCatalog"].ToString() ?? "50";
-        //ViewBag.RowOnPageCatalog = parameters.TryGetValue("RowOnPageCatalog", out var rows) ? Convert.ToInt32(rows) : 50;
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
         try
         {
-            #region Development block
-            //var parametersList = parameters.ToList();
-            //var firstParam = parametersList[1]; 
-            //var firstParamKey = firstParam.Key;   
-            //var firstParamValue = firstParam.Value; 
-
-            //List<NGCICOpendatasoft> selectedListNGCIC2000 = new();
-            //var countNGCTask = await _context.NGCIC_Catalog.CountAsync();
-            //var countNGCE_Task = await _context.NGCICOpendatasoft_E.CountAsync();
-
-            //selectedListNGCIC2000 = await _context.NGCIC_Catalog
-            //    .OrderBy(x => x.NGC_IC)
-            //    .ThenBy(x => x.Name)
-            //    .Take(50)
-            //    .ToListAsync();
-
-            //ViewBag.RowsCount = countNGCTask + countNGCE_Task;
-            #endregion
-
             List<NGCICOpendatasoft> selectedListNGCIC2000 = await _filterService.GetFilteredDataAsync(parameters);
             ViewBag.RowsCount = selectedListNGCIC2000.Count;
 

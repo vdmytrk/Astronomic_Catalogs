@@ -2,7 +2,7 @@
 
 @foreach (var item in Model)
 {
-    var rowClass = item.SourceTable == "NGCICOpendatasoft_Extension" ? "tableExtension" : "";
+    var rowClass = item.SourceTable == "NGCICOpendatasoft_Extension" ? "highlightRowClass" : "";
 
     <tr class="@rowClass">
         <td>

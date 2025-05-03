@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
 
-    var angDiameterValues = Enumerable.Range(0, 96).Select(i => new SelectListItem { Text = i.ToString(), Value = i.ToString() }).ToList();
+    var angDiameterValues = Enumerable.Range(0, 301).Select(i => new SelectListItem { Text = i.ToString(), Value = i.ToString() }).ToList();
     var hoursValues = Enumerable.Range(0, 24).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
     var minsSecsValues = Enumerable.Range(0, 60).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
     var degreesValues = Enumerable.Range(0, 90).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
@@ -37,7 +37,7 @@
                 <span class="">   Other names: @Html.CheckBox("Other_names", true, new { @class = "chb-Other_names", onclick = "toggleCheckbox(this, 'Other_names')" })                                   <span class="borderBlock pe-2">|</span></span>
                 <span class="">   NGC: @Html.CheckBox("NGC", false, new { @class = "chb-NGC", onclick = "toggleCheckbox(this, 'NGC')" })                                                                  <span class="borderBlock pe-2">|</span></span>
                 <span class="">   IC: @Html.CheckBox("IC", false, new { @class = "chb-IC", onclick = "toggleCheckbox(this, 'IC')" })                                                                      <span class="borderBlock pe-2">|</span></span>
-                <span class="">   LimitAngDiameter: @Html.CheckBox("LimitAngDiameter", true, new { @class = "chb-LimitAngDiameter", onclick = "toggleCheckbox(this, 'LimitAngDiameter')" })               <span class="borderBlock pe-2">|</span></span>
+                <span class="">   LimitAngDiameter: @Html.CheckBox("LimitAngDiameter", false, new { @class = "chb-LimitAngDiameter", onclick = "toggleCheckbox(this, 'LimitAngDiameter')" })               <span class="borderBlock pe-2">|</span></span>
                 <span class="">   AngDiameter: @Html.CheckBox("AngDiameter", true, new { @class = "chb-AngDiameter", onclick = "toggleCheckbox(this, 'AngDiameter')" })                                   <span class="borderBlock pe-2">|</span></span>
                 <span class="">   Object Type Abrev: @Html.CheckBox("ObjectTypeAbrev", true, new { @class = "chb-ObjectTypeAbrev", onclick = "toggleCheckbox(this, 'ObjectTypeAbrev')" })                 <span class="borderBlock pe-2">|</span></span>
                 <span class="">   Object Type: @Html.CheckBox("ObjectType", false, new { @class = "chb-ObjectType", onclick = "toggleCheckbox(this, 'ObjectType')" })                                     <span class="borderBlock pe-2">|</span></span>
@@ -170,7 +170,7 @@
                                             <div class="row g-1">
                                                 <div class="col" style="min-width: 5rem">
                                                     <div class="flex-wrap">
-                                                    @Html.DropDownList("Ang_Diameter_max", new SelectList(angDiameterValues, "Value", "Text", "95"), new { @class = "form-select text-Ang_Diameter_max", id = "Ang_Diameter_max", data_default = "95" })
+                                                    @Html.DropDownList("Ang_Diameter_max", new SelectList(angDiameterValues, "Value", "Text", "300"), new { @class = "form-select text-Ang_Diameter_max", id = "Ang_Diameter_max", data_default = "300" })
                                                         °
                                                     </div>
                                                 </div>
@@ -354,13 +354,13 @@
                     </div>
                 </div>
                 <div class="marginButton">
-                    <button type="button" id="updateCatalogData" class="btn btn-danger " style="margin: 0.5rem" onclick="" value="">
+                    <button type="button" id="" class="btn btn-danger " style="margin: 0.5rem" onclick="updateCatalogData()">
                         APPLY FILTERS
                     </button>
-                    <button type="button" class="btn btn-primary resetObjectSelection" style="margin: 0.5rem" onclick="resetObjectSelection()" value="">
+                    <button type="button" class="btn btn-primary resetObjectSelection" style="margin: 0.5rem" onclick="resetObjectSelection()">
                         Reset object selection
                     </button>
-                    <button type="button" class="btn btn-primary " style="margin: 0.5rem" onclick="resetAllFilters()" value="">
+                    <button type="button" class="btn btn-primary " style="margin: 0.5rem" onclick="resetAllFilters()">
                         Reset all filters
                     </button>
                 </div>
