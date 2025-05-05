@@ -4,7 +4,6 @@ using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using Astronomic_Catalogs.Utils;
 
 namespace Astronomic_Catalogs.Services;
 
@@ -21,7 +20,7 @@ public class NGCICFilterService : INGCICFilterService
     {
         string? name = parameters.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() : null;
         var constellationsJson = parameters.TryGetValue("constellations", out var obj)
-            ? JsonSerializerAC.SerializeToNormalizedJson(obj)
+            ? JsonSerializerOneUnit.SerializeToNormalizedJson(obj)
             : null;
 
         double? angDiameterMin = parameters.GetInt("Ang_Diameter_min");

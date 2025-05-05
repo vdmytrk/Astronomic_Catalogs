@@ -465,7 +465,7 @@ public class DatabaseInitializer
         await ExecuteSqlScriptAsync($"Functions and procedures/InsertNGCICOpendatasoft_Extension.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_Cursor.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_While.sql");
-        await ExecuteSqlScriptAsync($"Functions and procedures/SearchFilteredNGCICData.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/GetFilteredNGCICData.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/GetActualDate.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/CreateNewDate.sql");
     }

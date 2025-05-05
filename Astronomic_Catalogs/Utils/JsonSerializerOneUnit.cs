@@ -2,7 +2,7 @@
 
 namespace Astronomic_Catalogs.Utils;
 
-internal static class JsonSerializerAC
+static class JsonSerializerOneUnit
 {
     internal static string? SerializeToNormalizedJson(object obj)
     {

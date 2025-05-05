@@ -11,6 +11,8 @@ using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Astronomic_Catalogs.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers;
 
@@ -33,7 +35,7 @@ public class NGCICOpendatasoftsController : Controller
         var countNGCE_Task = await _context.NGCICOpendatasoft_E.CountAsync();
 
         var catalogItems = await _context.NGCIC_Catalog
-            .OrderBy(x => x.NGC_IC)
+            .OrderByDescending(x => x.NGC_IC)
             .ThenBy(x => x.Name)
             .Take(50)
             .ToListAsync();
@@ -60,21 +62,43 @@ public class NGCICOpendatasoftsController : Controller
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
+
+        List<NGCICOpendatasoft> selectedList;
+
         try
         {
-            List<NGCICOpendatasoft> selectedListNGCIC2000 = await _filterService.GetFilteredDataAsync(parameters);
-            ViewBag.RowsCount = selectedListNGCIC2000.Count;
-
-            if (selectedListNGCIC2000 == null)
-            {
-                return NotFound();
-            }
-
-            return PartialView("_NGCICTableHeaders", selectedListNGCIC2000);
+            selectedList = await _filterService.GetFilteredDataAsync(parameters);
         }
-        catch 
+        catch (Exception ex)
         {
-            throw;
+            return StatusCode(500, $"Error fetching filtered data: {ex.Message}");
+        }
+
+        if (selectedList == null || selectedList.Count == 0)
+        {
+            return NotFound();
+        }
+
+        var firstItem = selectedList.FirstOrDefault();
+        if (firstItem == null)
+        {
+            return StatusCode(500, "Unexpected error: filtered list is not empty, but contains no items.");
+        }
+
+        ViewBag.RowsCount = firstItem.PageCount;
+        ViewBag.PageNumber = firstItem.PageNumber;
+        ViewBag.Contorller = "NGCICOpendatasofts";
+
+        try
+        {
+            var tableHtml = await this.RenderViewAsync("_NGCICTableHeaders", selectedList, true);
+            var paginationHtml = await this.RenderViewAsync("_PaginationLine", null, true);
+
+            return Json(new { tableHtml, paginationHtml });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"RenderViewAsync error: {ex.Message}");
         }
     }
 
@@ -239,4 +263,5 @@ public class NGCICOpendatasoftsController : Controller
     {
         return _context.NGCIC_Catalog.Any(e => e.Id == id);
     }
+
 }

@@ -2,7 +2,7 @@
 
 namespace Astronomic_Catalogs.Utils;
 
-public static class SafeDictionaryReader 
+static class SafeDictionaryReader 
 {
     public static int? GetInt(this Dictionary<string, object> parameters, string key) =>
         parameters.TryGetValue(key, out var val) && int.TryParse(val?.ToString(), out var result) ? result : null;

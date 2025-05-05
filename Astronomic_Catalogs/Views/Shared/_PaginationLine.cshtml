@@ -1,9 +1,10 @@
 ﻿@{
-    int RowOnPageCatalog = ViewBag.RowOnPageCatalog == null ? 50 : ViewBag.RowOnPageCatalog;
-    int rowCount = ViewBag.RowsCount == null ? 1 : ViewBag.RowsCount;
-    int pageCount = (int)Math.Ceiling((double)rowCount / RowOnPageCatalog);
+    int rowOnPageCatalog = Convert.ToInt32(ViewBag.RowOnPageCatalog == null ? 50 : ViewBag.RowOnPageCatalog);
+    int rowCount = Convert.ToInt32(ViewBag.RowsCount == null ? 10000000 : ViewBag.RowsCount);
+    int pageNumber = Convert.ToInt32(ViewBag.PageNumber == null ? 1 : ViewBag.PageNumber);
+    int pageCount = (int)Math.Ceiling((double)rowCount / rowOnPageCatalog);
+    string controller = ViewBag.Contorller;
 }
-
 
 <div class="paginationBodyBlock">
     <div value="0" hidden>0</div>
@@ -12,14 +13,14 @@
     {
         @if (i < pageCount)
         {
-            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="SelectPage(this)">
+            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
                 @i
                 <span class="borderBlock">|</span>
             </div>
         }
         else
         {
-            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="SelectPage(this)">
+            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
                 @i
             </div>
         }

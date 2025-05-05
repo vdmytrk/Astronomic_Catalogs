@@ -235,15 +235,15 @@ function updateFixedColumnLeftOffset(): void {
 function adjustTableSize(remInPixels: number): void {
     console.log("FUNCTION: adjustTableSize()");
     const header = document.querySelector(".toFixLayoutHeader") as HTMLElement | null;
-    if (!header) console.log("ATTENTION!!!The header variable is null!");
+    if (!header) { console.log("ATTENTION!!!The header variable is null!") };
     const footer = document.querySelector("footer") as HTMLElement | null;
-    if (!footer) console.log("ATTENTION!!! The footer variable is null!");
+    if (!footer) { console.log("ATTENTION!!! The footer variable is null!") };
     const main = document.querySelector(".main-RenderBody-container") as HTMLElement | null;
-    if (!main) console.log("ATTENTION!!! The main variable is null!");
+    if (!main) { console.log("ATTENTION!!! The main variable is null!") };
     const tableContainer = document.querySelector(".table-set-size") as HTMLElement | null;
-    if (!tableContainer) console.log("ATTENTION!!! The tableContainer variable is null!");
+    if (!tableContainer) { console.log("ATTENTION!!! The tableContainer variable is null!") };
     const pageContent = document.querySelector(".catalogPagesHeader") as HTMLElement | null;
-    if (!pageContent) console.log("ATTENTION!!! The pageContent variable is null!");
+    if (!pageContent) { console.log("ATTENTION!!! The pageContent variable is null!") };
 
     if (!tableContainer || !header || !footer || !main || !pageContent) return;
 
@@ -472,7 +472,7 @@ interface FormData {
     [key: string]: string | string[];
 }
 
-function serializeForm(rootElement: HTMLElement): FormData {
+function serializeForm(rootElement: HTMLElement, pageNumber: string): FormData {
     const data: FormData = {};
 
     // Text inputs, selects (single & multiple), dropdowns
@@ -492,11 +492,15 @@ function serializeForm(rootElement: HTMLElement): FormData {
             }
         } else if (input instanceof HTMLInputElement) {
             if (input.type === 'checkbox') {
+                if (data[name] === undefined) {
+                    data[name] = [];
+                }
+                
                 if (input.checked) {
                     if (!Array.isArray(data[name])) {
                         data[name] = [];
                     }
-                    (data[name] as string[]).push(input.value);
+                    (data[name] as string[]).push(input.value); 
                 }
             } else if (input.type === 'radio') {
                 if (input.checked) {
@@ -526,35 +530,33 @@ function serializeForm(rootElement: HTMLElement): FormData {
         }
     }
 
-    data["PageNumberVaulue"] = "1";
+    data["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
 
     return data;
 }
 
-async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partialSelector: string, spinnerSelector?: string) {
+async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partialSelector: string, pageNumber: string = '1') {
     console.log("FUNCTION: submitFormAndUpdatePartial()");
-    const spinner = spinnerSelector ? document.querySelector(spinnerSelector) : null;
-    // const tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement;
+
     const tableHeader = document.querySelector(partialSelector);
+    const paginationBodyBlock = document.getElementById("paginationBodyBlockContainer");
     let tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement | null;
 
     // 1. Collect form data into JSON
-    const json = serializeForm(form);
+    const json = serializeForm(form, pageNumber); 
     console.log(json);
 
     try {
         // 2. Show spinner
-        if (spinner) {
-            spinner.classList.remove('hidden');
-        } else {
-            console.log(`Adding spinnerHTML.`);
+        console.log(`Adding spinnerHTML.`);
 
-            // Remove the old spinner, if it exists
-            const existingSpinnerTr = document.getElementById("spinnerTr");
-            if (existingSpinnerTr) {
-                existingSpinnerTr.remove();
-            }
+        // Remove the old spinner, if it exists
+        const existingSpinnerTr = document.getElementById("spinnerTr");
+        if (existingSpinnerTr) {
+            existingSpinnerTr.remove();
+        }
 
+        if (tableBody) {
             tableBody.insertAdjacentHTML('afterbegin', createSpinnerHTML());
         }
 
@@ -571,37 +573,46 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
         }
 
         // 5. Receive partial HTML
-        const partialHtml = await response.text();
-        console.log(`response.text: ${partialHtml}`);
+        const data = await response.json();
+        console.log("Fetched data:", data);
 
         // 6. Insert it into the DOM
-        if (tableHeader) {
-            tableHeader.innerHTML = partialHtml;
+        if (tableHeader && data.tableHtml) {
+            tableHeader.innerHTML = data.tableHtml;
         } else {
             console.error(`Partial container with selector "${partialSelector}" not found.`);
         }
+
+        if (paginationBodyBlock && data.paginationHtml) {
+            paginationBodyBlock.innerHTML = data.paginationHtml;
+        } else {
+            console.error(`Partial container with selector "paginationBodyBlockContainer" not found.`);
+        }
+
     } catch (error) {
         console.error('Error submitting form or updating partial:', error);
     } finally {
-        // 7. Hide spinner
-        if (spinner) {
-            spinner.classList.add('hidden');
-        } else {
-            const spinnerTr = document.getElementById("spinnerTr");
-            if (spinnerTr) {
-                spinnerTr.remove();
-            }
+        const spinnerTr = document.getElementById("spinnerTr");
+        if (spinnerTr) {
+            spinnerTr.remove();
         }
     }
 }
 
-function updateCatalogData() {
+function updateCatalogData(catalog: string, pageButton: HTMLElement) {
+    
     const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement;
     if (!form) return;
 
     console.log(form);
 
-    submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable');
+    let pageNumber = '1';
+
+    if (pageButton)
+        pageNumber = pageButton.textContent?.trim() || '1';
+
+    if (catalog === 'NGCICOpendatasofts')
+        submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable', pageNumber);
 }
 
 (window as any).updateCatalogData = updateCatalogData;
