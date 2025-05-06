@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Astronomic_Catalogs.Utils;
-using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Data;
+﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
-using Microsoft.AspNetCore.Authorization;
 using Astronomic_Catalogs.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Astronomic_Catalogs.Utils;
+using Astronomic_Catalogs.ViewModels;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers;
 
@@ -21,11 +16,13 @@ public class NGCICOpendatasoftsController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly INGCICFilterService _filterService;
+    private readonly IMapper _mapper;
 
-    public NGCICOpendatasoftsController(ApplicationDbContext context, INGCICFilterService filterService)
+    public NGCICOpendatasoftsController(ApplicationDbContext context, INGCICFilterService filterService, IMapper mapper)
     {
         _context = context;
         _filterService = filterService;
+        _mapper = mapper;
     }
 
     // GET: Catalogs/NGCICOpendatasofts
@@ -40,7 +37,9 @@ public class NGCICOpendatasoftsController : Controller
             .Take(50)
             .ToListAsync();
 
-        var constellationsTask = await _context.Constellations
+        var catalogViewModels = _mapper.Map<List<NGCICViewModel>>(catalogItems);
+
+        var constellations = await _context.Constellations
             .Select(c => new
             {
                 c.ShortName,
@@ -52,9 +51,9 @@ public class NGCICOpendatasoftsController : Controller
 
 
         ViewBag.RowsCount = countNGCTask + countNGCE_Task;
-        ViewBag.Constellations = constellationsTask;
+        ViewBag.Constellations = constellations;
 
-        return View(catalogItems);
+        return View(catalogViewModels);
     }
 
 
@@ -79,19 +78,20 @@ public class NGCICOpendatasoftsController : Controller
             return NotFound();
         }
 
-        var firstItem = selectedList.FirstOrDefault();
+        var viewModelList = _mapper.Map<List<NGCICViewModel>>(selectedList);
+        var firstItem = viewModelList.FirstOrDefault();
         if (firstItem == null)
         {
             return StatusCode(500, "Unexpected error: filtered list is not empty, but contains no items.");
         }
 
         ViewBag.RowsCount = firstItem.PageCount;
-        ViewBag.PageNumber = firstItem.PageNumber;
+        ViewBag.AmountRowsResult = firstItem.PageNumber; // Using the PageNumber field of the database table to pass a value.
         ViewBag.Contorller = "NGCICOpendatasofts";
 
         try
         {
-            var tableHtml = await this.RenderViewAsync("_NGCICTableHeaders", selectedList, true);
+            var tableHtml = await this.RenderViewAsync("_NGCICTableHeaders", viewModelList, true);
             var paginationHtml = await this.RenderViewAsync("_PaginationLine", null, true);
 
             return Json(new { tableHtml, paginationHtml });
@@ -114,14 +114,11 @@ public class NGCICOpendatasoftsController : Controller
             return NotFound();
         }
 
-        var nGCICOpendatasoft = await _context.NGCIC_Catalog
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (nGCICOpendatasoft == null)
-        {
-            return NotFound();
-        }
+        var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
+        if (entity == null) return NotFound();
 
-        return View(nGCICOpendatasoft);
+        var viewModel = _mapper.Map<NGCICViewModel>(entity);
+        return View(viewModel);
     }
 
     // GET: Catalogs/NGCICOpendatasofts/Create
@@ -130,7 +127,8 @@ public class NGCICOpendatasoftsController : Controller
     [Authorize(Policy = "UsersAccessClaim")]
     public IActionResult Create()
     {
-        return View();
+        var model = new NGCICViewModel();
+        return View(model);
     }
 
     // POST: Catalogs/NGCICOpendatasofts/Create
@@ -141,20 +139,16 @@ public class NGCICOpendatasoftsController : Controller
     [Authorize(Policy = "UsersAccessClaim")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,NGC_IC,Name,SubObject,Messier,Name_UK,Comment,OtherNames," +
-        "NGC,IC,LimitAngDiameter,AngDiameter,ObjectTypeAbrev,ObjectType,ObjectTypeFull,SourceType,RA," +
-        "RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,DEC,Declination,NS,DeclinationD," +
-        "DeclinationM,DeclinationS,Constellation,MajorAxis,MinorAxis,PositionAngle,AppMag,AppMagFlag,BMag," +
-        "VMag,JMag,HMag,KMag,SurfaceBrightness,HubbleOnlyGalaxies,CstarUMag,CstarBMag,CstarVMag,CstarNames," +
-        "CommonNames,NedNotes,OpenngcNotes,Image,PageNumber,PageCount")] NGCICOpendatasoft nGCICOpendatasoft)
+    public async Task<IActionResult> Create(NGCICViewModel viewModel)
     {
         if (ModelState.IsValid)
         {
-            _context.Add(nGCICOpendatasoft);
+            var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
+            _context.Add(entity);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        return View(nGCICOpendatasoft);
+        return View(viewModel);
     }
 
     // GET: Catalogs/NGCICOpendatasofts/Edit/5
@@ -168,12 +162,11 @@ public class NGCICOpendatasoftsController : Controller
             return NotFound();
         }
 
-        var nGCICOpendatasoft = await _context.NGCIC_Catalog.FindAsync(id);
-        if (nGCICOpendatasoft == null)
-        {
-            return NotFound();
-        }
-        return View(nGCICOpendatasoft);
+        var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
+        if (entity == null) return NotFound();
+
+        var viewModel = _mapper.Map<NGCICViewModel>(entity);
+        return View(viewModel);
     }
 
     // POST: Catalogs/NGCICOpendatasofts/Edit/5
@@ -184,39 +177,26 @@ public class NGCICOpendatasoftsController : Controller
     [Authorize(Policy = "UsersAccessClaim")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,NGC_IC,Name,SubObject,Messier,Name_UK,Comment,OtherNames," +
-        "NGC,IC,LimitAngDiameter,AngDiameter,ObjectTypeAbrev,ObjectType,ObjectTypeFull,SourceType,RA," +
-        "RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,DEC,Declination,NS,DeclinationD," +
-        "DeclinationM,DeclinationS,Constellation,MajorAxis,MinorAxis,PositionAngle,AppMag,AppMagFlag,BMag," +
-        "VMag,JMag,HMag,KMag,SurfaceBrightness,HubbleOnlyGalaxies,CstarUMag,CstarBMag,CstarVMag,CstarNames," +
-        "CommonNames,NedNotes,OpenngcNotes,Image,PageNumber,PageCount")] NGCICOpendatasoft nGCICOpendatasoft)
+    public async Task<IActionResult> Edit(int id, NGCICViewModel viewModel)
     {
-        if (id != nGCICOpendatasoft.Id)
-        {
-            return NotFound();
-        }
+        if (id != viewModel.Id) return NotFound();
 
         if (ModelState.IsValid)
         {
             try
             {
-                _context.Update(nGCICOpendatasoft);
+                var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
+                _context.Update(entity);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!NGCICOpendatasoftExists(nGCICOpendatasoft.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!NGCICOpendatasoftExists(viewModel.Id)) return NotFound();
+                else throw;
             }
             return RedirectToAction(nameof(Index));
         }
-        return View(nGCICOpendatasoft);
+        return View(viewModel);
     }
 
     // GET: Catalogs/NGCICOpendatasofts/Delete/5
@@ -230,14 +210,11 @@ public class NGCICOpendatasoftsController : Controller
             return NotFound();
         }
 
-        var nGCICOpendatasoft = await _context.NGCIC_Catalog
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (nGCICOpendatasoft == null)
-        {
-            return NotFound();
-        }
+        var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
+        if (entity == null) return NotFound();
 
-        return View(nGCICOpendatasoft);
+        var viewModel = _mapper.Map<NGCICViewModel>(entity);
+        return View(viewModel);
     }
 
     // POST: Catalogs/NGCICOpendatasofts/Delete/5

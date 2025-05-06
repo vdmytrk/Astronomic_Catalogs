@@ -1,12 +1,12 @@
-﻿namespace Astronomic_Catalogs.Models;
+﻿namespace Astronomic_Catalogs.ViewModels;
 
-public class NGCICOpendatasoft
+public class NGCICViewModel
 {
     public int Id { get; set; }
     public string? NGC_IC { get; set; }
     public int? Name { get; set; }
     public string? SubObject { get; set; }
-    public int? Messier { get; set; }
+    public string? Messier { get; set; }
     public string? Name_UK { get; set; }
     public string? Comment { get; set; }
     public string? OtherNames { get; set; }
@@ -65,5 +65,4 @@ public class NGCICOpendatasoft
     public int? PageNumber { get; set; }
     public int? PageCount { get; set; }
     public string? SourceTable { get; set; }
-
 }

@@ -61,7 +61,9 @@ BEGIN
 			Hubble_OnlyGalaxies, Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names, CommonNames, NedNotes, OpenngcNotes, [Image], SourceTable
 		)
 		VALUES (
-			@NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, @ObjectType, 
+			@NGC_IC, @Name, @SubObject, 
+			CAST(STUFF(@Messier, 1, 1, '') AS INT),
+			@NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, @ObjectType, 
 			@RA, 
 			REPLACE((SELECT RA_H
 					FROM (SELECT ID, VALUE AS RA_H, ROW_NUMBER() OVER (PARTITION BY ID ORDER BY ID) AS RN 

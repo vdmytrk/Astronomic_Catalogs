@@ -5,7 +5,7 @@ module.exports = {
     mode: "production",
     entry: {
         main: "./Scripts/ts/main.ts",
-        theme: "./wwwroot/js/theme.js",
+        theme: "./Scripts/ts/theme.ts",
         NGCICOpendatasoft: "./wwwroot/js/AstroTableFilters.js",
     },
     output: {

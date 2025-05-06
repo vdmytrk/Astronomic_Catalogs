@@ -1,7 +1,7 @@
 ﻿@{
     int rowOnPageCatalog = Convert.ToInt32(ViewBag.RowOnPageCatalog == null ? 50 : ViewBag.RowOnPageCatalog);
     int rowCount = Convert.ToInt32(ViewBag.RowsCount == null ? 10000000 : ViewBag.RowsCount);
-    int pageNumber = Convert.ToInt32(ViewBag.PageNumber == null ? 1 : ViewBag.PageNumber);
+    int amountRowsResult = Convert.ToInt32(ViewBag.AmountRowsResult == null ? 1 : ViewBag.AmountRowsResult);
     int pageCount = (int)Math.Ceiling((double)rowCount / rowOnPageCatalog);
     string controller = ViewBag.Contorller;
 }
@@ -11,17 +11,24 @@
     <input class="ActualPegeNumber1" type="hidden" value="1" />
     @for (var i = 1; i <= pageCount; i++)
     {
-        @if (i < pageCount)
+        @if (i == amountRowsResult)
         {
             <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
-                @i
-                <span class="borderBlock">|</span>
+                <span class="currentPage">@i</span>
+                @if (i < pageCount)
+                {
+                    <span class="borderBlock">|</span>
+                }
             </div>
         }
         else
         {
             <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
                 @i
+                @if (i < pageCount)
+                {
+                    <span class="borderBlock">|</span>
+                }
             </div>
         }
     }

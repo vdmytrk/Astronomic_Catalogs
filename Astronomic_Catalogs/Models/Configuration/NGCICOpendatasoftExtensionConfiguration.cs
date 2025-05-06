@@ -15,7 +15,7 @@ public class NGCICOpendatasoftExtensionConfiguration : IEntityTypeConfiguration<
         builder.Property(e => e.NGC_IC).HasMaxLength(13);
         builder.Property(e => e.Name).HasColumnName("Name"); // The name matches, but "Name" is a reserved word, so explicit specification is appropriate.
         builder.Property(e => e.SubObject).HasMaxLength(15);
-        builder.Property(e => e.Messier).HasMaxLength(15);
+        builder.Property(e => e.Messier).HasDefaultValue(0);
         builder.Property(e => e.Name_UK).HasMaxLength(50);
         builder.Property(e => e.Comment).HasMaxLength(50);
         builder.Property(e => e.OtherNames).HasColumnName("Other_names").HasMaxLength(400);

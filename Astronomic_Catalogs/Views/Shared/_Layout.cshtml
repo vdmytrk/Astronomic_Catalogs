@@ -4,10 +4,17 @@
     <script>
         (function() {
             if (localStorage.getItem("theme") === "dark") {
-                document.documentElement.classList.add("loading");
+                document.documentElement.style.display = "none";
+                document.documentElement.style.backgroundColor = "#121212";
             };
         })();
     </script>
+    @* Solving the white flash of unstyled content (FOUC) problem, but it didn't work.  *@      
+    @*<style>
+        html.dark-theme, body.dark-theme {
+            background-color: #121212;
+        }
+    </style> *@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Astronomic_Catalogs</title>
@@ -87,10 +94,10 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/main.min.js" asp-append-version="true"></script> 
+    <script src="~/js/main.min.js" asp-append-version="true"></script>
+    <script src="~/js/theme.min.js" asp-append-version="true"></script>
     @* <script src="~/js/AstroTableFilters.min.js" asp-append-version="true"></script> *@
     <script src="~/js/AstroTableFilters.js" asp-append-version="true"></script>
-    <script src="~/js/theme.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>

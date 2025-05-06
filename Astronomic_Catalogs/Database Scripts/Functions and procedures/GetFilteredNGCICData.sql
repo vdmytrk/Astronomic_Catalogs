@@ -4,16 +4,15 @@
 -------------------------------------------------------------------------------------------------------------------------------------------
 --==================================================  GET DATA FROM NGCICOpendatasoft  ==================================================--
 -------------------------------------------------------------------------------------------------------------------------------------------
-
 CREATE OR ALTER PROC GetFilteredNGCICData
     @Name NVARCHAR(100) = NULL,
     @Constellations NVARCHAR(MAX) = NULL, 
     @Ang_Diameter_min FLOAT = NULL,
     @Ang_Diameter_max FLOAT = NULL,
-    @RA_From_Hours INT = NULL,
+    @RA_From_Hours INT = NULL, 
     @RA_From_Minutes INT = NULL,
     @RA_From_Seconds FLOAT = NULL,
-    @RA_To_Hours INT = NULL, 
+    @RA_To_Hours INT = NULL,
     @RA_To_Minutes INT = NULL,
     @RA_To_Seconds FLOAT = NULL,
     @Dec_From_Pole CHAR(1) = NULL,
@@ -31,7 +30,8 @@ CREATE OR ALTER PROC GetFilteredNGCICData
     @PageNumber INT = 1,
     @RowOnPage INT = 50
 AS
-BEGIN		
+BEGIN
+	DECLARE @TotalCount INT = 0, @PageCountInResult INT = 0, @Offset INT = 0;
 
     -- For error hendling
 	DECLARE @FuncProc AS VARCHAR(50), 
@@ -41,24 +41,10 @@ BEGIN
 			@FullEerrorMessage NVARCHAR(MAX),
 			@ErrorSeverity INT, 
 			@ErrorState INT;
-	
-    DECLARE @trancount INT;
-    SET @trancount = @@TRANCOUNT; 
 
     SET NOCOUNT ON; 
 
 	BEGIN TRY
-		IF @trancount = 0
-			BEGIN	            
-				BEGIN TRANSACTION GetFilteredNGCICData_Tran;
-			END;
-        ELSE
-			BEGIN
-				COMMIT TRANSACTION GetFilteredNGCICData_Tran;
-				THROW 50001, 'There was an error becose there is more then one open transaction.', 1;
-			END;
-
-		
 		-- Default value blok
 		SET @Dec_From_Pole = ISNULL(@Dec_From_Pole, '-'); 
 		SET @Dec_To_Pole = ISNULL(@Dec_To_Pole, '+');
@@ -86,11 +72,8 @@ BEGIN
 			END;
 
 
-
-
-		DECLARE @Offset INT = (@PageNumber - 1) * @RowOnPage;
-
-		;WITH CTE AS (
+		SELECT * INTO #TemporaryTable
+		FROM (
 			SELECT * FROM NGCICOpendatasoft
 			WHERE
 				(@Name IS NULL OR [Other_names] LIKE '%' + @Name + '%')
@@ -181,56 +164,66 @@ BEGIN
 						OR (@IncludeIC = 1 AND NGC_IC LIKE 'IC%')
 						OR (@IncludeMessier = 1 AND Messier IS NOT NULL AND Messier <> '')
 					)
-				)				
-			) 
+				)
+		) AS SelectedData;
+		
+		
+		SELECT @TotalCount = COUNT(*) FROM #TemporaryTable;
+		SET @PageCountInResult = CEILING(1.0 * @TotalCount / @RowOnPage);
 
+		IF @PageCountInResult = 0
+			BEGIN
+				SET @Offset = 0;
+				SET @PageNumber = 0;
+			END
+		ELSE IF @PageNumber <= @PageCountInResult
+			BEGIN
+				SET @Offset = (@PageNumber - 1) * @RowOnPage;
+			END
+		ELSE 
+			BEGIN -- To return the last available page.
+				SET @Offset = (@PageCountInResult - 1) * @RowOnPage; 
+				SET @PageNumber = @PageCountInResult;
+			END 
 
-		SELECT 
-			Id, NGC_IC, [Name],	SubObject
-			, Messier, Name_UK, Comment, Other_names, NGC, IC
-			, Limit_Ang_Diameter, Ang_Diameter
-			, ObjectTypeAbrev, ObjectType, Object_type, Source_Type
-			, RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S	
-			, [DEC], Declination, NS,	Declination_D, Declination_M, Declination_S
-			, Constellation, MajorAxis, MinorAxis, PositionAngle
-			, App_Mag, App_Mag_Flag
-			, b_mag, v_mag, j_mag, h_mag, k_mag
-			, Surface_Brigthness, Hubble_OnlyGalaxies
-			, Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names
-			, CommonNames, NedNotes, OpenngcNotes
-			, [Image] AS Image
-			, SourceTable		
-			, COUNT(*) OVER() AS [PageCount]
-			, @PageNumber AS PageNumber
-		FROM CTE
-		ORDER BY NGC_IC DESC, [Name]
+		SELECT
+			Id, NGC_IC, [Name], SubObject, Messier,
+			Name_UK, Comment, Other_names, NGC, IC,
+			Limit_Ang_Diameter, Ang_Diameter,
+			ObjectTypeAbrev, ObjectType, Object_type, Source_Type,
+			RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S,
+			[DEC], Declination, NS, Declination_D, Declination_M, Declination_S,
+			Constellation, MajorAxis, MinorAxis, PositionAngle,
+			App_Mag, App_Mag_Flag,
+			b_mag, v_mag, j_mag, h_mag, k_mag,
+			Surface_Brigthness, Hubble_OnlyGalaxies,
+			Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names,
+			CommonNames, NedNotes, OpenngcNotes,
+			[Image] AS Image,
+			SourceTable,
+			COUNT(*) OVER() AS [PageCount],
+			@PageNumber AS PageNumber -- Using the PageNumber field of the database table to pass a value of @PageCountInResult.
+		FROM #TemporaryTable
+		ORDER BY 
+			CASE 
+				WHEN @IncludeNGC = 0 AND @IncludeIC = 0 AND @IncludeMessier = 1 
+				THEN CAST(Messier AS INT)
+			END,
+			CASE 
+				WHEN @IncludeNGC = 1 OR @IncludeIC = 1 OR @IncludeMessier = 0
+				THEN NGC_IC
+			END DESC,
+			CASE 
+				WHEN @IncludeNGC = 1 OR @IncludeIC = 1 OR @IncludeMessier = 0
+				THEN [Name]
+			END
 		OFFSET @Offset ROWS FETCH NEXT @RowOnPage ROWS ONLY;
 
-		COMMIT TRANSACTION GetFilteredNGCICData_Tran;
-
+		DROP TABLE #TemporaryTable;
+		
 	END TRY
 	BEGIN CATCH
 		BEGIN TRY
-			DECLARE @xstate INT;
-			SET @xstate = XACT_STATE(); 
-
-			IF @xstate = -1 
-				BEGIN
-					PRINT 'EXCEPTION STATE: --> IF(1): @xstate = ' + CAST(@xstate AS VARCHAR);
-					ROLLBACK;
-				END;
-			IF @xstate = 1 and @trancount = 0
-				BEGIN
-					PRINT 'EXCEPTION STATE: --> IF(2): @xstate = ' + CAST(@xstate AS VARCHAR) + ', @trancount = ' + CAST(@trancount AS VARCHAR);
-					ROLLBACK;
-				END;
-			IF @xstate = 1 and @trancount > 0				
-				BEGIN
-					PRINT 'EXCEPTION STATE: --> IF(3): @xstate = ' + CAST(@xstate AS VARCHAR) + ', @trancount = ' + CAST(@trancount AS VARCHAR);
-					ROLLBACK TRANSACTION GetFilteredNGCICData_Tran;
-				END;
-				   
-
 			PRINT 'BEGIN CATCH';
 			SET @FuncProc = ERROR_PROCEDURE();
 			SET @Line = ERROR_LINE();
@@ -244,17 +237,16 @@ BEGIN
 			
 			SET @FullEerrorMessage = 'An error occurred in GetFilteredNGCICData: ' +
 				' Error_number: ' + CAST(@ErrorNumber AS VARCHAR(10)) + 
-				' Error_message: ' + CAST(@ErrorMessage AS NVARCHAR(MAX)) + 
+				' Error_message: ' + CAST(@ErrorMessage AS NVARCHAR(MAX)) +
 				' Error_severity: ' + CAST(@ErrorSeverity AS VARCHAR(2)) +
 				' Error_state: ' +  CAST(@ErrorState AS VARCHAR(3)) + 
 				' Error_line: ' + CAST(@Line AS VARCHAR(10));
-
-			THROW 50004, @FullEerrorMessage, 4; 
+			
+			THROW 50004, @FullEerrorMessage, 4;
 		END TRY
 		BEGIN CATCH
-			PRINT 'An error occurred during handling error from GetFilteredNGCICData_Tran transaction: ' + @ErrorMessage;
+			PRINT 'An error occurred during handling error in GetFilteredNGCICData stored procedure: ' + @ErrorMessage;
 		END CATCH
 	END CATCH
 END
-
 

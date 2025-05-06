@@ -6,7 +6,7 @@ public class NGCICOpendatasoftExtension
     public string? NGC_IC { get; set; }
     public int? Name { get; set; }
     public string? SubObject { get; set; }
-    public string? Messier { get; set; }
+    public int? Messier { get; set; }
     public string? Name_UK { get; set; }
     public string? Comment { get; set; }
     public string? OtherNames { get; set; }

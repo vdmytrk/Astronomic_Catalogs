@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Astronomic_Catalogs.Models.NGCICOpendatasoft>
+﻿@model IEnumerable<Astronomic_Catalogs.ViewModels.NGCICViewModel>
 
 <table id="sizeFilterTable" class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size">
     <thead>
@@ -14,7 +14,7 @@
                 @Html.DisplayNameFor(model => model.Messier)
                 <span class="">&#8595;&#8593;</span>
             </th>
-            <th class="Name_UK" title="Other unique name (taken from the NGC2000_UK catalog. Analogous to the Othernames field). THESE TWO FIELDS SHOULD BE MERGED EVENTUALLY!!!">
+            <th class="Name_UK" title="Other unique name (taken from the NGC2000_UK catalog. Analogous to the Othernames field). THESE TWO FIELDS SHOULD BE MERGED EVENTUALLY!!!" hidden>
                 @Html.DisplayNameFor(model => model.Name_UK)*
                 <span class="">&#8595;&#8593;</span>
             </th>

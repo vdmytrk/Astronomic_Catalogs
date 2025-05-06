@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Astronomic_Catalogs.Models.NGCICOpendatasoft>
+﻿@model IEnumerable<Astronomic_Catalogs.ViewModels.NGCICViewModel>
 
 @{
     ViewData["Title"] = "NGC/IC";
@@ -33,7 +33,7 @@
                 <h5 class="pHeader mt-4 p-2">Table fields:</h5>
                 <span class="">   SubObject: @Html.CheckBox("SubObject", true, new { @class = "chb-SubObject", onclick = "toggleCheckbox(this, 'SubObject')" })                                           <span class="borderBlock pe-2">|</span></span>
                 <span class="">   Messier: @Html.CheckBox("Messier", true, new { @class = "chb-Messier", onclick = "toggleCheckbox(this, 'Messier')" })                                                   <span class="borderBlock pe-2">|</span></span>
-                <span class="">   Name UK: @Html.CheckBox("Name_UK", true, new { @class = "chb-Name_UK", onclick = "toggleCheckbox(this, 'Name_UK')" })                                                   <span class="borderBlock pe-2">|</span></span>
+                <span class="">   Name UK: @Html.CheckBox("Name_UK", false, new { @class = "chb-Name_UK", onclick = "toggleCheckbox(this, 'Name_UK')" })                                                   <span class="borderBlock pe-2">|</span></span>
                 <span class="">   Comment: @Html.CheckBox("Comment", true, new { @class = "chb-Comment", onclick = "toggleCheckbox(this, 'Comment')" })                                                   <span class="borderBlock pe-2">|</span></span>
                 <span class="">   Other names: @Html.CheckBox("Other_names", true, new { @class = "chb-Other_names", onclick = "toggleCheckbox(this, 'Other_names')" })                                   <span class="borderBlock pe-2">|</span></span>
                 <span class="">   NGC: @Html.CheckBox("NGC", false, new { @class = "chb-NGC", onclick = "toggleCheckbox(this, 'NGC')" })                                                                  <span class="borderBlock pe-2">|</span></span>
@@ -381,16 +381,12 @@
 </div>
 
 <div id="nGCICTableContainer" class="hideShowColumnTable">
-    @* Попробуй використати унікальний клас для відображення помилки оновлення сторінки. Подібні зміни внеси до id planetsTableContainer *@
     @await Html.PartialAsync("_NGCICTableHeaders", Model)
 </div>
 
 <script>
     window.isAuthenticated = @isAuthenticated.ToString().ToLower();
 </script>
-
-
-
 
 
 

@@ -41,6 +41,7 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddSignalR();
         builder.Services.AddRazorPages();
+        builder.Services.AddAutoMapper(typeof(Program));
 
         var app = builder.Build();
 
