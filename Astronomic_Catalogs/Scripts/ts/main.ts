@@ -507,7 +507,6 @@ function serializeForm(rootElement: HTMLElement, pageNumber: string): FormData {
         }
     });
 
-    console.log("serializeForm (before): ", data);
 
     // Retrieves a boolean value from checkboxes.
     // Boolean values from checkboxes are used in the service that calls the stored procedure to generate a JSON list of selected the Object Types checkboxes.
@@ -668,10 +667,6 @@ function executeCreateNewDateProcedure(): void {
             showAlert("AN ERROR OCCURRED WHEN THE CallCreateNewDateProcedure WAS CALLED. THERE ARE SOME ISSUES ON THE SERVER! PLEASE CONTACT THE ADMINISTRATION.");
         });
 }
-
-
-
-
 
 
 
