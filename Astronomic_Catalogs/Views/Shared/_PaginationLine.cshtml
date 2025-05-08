@@ -11,17 +11,7 @@
     <input class="ActualPegeNumber1" type="hidden" value="1" />
     @for (var i = 1; i <= pageCount; i++)
     {
-        @if (i == amountRowsResult)
-        {
-            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
-                <span class="currentPage">@i</span>
-                @if (i < pageCount)
-                {
-                    <span class="borderBlock">|</span>
-                }
-            </div>
-        }
-        else
+        @if (i != amountRowsResult)
         {
             <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
                 @i
@@ -30,6 +20,23 @@
                     <span class="borderBlock">|</span>
                 }
             </div>
+        }
+        else
+        {
+            @if (rowOnPageCatalog != 500)
+            {
+                <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
+                    <span class="currentPage">@i</span>
+                </div>
+            }
+            else
+            {
+                <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
+                    @i
+                    <span class="borderBlock">|</span>
+                    <span>Row in result: @rowCount</span>
+                </div>
+            }
         }
     }
 </div>

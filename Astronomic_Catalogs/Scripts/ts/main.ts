@@ -21,10 +21,68 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
+
+    /////////////////////////////////////////////
+    /// HIDDEN PAGE ELEMENTS
+    /////////////////////////////////////////////
+    //const filterToggleButton = document.querySelector(".hideFilters");
+
+    setupShowTextBlockToggles();
+    
+
     fixSelectBehavior();
     alertUnauthorizedAccess();
     //updateTableHeaderOffset();
 });
+
+function setupShowTextBlockToggles(): void {
+    //const textBlockToggleButton = document.querySelectorAll<HTMLButtonElement>(".showTextBlockBtn");
+
+    //textBlockToggleButton.forEach(button => {
+    //    button.addEventListener("click", () => {
+
+    document.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains("showTextBlockBtn")) {
+            //const container = button.closest("div");
+            //if (!container) {
+            //    console.log("Block container is not find.");
+            //    return;
+            //} else console.log("Block container is find.");
+
+            //const outerContainer = container.parentElement;
+            //if (!outerContainer) {
+            //    console.log("Block outerContainer is not find.");
+            //    return;
+            //} else console.log("Block outerContainer is find.");
+
+            const rowDiv = target.closest(".row");
+            if (!rowDiv) {
+                console.log("Block rowDiv is not find.")
+                return;
+            } else console.log("Block rowDiv is  find.")
+
+            const hiddenBlock = rowDiv.querySelector(".hiddenBlock") as HTMLElement | null;
+            if (!hiddenBlock) {
+                console.log("Block hiddenBlock is not find.");
+                return;
+            } else console.log("Block hiddenBlock is find.");
+
+            const isHidden = hiddenBlock.hasAttribute("hidden");
+
+            if (isHidden) {
+                console.log("Block hiddenBlock is hidden.");
+                hiddenBlock.removeAttribute("hidden");
+                target.textContent = "Hide";
+            } else {
+                console.log("Block hiddenBlock is not hidden.");
+                hiddenBlock.setAttribute("hidden", "true");
+                target.textContent = "Show";
+            }
+        };
+    });
+}
+
 
 // The metrics functions
 export function setElemSize(): void {
@@ -608,6 +666,9 @@ function updateCatalogData(catalog: string, pageButton: HTMLElement) {
 
     if (catalog === 'NGCICOpendatasofts')
         submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable', pageNumber);
+
+    if (catalog === 'CollinderCatalogs')
+        submitFormAndUpdatePartial(form, '/Catalogs/CollinderCatalogs/Index', '#sizeFilterTable', pageNumber);
 }
 
 (window as any).updateCatalogData = updateCatalogData;

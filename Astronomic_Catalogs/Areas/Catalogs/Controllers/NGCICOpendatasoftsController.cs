@@ -73,20 +73,14 @@ public class NGCICOpendatasoftsController : Controller
             return StatusCode(500, $"Error fetching filtered data: {ex.Message}");
         }
 
-        if (selectedList == null || selectedList.Count == 0)
-        {
+        if (selectedList == null)
             return NotFound();
-        }
 
         var viewModelList = _mapper.Map<List<NGCICViewModel>>(selectedList);
         var firstItem = viewModelList.FirstOrDefault();
-        if (firstItem == null)
-        {
-            return StatusCode(500, "Unexpected error: filtered list is not empty, but contains no items.");
-        }
 
-        ViewBag.RowsCount = firstItem.PageCount;
-        ViewBag.AmountRowsResult = firstItem.PageNumber; // Using the PageNumber field of the database table to pass a value.
+        ViewBag.RowsCount = firstItem?.PageCount ?? 1;
+        ViewBag.AmountRowsResult = firstItem?.PageNumber ?? 0; // Using the PageNumber field of the database table to pass a value.
         ViewBag.Contorller = "NGCICOpendatasofts";
 
         try

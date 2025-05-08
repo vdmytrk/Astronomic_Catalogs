@@ -77,6 +77,7 @@ public class Program
         builder.Services.AddScoped<DatabaseInitializer>();
         builder.Services.AddScoped<IExcelImport, ExcelImportService_OpenXml>();
         builder.Services.AddScoped<INGCICFilterService, NGCICFilterService>();
+        builder.Services.AddScoped<ICollinderFilterService, CollinderFilterService>();
     }
 
     private static IConfiguration LoadConfiguration()

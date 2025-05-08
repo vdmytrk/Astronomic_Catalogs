@@ -2,180 +2,398 @@
 
 @{
     ViewData["Title"] = "Collinder";
+    ViewBag.Contorller = "CollinderCatalogs";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+    var angDiameterValues = Enumerable.Range(0, 351).Select(i => new SelectListItem { Text = i.ToString(), Value = i.ToString() }).ToList();
+    var hoursValues = Enumerable.Range(0, 24).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
+    var minsSecsValues = Enumerable.Range(0, 60).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
+    var degreesValues = Enumerable.Range(0, 90).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
+    var poleOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "-", Text = "S" },
+        new SelectListItem { Value = "+", Text = "N" }
+    };
 }
 
 <div class="catalogPagesHeader">
-    <h1>@ViewData["Title"] catalog.</h1>
+    <div class="row align-items-center">
+        <div class="col">
+            <h1>@ViewData["Title"] catalog</h1>
+        </div>
+        <div class="col-auto ms-auto">
+            <button type="button" class="btn btn-success btn-lg d-inline-block hideFilters">Hide filters</button>
+        </div>
+    </div>
 
-    @if (User.IsInRole("OwnerAdministratorPower"))
-    {
-        <p>
-            <a asp-action="Create">Create New</a>
-        </p>
-    }
+
+    <div class="row">
+        <div class="d-flex align-items-center">
+            <h6 class="mb-0 me-2">THE COLLINDER CATALOG OF OPEN STAR CLUSTERS</h6>
+            <button type="button" class="btn btn-primary permissionAlert showTextBlockBtn">
+                Show
+            </button>
+        </div>
+        <div class="hiddenBlock mb-4" hidden>
+            <p class="pTitle">An Observer’s Checklist</p>
+            <p>In 2004 a puzzle presented by a star chart notation sent me off on what, for many months, seemed like the proverbial wild goose chase. Persistence and a good deal of luck, however, eventually led me to the solution to the puzzle, and to the creation of this observer’s checklist.</p>
+            <p>Like many of you, I have a fondness for the Coathanger, a curious and well-named asterism. I first became aware of its existence while using a copy of Dickinson’s Nightwatch as I reacquainted myself with the night sky. Not long afterward I picked up a copy of the 19th edition of the Norton’s Star Atlas and Reference Handbook and found, where the Coathanger should be, the designation “Cr.399.”   What, I wondered, did the letters “Cr” stand for?   In this age of instant access to all manner of information, I soon learned that the notation referred to a catalog of open star clusters created by a Swedish astronomy graduate student – Per Arne Collinder – for  his 1931 doctoral dissertation. (“On Structural Properties of Open Clusters and Their Spatial Distribution.”)   Web searches and conventional digging around in the library brought limited results. I came across a reference to the fact that Collinder had gone on to become, not an astronomer, but something of an authority on navigation. I also found that many studies of stars and star clusters (to this day) cite Collinder’s dissertation as a reference. He may have become a mystery to amateur astronomers, but his work was obviously of use to someone. Nothing else about this admittedly minor character in the history of astronomy was forthcoming. No copies of Collinder’s dissertation existed in the local university library, so I was unable to see the catalog, much less read the man’s findings with regards to this class of deep sky objects. I’d come to a dead end, my curiosity far from satisfied.</p>
+            <p>I really hate when that happens.</p>
+            <p>Astronomy writer Nancy Thomas, in the Winter 2005 issue of Amateur Astronomy magazine, published an essay on Collinder that rekindled my interest in his catalog. Like me, she had been sent on her quest, years ago, by the “Cr.399” notation for the Coathanger. However, she had done substantially better in her efforts to learn about Collinder, coming up with a photocopy of his catalog (reproduced by the US Naval Observatory directly from his dissertation) and an obituary that, when translated, provided a nutshell account of the man’s life. (See “Per Collinder and His Catalog,” by Nancy Thomas; Amateur Astronomy #48, Winter 2005.)   At the end of her essay, Ms. Thomas expressed the hope that amateur astronomers would take up the challenge of using Collinder’s catalog as an observing list. This seemed a vain hope, without a copy of the catalog. I wrote Nancy a letter to congratulate her on her findings, express appreciation for publishing her results, and to say that I would be interested in taking up the challenge if I could trouble her for a copy of the catalog. This, she was most happy to do, and in a couple of weeks a photocopy of it arrived in my mailbox.</p>
+            <p>To say I was pleased by this turn of events would be an understatement. I studied the catalog and soon came to the realization that, in its original form, the catalog was of little use to the amateur observer. It contained out-dated coordinates, incorrect NGC and IC numbers (often through no fault of the author), and data that was just plain obscure from the perspective of the average backyard observer. The idea occurred to convert this document into a more streamlined form that might appeal to those who have an interest in both astronomy and history, and so I set to work updating the catalog in a spreadsheet. This turned into a larger task than I expected, especially when I set about finding correct NGC numbers for the objects. To accomplish this, and to provide modern coordinate information, I came to rely heavily on the Historically Corrected New General Catalogue  Ver 1.02 (available on line) and the book Star Clusters by Brent A. Archinal and Steven J. Hynes (Willmann-Bell). No observer of deep sky objects should remain unacquainted with these references.</p>
+            <p>As I was working my way through the process of making the conversion, a chance came my way, in the summer of 2006, to see Collinder’s dissertation in its entirety. A spur of the moment search with Google Scholar, followed up by a call to the folks at the University of Arizona interlibrary loan program, put a copy of the seventy-five year old tome in my hands for a few weeks. It was an interesting read, written as it was in a more personable and human style than we see used in professional science journals and dissertations these days.   Of greatest interest was the collection of notes that followed the catalog, in which Collinder discusses the individual objects he decided to include in his research. Holding that old dissertation in my hands, after trying for so long to find out anything at all about its author, was a very satisfying experience. The search had come full circle.</p>
+            <p>Although the majority of the open clusters used by Collinder for his research were objects discovered by other observers over the ages, a significant number of these objects were recognized for what they are for the first time by Collinder, himself. It is for this reason, of course, that the “Cr” designation that sent me on my quest remains on star charts today. The catalog as a whole is a catalog in its own right in that it is a compilation of data on a specific class of objects (open clusters) assembled to facilitate a study of the characteristics of those objects. But whatever use Collinder – and those who came after him – made of this catalog, we now have the option, thanks in large part to the detective work of Nancy Thomas, of using this large collection of objects as resource for our enjoyment of the night sky. I hope this version of it does indeed prove to be user friendly enough to guide you to many worthwhile encounters with the open star clusters of the Milky Way galaxy.</p>
+            <p class="pTitle">Using the Updated Collinder Catalog</p>
+            <p>As you observe these objects through the eyepiece it might be interesting to keep in mind that Collinder apparently never saw the majority of the clusters he listed directly with his own eyes. Much, if not most, of his work was done using photographic plates taken from a variety of observatories. Because he used this approach, a significant number of the clusters in his catalog are objects out of reach of northern hemisphere observers. That seems fair enough, when you consider that a comparable number are invisible to observers in the south. The checklist has been left in the original order according to each object’s Cr.number, just as Collinder published it, with no attempt made to sort according to the prospective observer’s latitude.</p>
+            <p>Most of the clusters in the Collinder Catalog are objects suited to telescopes of various sizes. Some require high magnification, others a low power wide field eyepiece. Some are best viewed with binoculars, or even with the naked eye. If nothing else, Collinder’s catalog clearly illustrates that open star clusters represent a highly diverse set of deep sky objects.</p>
+            <p>The following is an explanation of the column headings of the checklist derived from Collinder’s catalog.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="d-flex align-items-center">
+            <h6 class="mb-0 me-2">NOTE</h6>
+            <button type="button" class="btn btn-primary permissionAlert showTextBlockBtn">
+                Show
+            </button>
+        </div>
+        <div class="hiddenBlock mb-4" hidden>
+            <p><span class="pTitle">Cr.#</span> - The catalog number assigned by Collinder to each object included in his study.</p>
+            <p><span class="pTitle">NGC/Other Cat</span> - Provides connections to the more general resources from which Collinder derived his list of open clusters. Not all of these designations were included in Collinder’s original catalog. They are added here to allow for easier cross referencing with modern resources. In a few cases Collinder got an NGC/IC number wrong, and where the erroneous number might be found in other references, this has been noted. Also, some of his designations, while correct in their time, are seldom used these days. A few of these, such as that for the Coathanger asterism (4-5 Vul)) have been retained as curiosities.</p>
+            <p><span class="pTitle">Con</span> - The constellation in which the object is found.</p>
+            <p><span class="pTitle">RA and DEC</span> - The celestial coordinates of the objects according to the Historically Corrected New General Catalogue (HCNGC) v1.02. The coordinates listed in Collinder’s dissertation are from the early 1900s and are not reproduced in this checklist. (See original catalog.)</p>
+            <p><span class="pTitle">M (v/p)</span> - Estimates of the apparent magnitudes of these clusters, either visual (v) or photographic (p) taken from such sources as NSOG, the SEDS website, and Archinal & Hynes, and The Historically Corrected New General Catalogue (HCNGC) v.1.02. The magnitudes recorded by Collinder often do not agree with modern sources. (See original catalog.)</p>
+            <p><span class="pTitle"># Stars</span> - Estimates of the number of stars contained within star clusters, determined by the examination of photographic plates. Most of these counts are by Collinder. Where he did not provide a number one was substituted from other (usually more recent) sources, as indicated by a number in parenthesis. This segregation was done in order to help maintain some sense of what Collinder measured in his work, while still providing useful information to modern observers. Although these numbers can be useful for giving the observer some sense for the cluster’s nature, always bear in mind that the number of stars seen will be strongly influenced by aperture and conditions.</p>
+            <p><span class="pTitle">Size '</span> - Modern estimates of angular size  –  in arc minutes  –  taken from sources such as The Historically Corrected New General Catalogue (HCNGC) v.1.02 and The Night Sky Observer’s Guide (NSOG) by Kepple and Sanner.</p>
+            <p><span class="pTitle">Class</span> - A classification system used to describe clusters by comparing them to typical and well known clusters as examples. Classifications of this sort from both Collinder and Lundmark (his doctoral advisor) are included in the original catalog, but only Collinder’s assessment (which in the overwhelming majority of cases is the same as Lundmark’s) are used for this list. This system of descriptive classification is included partly for the historical insight it provides into how these objects were seen by the researcher involved, and also because they might offer an aid to the identification of objects when they are found.</p>
+            <p><span class="pTitle">Plei</span> = Pleiades (M45)</p>
+            <p><span class="pTitle">Praes</span> = Praesepe (M44)</p>
+            <p><span class="pTitle">μ Norm</span> = mu Normae Cluster (NGC 6169)</p>
+            <p><span class="pTitle">Glob</span> = resembled a globular cluster</p>
+            <p><span class="pTitle">Chain</span> = string-like asterism</p>
+            <p><span class="pTitle">Neb</span> = appears nebulous, or contains nebulosity</p>
+            <p><span class="pTitle">nl</span> = none listed</p>
+            <p><span class="pTitle">Notes (n)</span> = Useful information that it is hoped provides some clarification of discrepancies between Collinder’s sources and those currently in use.</p>
+        </div>
+    </div>
     <p hidden>
         Різниця в розмірах між каталогом Колінджера та NGC 2000 пов'язана з тим, що Колінджер рахував розмір об'єкту лише по зірках, а в NGC 2000 розмір може включати туманність та інші об'єкти або навпаки, не включати якісь зірки.
     </p>
     <p>
-        The difference in sizes between the Collinder catalog and NGC 2000 is due to the fact that Collinder calculated the object's size based only on stars, whereas in NGC 2000, the size may include the nebula and other objects, or conversely, may exclude some stars.
+        * The difference in sizes between the Collinder catalog and NGC 2000 is due to the fact that Collinder calculated the object's size based only on stars, whereas in NGC 2000, the size may include the nebula and other objects, or conversely, may exclude some stars.
     </p>
+
+
+    <div class="restrictedWrapper">
+        <div class="allTopMenuFilters restrictedBlock">
+            <div class="fieldsCheckBoks">
+                <h5 class="pHeader mt-4 p-2">Table fields:</h5>
+                <span class="">   Constellation: @Html.CheckBox("Constellation", true, new { @class = "chb-Constellation", onclick = "toggleCheckbox(this, 'Constellation')" })                           <span class="borderBlock pe-2">|</span></span>
+                <span class="">   Right Ascension: @Html.CheckBox("RightAscension", true, new { @class = "chb-RightAscension", onclick = "toggleCheckbox(this, 'RightAscension')" })                      <span class="borderBlock pe-2">|</span></span>
+                <span class="">   Declination: @Html.CheckBox("Declination", true, new { @class = "chb-Declination", onclick = "toggleCheckbox(this, 'Declination')" })                                   <span class="borderBlock pe-2">|</span></span>
+                <span class="">   AppMag: @Html.CheckBox("AppMag", true, new { @class = "chb-AppMag", onclick = "toggleCheckbox(this, 'AppMag')" })                                                       <span class="borderBlock pe-2">|</span></span>
+                <span class="">   AppMag Flag: @Html.CheckBox("AppMagFlag", true, new { @class = "chb-AppMagFlag", onclick = "toggleCheckbox(this, 'AppMagFlag')" })                                      <span class="borderBlock pe-2">|</span></span>
+                <span class="">   Count Stars: @Html.CheckBox("CountStars", true, new { @class = "chb-CountStars", onclick = "toggleCheckbox(this, 'CountStars')" })                                      <span class="borderBlock pe-2">|</span></span>
+                <span class="">   CountStars to finding: @Html.CheckBox("CountStarsToFinding", true, new { @class = "chb-CountStarsToFinding", onclick = "toggleCheckbox(this, 'CountStarsToFinding')" }) <span class="borderBlock pe-2">|</span></span>
+                <span class="">   Ang Diameter: @Html.CheckBox("AngDiameter", true, new { @class = "chb-AngDiameter", onclick = "toggleCheckbox(this, 'AngDiameter')" })                                  <span class="borderBlock pe-2">|</span></span>
+                <span class="">   AngDiameterNew: @Html.CheckBox("AngDiameterNew", true, new { @class = "chb-AngDiameterNew", onclick = "toggleCheckbox(this, 'AngDiameterNew')" })                       <span class="borderBlock pe-2">|</span></span>
+                <span class="">   Class: @Html.CheckBox("Class", true, new { @class = "chb-Class", onclick = "toggleCheckbox(this, 'Class')" })                                                           <span class="borderBlock pe-2">|</span></span>
+                <span class="">   Comment: @Html.CheckBox("Comment", true, new { @class = "chb-Comment", onclick = "toggleCheckbox(this, 'Comment')" })                                                   <span class="borderBlock pe-2">|</span></span>
+            </div>
+            <div class="marginButton">
+                <button type="button" class="btn btn-primary selectAllFieldsCheckBox">
+                    Show all fields
+                </button>
+                <button type="button" class="btn btn-primary deselectAllFieldsCheckBox">
+                    Hide all fields
+                </button>
+            </div>
+
+            <!---------------------------------------------------------------------->
+            <!-----------------------------    FORM    ----------------------------->
+            <!---------------------------------------------------------------------->
+            <div class="topMenuFiltersCatalogs">
+                <div>
+                    <h5 class="pHeader mt-4 p-2">Objects filters:</h5>
+                    <div class="row m-0">
+                        <div class="col-6" style="min-width: 40rem;">
+
+                            <div class="filter-grid" style="width: 40rem;">
+                                <div class="filter-row">
+                                    <span class="label fw-bold">Name Other Catalogs:</span>
+                                    <div class="filter-fields">
+                                        @Html.TextBox("Name", "", new { @class = "text-Name w-100" })
+                                    </div>
+                                </div>
+                                <div class="filter-row mt-3">
+                                    <span class="label fw-bold">Constellation:</span>
+                                    <div class="filter-fields">
+                                        <select id="constellationSelect" name="constellations" class="form-select" style="height: 10rem;" multiple>
+                                            @foreach (var item in ViewBag.Constellations)
+                                            {
+                                                <option value="@item.ShortName">
+                                                    @item.ShortName — @item.LatineNameNominativeCase | @item.EnglishName | @item.UkraineName
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="dropdown pt-3 text-center">
+                                <button class="btn btn-secondary dropdown-toggle w-100" style="max-width: 30rem" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select constellation
+                                </button>
+                                <div class="constallationSelectTableWindow dropdown-menu p-0" style="width: 44rem; max-height: 20rem; overflow-y: auto;">
+                                    <table class="table constallationSelectTable table-bordered table-sm m-0" style="font-family: 'JetBrains Mono', monospace">
+                                        <thead class="table-light position-sticky top-0">
+                                            <tr>
+                                                <th style="width: 2rem;">✓</th>
+                                                <th style="width: 4rem;">Abbr.</th>
+                                                <th style="width: 11rem;">Lat. (Nom.)</th>
+                                                <th style="width: 11rem;">Eng.</th>
+                                                <th style="width: 14rem;">Urk.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in ViewBag.Constellations)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" name="constellations" value="@item.ShortName" />
+                                                    </td>
+                                                    <td>@item.ShortName</td>
+                                                    <td>@item.LatineNameNominativeCase</td>
+                                                    <td>@item.EnglishName</td>
+                                                    <td>@item.UkraineName</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="filter-grid" style="max-width: 90rem;">
+                                @********************************************************************************************************@
+                                <!--°-->
+                                <div class="filter-row">
+                                    <div class="label fw-bold">New angle diameter:</div>
+                                    <div class="filter-fields row">
+                                        <!-- FROM -->
+                                        <div class="col-6">
+                                            <div class="fw-semibold">from:</div>
+                                            <div class="row g-1">
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Ang_Diameter_New_min", new SelectList(angDiameterValues, "Value", "Text", "0"), new { @class = "form-select text-Ang_Diameter_New_min", id = "Ang_Diameter_New_min", data_default = "0" })
+                                                        Arcminute ( ' )
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TO -->
+                                        <div class="col-6">
+                                            <div class="fw-semibold">to:</div>
+                                            <div class="row g-1">
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Ang_Diameter_New_max", new SelectList(angDiameterValues, "Value", "Text", "350"), new { @class = "form-select text-Ang_Diameter_New_max", id = "Ang_Diameter_New_max", data_default = "350" })
+                                                        Arcminute  ( ' )
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @********************************************************************************************************@
+                                <!--RA - 0h 8m 27.05s-->
+                                <div class="filter-row">
+                                    <div class="label fw-bold">Right Ascension (RA):</div>
+                                    <div class="filter-fields row g-2 align-items-center">
+                                        <!-- FROM -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">from:</div>
+                                            <div class="row g-1">
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_From_Hours", new SelectList(hoursValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Hours", data_default = "00" })
+                                                        h
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_From_Minutes", new SelectList(minsSecsValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Minutes", data_default = "00" })
+                                                        m
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_From_Seconds", new SelectList(minsSecsValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Seconds", data_default = "00" })
+                                                        s
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TO -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">to:</div>
+                                            <div class="row g-1">
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_To_Hours", new SelectList(hoursValues, "Value", "Text", "23"), new { @class = "form-select", id = "RA_To_Hours", data_default = "23" })
+                                                        h
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_To_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "RA_To_Minutes", data_default = "59" })
+                                                        m
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_To_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "RA_To_Seconds", data_default = "59" })
+                                                        s
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @********************************************************************************************************@
+                                <!--DEC - 27° 40' 42.1"-->
+                                <div class="filter-row mt-3">
+                                    <div class="label fw-bold">Declination (DEC):</div>
+                                    <div class="filter-fields row g-2 align-items-center">
+                                        <!-- FROM -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">from:</div>
+                                            <div class="row g-1">
+                                                <div class="col" style="min-width: 4rem">
+                                                    <div class="flex-wrap text-center">
+                                                        @Html.DropDownList("Dec_From_Pole", new SelectList(poleOptions, "Value", "Text", "-"), new { @class = "form-select text-center", id = "Dec_From_Pole", data_default = "-" })
+                                                        Pole
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_From_Degrees", new SelectList(degreesValues, "Value", "Text", "89"), new { @class = "form-select", id = "Dec_From_Degrees", data_default = "89" })
+                                                        °
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_From_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_From_Minutes", data_default = "59" })
+                                                        '
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_From_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_From_Seconds", data_default = "59" })
+                                                        "
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TO -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">to:</div>
+                                            <div class="row g-1">
+                                                <div class="col" style="min-width: 4rem">
+                                                    <div class="flex-wrap text-center">
+                                                        @Html.DropDownList("Dec_To_Pole", new SelectList(poleOptions, "Value", "Text", "+"), new { @class = "form-select text-center", id = "Dec_To_Pole", data_default = "+" })
+                                                        Pole
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_To_Degrees", new SelectList(degreesValues, "Value", "Text", "89"), new { @class = "form-select", id = "Dec_To_Degrees", data_default = "89" })
+                                                        °
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_To_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_To_Minutes", data_default = "59" })
+                                                        '
+                                                    </div>
+                                                </div>
+                                                <div class="col" style="min-width: 5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_To_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_To_Seconds", data_default = "59" })
+                                                        "
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @********************************************************************************************************@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="line"></div>
+                <div class="m-0">
+                    <h5 class="pHeader mt-4 p-2">Objects class:</h5>
+                    <div class="responsiveColumnsContainer">
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("μNorm", false, new { @class = "type-Norm" })    μ Norm</span> — Resembles the cluster μ Normae (NGC 6169), but with uncertainty.</p> <!--схоже на скупчення μ Normae (NGC 6169), але з невизначеністю.-->
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Chain", false, new { @class = "type-Chain" })   Chain</span> — Stars are arranged in a chain-like or linear formation.</p> <!--зорі розташовані у вигляді ланцюжка або лінії.-->
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Glob", false, new { @class = "type-Glob" })     Glob</span> — The cluster resembles a globular cluster in appearance.</p> <!-- скупчення нагадує кулясте скупчення-->
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Neb", false, new { @class = "type-Neb" })       Neb</span> — The cluster appears nebulous or is embedded in a nebula.</p> <!--скупчення виглядає туманним або містить туманність.-->
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Neb?", false, new { @class = "type-Neb?" })     Neb?</span> — Possibly associated with a nebula, but this is uncertain.</p> <!--можливо, містить туманність, але це не підтверджено.-->
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("nl", false, new { @class = "type-nl" })         nl</span> — No classification listed (stands for “none listed”).</p> <!--немає вказаної класифікації (від англ. none listed).-->
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Plei", false, new { @class = "type-Plei" })     Plei</span> — Resembles the Pleiades (M45): bright, compact, and well-defined.</p> <!--схоже на Плеяди (M45), тобто компактне та яскраве скупчення.-->
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Praes", false, new { @class = "type-Praes" })   Praes</span> —  Resembles the Beehive Cluster (Praesepe, M44): more spread out and loose.</p> <!--схоже на скупчення Вулик (Praesepe, M44), тобто більш розсіяне.-->
+                    </div>
+                </div>
+
+                <div class="line"></div>
+                <h5 class="pHeader mt-4 p-2">Additional:</h5>
+                <div class="row" style="margin: 0 !important;">
+                    <div class="col-6">
+                        <div class="d-flex flex-wrap align-items-center">
+                            <h6 class="pe-2">Number of elements on the page:</h6>
+                            @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50", "100", "All" }, "50"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "50" })
+                        </div>
+                    </div>
+                </div>
+                <div class="marginButton">
+                    <button type="button" id="" class="btn btn-danger " style="margin: 0.5rem" onclick="updateCatalogData('@ViewBag.Contorller')">
+                        APPLY FILTERS
+                    </button>
+                    <button type="button" class="btn btn-primary resetObjectSelection" style="margin: 0.5rem" onclick="resetObjectSelection()">
+                        Reset object selection
+                    </button>
+                    <button type="button" class="btn btn-primary " style="margin: 0.5rem" onclick="resetAllFilters()">
+                        Reset all filters
+                    </button>
+                </div>
+            </div>
+            <!------------------------------------------------------------------------>
+            <!-----------------------------   END FORM   ----------------------------->
+            <!------------------------------------------------------------------------>
+
+        </div>
+    </div>
+
+
+
+    <div id="paginationBodyBlockContainer">
+        @await Html.PartialAsync("_PaginationLine")
+    </div>
+
 </div>
 
-<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size">
-    <thead>
-        <tr class="tr-oun-style">
-            <th>
-                @Html.DisplayNameFor(model => model.NamberName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NameOtherCat)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Constellation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscension)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscensionH)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscensionM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscensionS)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Declination)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NS)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeclinationD)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeclinationM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeclinationS)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AppMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AppMagFlag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CountStars)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CountStarsToFinding)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AngDiameter)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AngDiameterNew)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Class)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Comment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PageNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PageCount)
-            </th>
-            @if (User.IsInRole("OwnerAdministratorPower"))
-            {
-                <th></th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NamberName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NameOtherCat)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Constellation)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscension)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscensionH)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscensionM)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscensionS)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Declination)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NS)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DeclinationD)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DeclinationM)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DeclinationS)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AppMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AppMagFlag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CountStars)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CountStarsToFinding)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AngDiameter)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AngDiameterNew)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Class)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Comment)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PageNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PageCount)
-                </td>
-                @if (User.IsInRole("OwnerAdministratorPower"))
-                {
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                }
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="collinderTableContainer" class="hideShowColumnTable">
+    @await Html.PartialAsync("_CollinderTable", Model)
+</div>
+
+<script>
+    window.isAuthenticated = @isAuthenticated.ToString().ToLower();
+</script>

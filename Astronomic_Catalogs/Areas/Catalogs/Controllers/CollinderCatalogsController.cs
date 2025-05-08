@@ -10,6 +10,10 @@ using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.RegularExpressions;
+using Astronomic_Catalogs.Utils;
+using Astronomic_Catalogs.ViewModels;
+using Astronomic_Catalogs.Services.Interfaces;
+using AutoMapper;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
 {
@@ -17,25 +21,84 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
     public class CollinderCatalogsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICollinderFilterService _filterService;
 
-        public CollinderCatalogsController(ApplicationDbContext context)
+        public CollinderCatalogsController(ApplicationDbContext context, ICollinderFilterService filterService)
         {
             _context = context;
+            _filterService = filterService;
         }
 
         // GET: Catalogs/CollinderCatalogs
         public async Task<IActionResult> Index()
         {
             var data = await _context.CollinderCatalog.ToListAsync();
+            var count = data.Count;
 
             var sorted = data
                 .OrderBy(x => ExtractLeadingNumber(x.NamberName))
-                .ThenBy(x => x.NamberName) // For identical numbers, sort by the rest of the string
+                .ThenBy(x => x.NamberName)
+                .Take(50)
                 .ToList();
+
+            var constellations = await _context.Constellations
+            .Select(c => new
+            {
+                c.ShortName,
+                c.LatineNameNominativeCase,
+                c.EnglishName,
+                c.UkraineName
+            })
+            .ToListAsync();
+
+
+            ViewBag.RowsCount = count;
+            ViewBag.Constellations = constellations;
 
             return View(sorted);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
+        {            
+            string rowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
+            ViewBag.RowOnPageCatalog = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
+
+            List<CollinderCatalog> selectedList;
+
+            try
+            {
+                selectedList = await _filterService.GetFilteredDataAsync(parameters);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error fetching filtered data: {ex.Message}");
+            }
+
+            if (selectedList == null)
+                return NotFound();
+
+            var firstItem = selectedList.FirstOrDefault();
+
+            ViewBag.RowsCount = firstItem?.PageCount ?? 1;
+            ViewBag.AmountRowsResult = firstItem?.PageNumber ?? 0; // Using the PageNumber field of the database table to pass a value.
+            ViewBag.Contorller = "CollinderCatalogs";
+
+            try
+            {
+                var tableHtml = await this.RenderViewAsync("_CollinderTable", selectedList, true);
+                var paginationHtml = await this.RenderViewAsync("_PaginationLine", null, true);
+
+                return Json(new { tableHtml, paginationHtml });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"RenderViewAsync error: {ex.Message}");
+            }
+        }
+
+
+        #region Optional methods
         // GET: Catalogs/CollinderCatalogs/Details/5
         [Authorize(Roles = RoleNames.Admin)]
         [Authorize(Policy = "AdminPolicy")]
@@ -180,6 +243,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
         private bool CollinderCatalogExists(int id)
         {

@@ -1,0 +1,161 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Models.CollinderCatalog>
+
+
+<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size">
+    <thead>
+        <tr class="tr-oun-style">
+            <th class="NamberName">
+                @Html.DisplayNameFor(model => model.NamberName)
+            </th>
+            <th class="NameOtherCat">
+                @Html.DisplayNameFor(model => model.NameOtherCat)
+            </th>
+            <th class="Constellation">
+                @Html.DisplayNameFor(model => model.Constellation)
+            </th>
+            <th class="RightAscension">
+                @Html.DisplayNameFor(model => model.RightAscension)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.RightAscensionH)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.RightAscensionM)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.RightAscensionS)
+            </th>
+            <th class="Declination">
+                @Html.DisplayNameFor(model => model.Declination)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.NS)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.DeclinationD)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.DeclinationM)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.DeclinationS)
+            </th>
+            <th class="AppMag">
+                @Html.DisplayNameFor(model => model.AppMag)
+            </th>
+            <th class="AppMagFlag">
+                @Html.DisplayNameFor(model => model.AppMagFlag)
+            </th>
+            <th class="CountStars">
+                @Html.DisplayNameFor(model => model.CountStars)
+            </th>
+            <th class="CountStarsToFinding">
+                @Html.DisplayNameFor(model => model.CountStarsToFinding)
+            </th>
+            <th class="AngDiameter">
+                @Html.DisplayNameFor(model => model.AngDiameter)
+            </th>
+            <th class="AngDiameterNew">
+                @Html.DisplayNameFor(model => model.AngDiameterNew)
+            </th>
+            <th class="Class">
+                @Html.DisplayNameFor(model => model.Class)
+            </th>
+            <th class="Comment">
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.PageNumber)
+            </th>
+            <th hidden>
+                @Html.DisplayNameFor(model => model.PageCount)
+            </th>
+            @if (User.IsInRole("OwnerAdministratorPower"))
+            {
+                <th>Admin functionality</th>
+            }
+        </tr>
+    </thead>
+    <tbody id="catalogTableBody">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NamberName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NameOtherCat)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Constellation)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RightAscension)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.RightAscensionH)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.RightAscensionM)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.RightAscensionS)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Declination)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.NS)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.DeclinationD)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.DeclinationM)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.DeclinationS)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AppMag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AppMagFlag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CountStars)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CountStarsToFinding)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AngDiameter)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AngDiameterNew)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Class)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.PageNumber)
+                </td>
+                <td hidden>
+                    @Html.DisplayFor(modelItem => item.PageCount)
+                </td>
+                @if (User.IsInRole("OwnerAdministratorPower"))
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+

@@ -6,6 +6,7 @@ module.exports = {
     entry: {
         main: "./Scripts/ts/main.ts",
         theme: "./Scripts/ts/theme.ts",
+        scriptTS: "./Scripts/ts/scriptTS.ts",
         NGCICOpendatasoft: "./wwwroot/js/AstroTableFilters.js",
     },
     output: {

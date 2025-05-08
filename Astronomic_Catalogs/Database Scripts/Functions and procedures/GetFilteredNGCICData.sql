@@ -94,7 +94,7 @@ BEGIN
 				)
 				AND (
 					((Right_ascension_H * 3600 + Right_ascension_M * 60 + Right_ascension_S) BETWEEN @RA_From AND @RA_To)
-					OR (RA = '')
+					OR RA = ''
 				)
 				AND (
 					(((Declination_D * 3600 + Declination_M * 60 + Declination_S) * CASE WHEN NS = '-' THEN -1 ELSE 1 END)
