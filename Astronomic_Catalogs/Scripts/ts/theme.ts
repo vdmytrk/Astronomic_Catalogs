@@ -1,79 +1,65 @@
-﻿/// <reference types="jquery" />
-import { setElemSize } from "./main";
-
-document.addEventListener("DOMContentLoaded", function () {
-    const body = document.body;
-    body.style.display = "none"; 
-    const themeToggle = document.getElementById("theme-toggle") as HTMLElement | null;
+﻿//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+export function initialize(body: HTMLElement): void {
     const inputs = document.querySelectorAll(".form-control") as NodeListOf<HTMLInputElement>;
+    const themeButton = document.getElementById("theme-toggle") as HTMLElement | null;
 
-    if (localStorage.getItem("theme") === "dark") {
-        body.classList.add("dark-theme");
-    }
-
-    // Set a delay on page load.
-    window.addEventListener("load", function () {
-        showBody(body);
-    });
-
-    // Click handler for theme switching.
-    themeToggle?.addEventListener("click", function () {
-        if (!body) {
-            console.error(`The body page was not found!`);
-            return;
-        }
-
-        body.style.display = "none";
-        body.classList.toggle("dark-theme");
-        localStorage.setItem("theme", body.classList.contains("dark-theme") ? "dark" : "light");
-
-        
-        if (localStorage.getItem("theme") === "dark") {
-            document.documentElement.style.backgroundColor = "#121212";
-            document.addEventListener("DOMContentLoaded", () => {
-                document.body.style.backgroundColor = "#121212";
-            });
-            window.addEventListener("load", () => {
-                document.body.style.backgroundColor = "#121212";
-            });
-        } else {
-            document.documentElement.style.backgroundColor = "#FFFFFF";
-            document.addEventListener("DOMContentLoaded", () => {
-                document.body.style.backgroundColor = "#FFFFFF";
-            });
-            window.addEventListener("load", () => {
-                document.body.style.backgroundColor = "#FFFFFF";
-            });
-        };
-
-        showBody(body);
-
-        // Style for HTMLInputElement
-        if (!inputs) return;
-        refreshAutofillStyles(inputs);
-        forceAutofillFix(inputs);
-        forceAutofillReRender(inputs);
-    });
+    updateThemeBackground(body);
+    themeToggle(themeButton, inputs, body);
+    fixSelectBehavior();
 
     // Updating autofill styles on page load.
-    if (!inputs) return;
-    refreshAutofillStyles(inputs);
-    forceAutofillFix(inputs);
-});
-
-
-function showBody(body: HTMLElement) {
-    setTimeout(() => {
-        body.style.display = "block";
-        document.documentElement.style.display = "block";
-
-        setElemSize();
-    }, 50);
+    if (inputs) {
+        updateAutofill(inputs);
+    }
 }
+
+function themeToggle(themeButton: HTMLElement, inputs: NodeListOf<HTMLInputElement>, body: HTMLElement): void {
+    if (themeButton) {
+        themeButton.addEventListener("click", () => {
+            //body.style.display = "none";
+            body.classList.toggle("dark-theme");
+            localStorage.setItem("theme", body.classList.contains("dark-theme") ? "dark" : "light");
+
+            updateThemeBackground(body);
+
+            if (inputs) {
+                updateAutofill(inputs);
+            }
+        });
+    };
+}
+
+function updateThemeBackground(body: HTMLElement): void {
+    const updateBodyBg = () => {
+        const isDark = localStorage.getItem("theme") === "dark";
+        const bg = isDark ? "#121212" : "#FFF";
+
+        if (isDark) {
+            body.classList.add("dark-theme");
+        }
+
+        document.documentElement.style.backgroundColor = bg;
+        body.style.backgroundColor = bg;
+    };
+
+    updateBodyBg();
+    window.addEventListener("load", updateBodyBg); // For the planet-grphic page where the background changes after load.
+}
+
+
 
 /////////////////////////////////////////////
 // Style for HTMLInputElement
 /////////////////////////////////////////////
+// Change the style of autofilled browser fields
+function updateAutofill(inputs: NodeListOf<HTMLInputElement>): void {
+    if (!inputs) return;
+    refreshAutofillStyles(inputs);
+    forceAutofillFix(inputs);
+    forceAutofillReRender(inputs);
+}
+
 // Forced autofill update.
 function refreshAutofillStyles(inputs: NodeListOf<HTMLInputElement>): void {
     console.log("🔄 Forced autofill update.");
@@ -119,3 +105,71 @@ function forceAutofillReRender(inputs: NodeListOf<HTMLInputElement>): void {
         input.classList.add("force-repaint");
     });
 }
+
+
+
+/////////////////////////////////////////////
+// Elements behavior
+/////////////////////////////////////////////
+// To solve problem with the background color of selected items in browser.
+// Used in:
+//      Admin:
+//          Role: Create, Edit;
+//          User: Create, Edit;
+function fixSelectBehavior(): void {
+    let selects: NodeListOf<HTMLSelectElement> = document.querySelectorAll("select.form-select"); // Can be used with "select.form-control"
+
+    selects.forEach(select => {
+        if (!select.multiple) return;
+
+        let selectedValues: Set<string> = new Set();
+
+
+        for (let option of Array.from(select.options)) {
+            if (option.hasAttribute("selected") || option.selected) {
+                selectedValues.add(option.value);
+                option.selected = true;
+                option.classList.add("selected-fix");
+            }
+        }
+
+        select.addEventListener("change", function () {
+            for (let option of Array.from(select.options)) {
+                if (option.selected) {
+                    selectedValues.add(option.value);
+                    option.classList.add("selected-fix");
+                } else {
+                    selectedValues.delete(option.value);
+                    option.classList.remove("selected-fix");
+                }
+            }
+        });
+
+        select.addEventListener("mousedown", function (event: MouseEvent) {
+            event.preventDefault();
+
+            let target = event.target as HTMLElement;
+
+            if (target.tagName === "OPTION") {
+                let option = target as HTMLOptionElement;
+
+                if (selectedValues.has(option.value)) {
+                    selectedValues.delete(option.value);
+                    option.selected = false;
+                    option.classList.remove("selected-fix");
+                } else {
+                    selectedValues.add(option.value);
+                    option.selected = true;
+                    option.classList.add("selected-fix");
+                }
+            }
+
+            return false; // Prevents selected values ​​from "disappearing"
+        });
+    });
+};
+
+
+
+
+

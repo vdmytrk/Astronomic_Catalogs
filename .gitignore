@@ -395,24 +395,26 @@ Astronomic_Catalogs/wwwroot/less/site.less
 
 # js + typescript
 Astronomic_Catalogs/wwwroot/js/*.js.map
-Astronomic_Catalogs/wwwroot/js/main.js
-Astronomic_Catalogs/wwwroot/js/mainC.js
-Astronomic_Catalogs/wwwroot/js/site.js
-Astronomic_Catalogs/wwwroot/js/site.min.js
-Astronomic_Catalogs/wwwroot/js/theme.js
-Astronomic_Catalogs/wwwroot/js/theme_old.js
-Astronomic_Catalogs/wwwroot/js/themeC.js
-Astronomic_Catalogs/wwwroot/js/themeC_old.js
-Astronomic_Catalogs/Scripts/ts/themeC.ts
-Astronomic_Catalogs/Scripts/ts/mainC.ts
-Astronomic_Catalogs/wwwroot/js/main.js
+Astronomic_Catalogs/wwwroot/js/alertOfSwal.js
 Astronomic_Catalogs/wwwroot/js/AstroTableFilters.js
+Astronomic_Catalogs/wwwroot/js/behavior.js
+Astronomic_Catalogs/wwwroot/js/formHandler.js
+Astronomic_Catalogs/wwwroot/js/main.js
+Astronomic_Catalogs/wwwroot/js/metrics.js
+Astronomic_Catalogs/wwwroot/js/progresImportBar.js
+Astronomic_Catalogs/wwwroot/js/scriptTS.js
+Astronomic_Catalogs/wwwroot/js/theme.js
 
-/Astronomic_Catalogs/wwwroot/js/NGCICOpendatasoft.min.js
-/Astronomic_Catalogs/Scripts/ts/main - Copy.ts
-/Astronomic_Catalogs/Scripts/ts/theme - Copy.ts
-/Astronomic_Catalogs/Scripts/ts/scriptTS.ts
-/Astronomic_Catalogs/wwwroot/js/main - Copy.js
-/Astronomic_Catalogs/wwwroot/js/theme - Copy.js
-/Astronomic_Catalogs/wwwroot/js/scriptTS.js
-/Astronomic_Catalogs/wwwroot/js/scriptTS.min.js
+Astronomic_Catalogs/wwwroot/js/themeC.js
+Astronomic_Catalogs/Scripts/ts/themeC.ts
+
+Astronomic_Catalogs/wwwroot/js/development.js
+Astronomic_Catalogs/wwwroot/js/development.min.js
+Astronomic_Catalogs/Scripts/ts/development.ts
+Astronomic_Catalogs/wwwroot/js/scriptTSC.js
+Astronomic_Catalogs/wwwroot/js/scriptTSC.min.js
+Astronomic_Catalogs/Scripts/ts/scriptTSC.ts
+Astronomic_Catalogs/wwwroot/js/mainCO.js
+Astronomic_Catalogs/wwwroot/js/mainCO.min.js
+Astronomic_Catalogs/Scripts/ts/mainCO.ts
+

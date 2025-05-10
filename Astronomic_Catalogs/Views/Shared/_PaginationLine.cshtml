@@ -13,7 +13,7 @@
     {
         @if (i != amountRowsResult)
         {
-            <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
+            <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
                 @i
                 @if (i < pageCount)
                 {
@@ -25,14 +25,14 @@
         {
             @if (rowOnPageCatalog != 500)
             {
-                <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
-                    <span class="currentPage">@i</span>
-                </div>
+                <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
+        <span class="currentPage">@i</span>
+    </div>
             }
             else
             {
-                <div class="page_@i paginationCell d-inline-block" value="@i" onclick="updateCatalogData('@controller', this)">
-                    @i
+                <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
+                    <span class="currentPage">@i</span>
                     <span class="borderBlock">|</span>
                     <span>Row in result: @rowCount</span>
                 </div>

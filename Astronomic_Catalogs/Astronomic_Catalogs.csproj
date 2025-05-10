@@ -41,8 +41,14 @@
 
 	<ItemGroup>
 		<Content Include="Scripts\ts\**\*.ts" />
-		<TypeScriptCompile Remove="Scripts\ts\mainC.ts" />
-		<TypeScriptCompile Remove="Scripts\ts\theme - ChatGPT.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\alertOfSwal.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\behavior.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\development.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\formHandler.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\mainCO.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\metrics.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\progresImportBar.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\scriptTSC.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\theme.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\themeC.ts" />
 		<None Update="NLog.config.Release.xml">

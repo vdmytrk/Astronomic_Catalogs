@@ -30,12 +30,12 @@
 
     <div class="row">
         <div class="d-flex align-items-center">
-            <h6 class="mb-0 me-2">THE COLLINDER CATALOG OF OPEN STAR CLUSTERS</h6>
-            <button type="button" class="btn btn-primary permissionAlert showTextBlockBtn">
+            <h6 class="mb-0 ms-3">THE COLLINDER CATALOG OF OPEN STAR CLUSTERS</h6>
+            <button type="button" class="btn btn-primary permissionAlert showTextBlockBtn ms-4">
                 Show
             </button>
         </div>
-        <div class="hiddenBlock mb-4" hidden>
+        <div class="hiddenBlock collapsed mb-4">
             <p class="pTitle">An Observer’s Checklist</p>
             <p>In 2004 a puzzle presented by a star chart notation sent me off on what, for many months, seemed like the proverbial wild goose chase. Persistence and a good deal of luck, however, eventually led me to the solution to the puzzle, and to the creation of this observer’s checklist.</p>
             <p>Like many of you, I have a fondness for the Coathanger, a curious and well-named asterism. I first became aware of its existence while using a copy of Dickinson’s Nightwatch as I reacquainted myself with the night sky. Not long afterward I picked up a copy of the 19th edition of the Norton’s Star Atlas and Reference Handbook and found, where the Coathanger should be, the designation “Cr.399.”   What, I wondered, did the letters “Cr” stand for?   In this age of instant access to all manner of information, I soon learned that the notation referred to a catalog of open star clusters created by a Swedish astronomy graduate student – Per Arne Collinder – for  his 1931 doctoral dissertation. (“On Structural Properties of Open Clusters and Their Spatial Distribution.”)   Web searches and conventional digging around in the library brought limited results. I came across a reference to the fact that Collinder had gone on to become, not an astronomer, but something of an authority on navigation. I also found that many studies of stars and star clusters (to this day) cite Collinder’s dissertation as a reference. He may have become a mystery to amateur astronomers, but his work was obviously of use to someone. Nothing else about this admittedly minor character in the history of astronomy was forthcoming. No copies of Collinder’s dissertation existed in the local university library, so I was unable to see the catalog, much less read the man’s findings with regards to this class of deep sky objects. I’d come to a dead end, my curiosity far from satisfied.</p>
@@ -53,12 +53,12 @@
 
     <div class="row">
         <div class="d-flex align-items-center">
-            <h6 class="mb-0 me-2">NOTE</h6>
-            <button type="button" class="btn btn-primary permissionAlert showTextBlockBtn">
+            <h6 class="mb-0 ms-3">NOTE</h6>
+            <button type="button" class="btn btn-primary permissionAlert showTextBlockBtn ms-4">
                 Show
             </button>
         </div>
-        <div class="hiddenBlock mb-4" hidden>
+        <div class="hiddenBlock collapsed mb-4">
             <p><span class="pTitle">Cr.#</span> - The catalog number assigned by Collinder to each object included in his study.</p>
             <p><span class="pTitle">NGC/Other Cat</span> - Provides connections to the more general resources from which Collinder derived his list of open clusters. Not all of these designations were included in Collinder’s original catalog. They are added here to allow for easier cross referencing with modern resources. In a few cases Collinder got an NGC/IC number wrong, and where the erroneous number might be found in other references, this has been noted. Also, some of his designations, while correct in their time, are seldom used these days. A few of these, such as that for the Coathanger asterism (4-5 Vul)) have been retained as curiosities.</p>
             <p><span class="pTitle">Con</span> - The constellation in which the object is found.</p>
@@ -77,13 +77,14 @@
             <p><span class="pTitle">Notes (n)</span> = Useful information that it is hoped provides some clarification of discrepancies between Collinder’s sources and those currently in use.</p>
         </div>
     </div>
-    <p hidden>
-        Різниця в розмірах між каталогом Колінджера та NGC 2000 пов'язана з тим, що Колінджер рахував розмір об'єкту лише по зірках, а в NGC 2000 розмір може включати туманність та інші об'єкти або навпаки, не включати якісь зірки.
-    </p>
-    <p>
-        * The difference in sizes between the Collinder catalog and NGC 2000 is due to the fact that Collinder calculated the object's size based only on stars, whereas in NGC 2000, the size may include the nebula and other objects, or conversely, may exclude some stars.
-    </p>
-
+    <div class="ms-3">
+        <p hidden>
+            Різниця в розмірах між каталогом Колінджера та NGC 2000 пов'язана з тим, що Колінджер рахував розмір об'єкту лише по зірках, а в NGC 2000 розмір може включати туманність та інші об'єкти або навпаки, не включати якісь зірки.
+        </p>
+        <p>
+            * The difference in sizes between the Collinder catalog and NGC 2000 is due to the fact that Collinder calculated the object's size based only on stars, whereas in NGC 2000, the size may include the nebula and other objects, or conversely, may exclude some stars.
+        </p>
+    </div>
 
     <div class="restrictedWrapper">
         <div class="allTopMenuFilters restrictedBlock">
@@ -364,7 +365,7 @@
                     </div>
                 </div>
                 <div class="marginButton">
-                    <button type="button" id="" class="btn btn-danger " style="margin: 0.5rem" onclick="updateCatalogData('@ViewBag.Contorller')">
+                    <button type="button" id="" class="btn btn-danger applyFiltersBtn" style="margin: 0.5rem" data-controller="@ViewBag.Contorller">
                         APPLY FILTERS
                     </button>
                     <button type="button" class="btn btn-primary resetObjectSelection" style="margin: 0.5rem" onclick="resetObjectSelection()">
@@ -395,5 +396,5 @@
 </div>
 
 <script>
-    window.isAuthenticated = @isAuthenticated.ToString().ToLower();
+    window.isAuthenticated = @(isAuthenticated.ToString().ToLower());
 </script>
