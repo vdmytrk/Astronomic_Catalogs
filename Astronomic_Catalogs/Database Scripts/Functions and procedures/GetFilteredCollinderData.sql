@@ -48,7 +48,11 @@ BEGIN
 		SET @Dec_To_Pole = ISNULL(@Dec_To_Pole, '+');
 		SET @NameOtherCat = NULLIF(@NameOtherCat, '');
 		SET @Ang_Diameter_min = ISNULL(@Ang_Diameter_min, 0);
-		SET @Ang_Diameter_max = ISNULL(@Ang_Diameter_max, 350);
+		SET @Ang_Diameter_max = 
+			CASE 
+				WHEN @Ang_Diameter_max IS NULL OR @Ang_Diameter_max >= 350 THEN 1000
+				ELSE @Ang_Diameter_max
+			END;
 		SET @PageNumber = ISNULL(@PageNumber, 1);
 		SET @RowOnPage = ISNULL(@RowOnPage, 50);
 		
@@ -88,7 +92,7 @@ BEGIN
 			)
 			AND (
 				[Ang_Diameter_Max] <= CAST(@Ang_Diameter_max AS FLOAT)
-				OR (@Ang_Diameter_max = 300 AND [Ang_Diameter_Max] IS NULL)
+				OR (@Ang_Diameter_max = 1000 AND [Ang_Diameter_Max] IS NULL)
 			)
 			AND (
 				((Right_ascension_H * 3600 + Right_ascension_M * 60 + Right_ascension_S) BETWEEN @RA_From AND @RA_To)

@@ -416,6 +416,7 @@ public class DatabaseInitializer
         await ExecuteCreateTableSqlScriptsAsync();
         await ExecuteInsertDataSqlScriptsAsync();
         await ExecuteCreateProcedureFunctionSqlScriptsAsync();
+        await ExecuteInsertDataSqlByStoredProcedureAsync();
     }
 
     /// <summary>
@@ -452,7 +453,6 @@ public class DatabaseInitializer
         await ExecuteSqlScriptIfNeededAsync("Data/Constellation.sql", nameof(initStatus.Is_Constellation_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarily.sql", nameof(initStatus.Is_NGC2000_UKTemporarily_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog_Temporarily.sql", nameof(initStatus.Is_CollinderCatalog_Temporarily_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog.sql", nameof(initStatus.Is_CollinderCatalog_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_TemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_TemporarilySource_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_ExtensionTemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_ExtensionTemporarilySource_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGCICOpendatasoft_Source.sql", nameof(initStatus.Is_NGCICOpendatasoft_Source_Executed), initStatus);
@@ -461,13 +461,29 @@ public class DatabaseInitializer
     private async Task ExecuteCreateProcedureFunctionSqlScriptsAsync()
     {
         await ExecuteSqlScriptAsync($"Functions and procedures/Log_NLogAddLogApplicationCode.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/InsertCollinderCatalog.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/InsertNGCICOpendatasoft.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/InsertNGCICOpendatasoft_Extension.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_Cursor.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_While.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/GetFilteredNGCICData.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/GetFilteredCollinderData.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/GetActualDate.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/CreateNewDate.sql");
+    }
+
+    private async Task ExecuteInsertDataSqlByStoredProcedureAsync()
+    {
+        var initStatus = await _context.DatabaseInitialization.FirstOrDefaultAsync(x => x.Id == 1);
+
+        if (initStatus == null)
+        {
+            initStatus = new DatabaseInitialization { };
+            _context.DatabaseInitialization.Add(initStatus);
+            await _context.SaveChangesAsync();
+        }
+
+        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog.sql", nameof(initStatus.Is_CollinderCatalog_Executed), initStatus);
     }
     #endregion
 

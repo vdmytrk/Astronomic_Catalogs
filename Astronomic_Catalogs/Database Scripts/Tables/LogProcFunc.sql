@@ -15,7 +15,7 @@ BEGIN
 	CREATE TABLE LogProcFunc (
 		[Id] INT NOT NULL IDENTITY,
 		[Time] DATETIME DEFAULT GETUTCDATE(),
-		[FuncProc] VARCHAR(100) DEFAULT NULL, 
+		[FuncProc] NVARCHAR(100) DEFAULT NULL, 
 		[Line] INT DEFAULT 0,  
 		[ErrorNumber] INT DEFAULT 0, 
 		[ErrorSeverity] INT, 
