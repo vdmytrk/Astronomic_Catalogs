@@ -17,7 +17,6 @@ function initialize(body) {
 function themeToggle(themeButton, inputs, body) {
     if (themeButton) {
         themeButton.addEventListener("click", () => {
-            //body.style.display = "none";
             body.classList.toggle("dark-theme");
             localStorage.setItem("theme", body.classList.contains("dark-theme") ? "dark" : "light");
             updateThemeBackground(body);
@@ -93,7 +92,7 @@ function forceAutofillReRender(inputs) {
     });
 }
 /////////////////////////////////////////////
-// Elements behavior
+// Style for the selected element of the multiselect list.
 /////////////////////////////////////////////
 // To solve problem with the background color of selected items in browser.
 // Used in:

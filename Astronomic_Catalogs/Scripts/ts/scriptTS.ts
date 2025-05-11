@@ -1,5 +1,4 @@
-﻿/// <reference types="jquery" />
-import * as Behavior from "./behavior";
+﻿import * as Behavior from "./behavior";
 import * as FormHandler from "./formHandler";
 import * as Main from "./main";
 import * as ProgresImportBar from "./progresImportBar";

@@ -25,7 +25,6 @@ function updateOnResizeElement() {
             resizeTimeout = window.setTimeout(() => {
                 isLayoutUpdating = true;
                 handleTable(remInPixels);
-                distributeItemsIntoColumns(".responsiveColumnsContainer", remInPixels);
                 isLayoutUpdating = false;
             }, 100); 
         });
@@ -40,27 +39,28 @@ function updateOnResizeWindow() {
     window.addEventListener("resize", () => {
         let remInPixels: number = parseFloat(getComputedStyle(document.documentElement).fontSize);
         handleTable(remInPixels);
-        distributeItemsIntoColumns(".responsiveColumnsContainer", remInPixels);
     });
 }
 
 function onWindowLoad(remInPixels: number) {
     window.addEventListener("load", () => {
         handleTable(remInPixels);
-        distributeItemsIntoColumns(".responsiveColumnsContainer", remInPixels);
     });
 }
 
 function handleTable(remInPixels: number): void {
     updateFixedColumnLeftOffset();
     adjustTableSize(remInPixels);
+    distributeItemsIntoColumns(".responsiveColumnsContainer", remInPixels);
     //updateTableHeaderOffset();
 }
 
 
+/////////////////////////////////////////////
+// Table block
+/////////////////////////////////////////////
 // Setting left offset for the 2nd and subsequent fixed columns:
 function updateFixedColumnLeftOffset(): void {
-    console.log("FUNCTION: updateFixedColumnLeftOffset()");
     const fixedColumns = 2;
     let offset = 0;
 
@@ -85,19 +85,12 @@ function updateFixedColumnLeftOffset(): void {
     }
 }
 
-// Table size adjustment function:
 function adjustTableSize(remInPixels: number): void {
-    console.log("FUNCTION: adjustTableSize()");
     const header = document.querySelector(".toFixLayoutHeader") as HTMLElement | null;
-    if (!header) { console.log("ATTENTION!!!The header variable is null!") };
     const footer = document.querySelector("footer") as HTMLElement | null;
-    if (!footer) { console.log("ATTENTION!!! The footer variable is null!") };
     const main = document.querySelector(".main-RenderBody-container") as HTMLElement | null;
-    if (!main) { console.log("ATTENTION!!! The main variable is null!") };
     const tableContainer = document.querySelector(".table-set-size") as HTMLElement | null;
-    if (!tableContainer) { console.log("ATTENTION!!! The tableContainer variable is null!") };
     const pageContent = document.querySelector(".catalogPagesHeader") as HTMLElement | null;
-    if (!pageContent) { console.log("ATTENTION!!! The pageContent variable is null!") };
 
     if (!tableContainer || !header || !footer || !main || !pageContent) return;
 
@@ -155,7 +148,7 @@ function updateTableHeaderOffset(): void {
 }
 
 
-
+/////////////////////////////////////////////
 // Block allocation for the maximum number of columns
 function distributeItemsIntoColumns(containerSelector: string, remInPixels: number, minColumnWidth: number = (remInPixels * 26)) {
     const container = document.querySelector(containerSelector);

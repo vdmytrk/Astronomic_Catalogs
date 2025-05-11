@@ -363,6 +363,19 @@
                             @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50", "100", "All" }, "50"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "50" })
                         </div>
                     </div>
+                    <div class="col-6">
+                        <div class="d-flex flex-wrap">
+                            <div class="me-3">Fix the column width: </div>
+                            <label class="switchButton">
+                                <input type="checkbox" checked>
+                                <span class="slider">
+                                    @* In testing:                                        
+                                    <span class="text-on">ON</span>
+                                    <span class="text-off">OFF</span> *@
+                                </span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="marginButton">
                     <button type="button" id="" class="btn btn-danger applyFiltersBtn" style="margin: 0.5rem" data-controller="@ViewBag.Contorller">

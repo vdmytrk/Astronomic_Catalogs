@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<Astronomic_Catalogs.Models.CollinderCatalog>
 
 
-<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size">
-    <thead>
+<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size astroCatalogTable setColumnWidth">
+    <thead id="CollinderCatalogTableHeader">
         <tr class="tr-oun-style">
             <th class="NamberName">
                 @Html.DisplayNameFor(model => model.NamberName)

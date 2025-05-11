@@ -113,8 +113,6 @@ function serializeForm(rootElement: HTMLElement, pageNumber: string): FormData {
 }
 
 async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partialSelector: string, pageNumber: string = '1') {
-    console.log("FUNCTION: submitFormAndUpdatePartial()");
-
     const tableHeader = document.querySelector(partialSelector);
     const paginationBodyBlock = document.getElementById("paginationBodyBlockContainer");
     let tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement | null;

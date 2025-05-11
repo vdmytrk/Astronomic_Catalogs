@@ -1,7 +1,8 @@
 ﻿@model IEnumerable<Astronomic_Catalogs.ViewModels.NGCICViewModel>
 
-<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size">
-    <thead>
+    @* table-toFixColumns-1 - КЛАС ЯКИЙ ОБМЕЖУЄ ШИРИНУ КОЛОНОК*@
+<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size astroCatalogTable setColumnWidth">
+    <thead id="NGCICOpendatasoftTableHeader">
         <tr class="tr-oun-style">
             <th class="Name">
                 @Html.DisplayNameFor(model => model.Name)
