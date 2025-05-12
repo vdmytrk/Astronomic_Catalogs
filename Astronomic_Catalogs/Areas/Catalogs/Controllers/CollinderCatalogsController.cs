@@ -64,7 +64,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             string rowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
             ViewBag.RowOnPageCatalog = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
 
-            List<CollinderCatalog> selectedList;
+            List<CollinderCatalog>? selectedList;
 
             try
             {

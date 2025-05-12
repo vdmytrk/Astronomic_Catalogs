@@ -3,6 +3,7 @@ using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using System.Text.Json;
 
 namespace Astronomic_Catalogs.Services;
@@ -10,13 +11,15 @@ namespace Astronomic_Catalogs.Services;
 public class CollinderFilterService : ICollinderFilterService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICacheService _cache;
 
-    public CollinderFilterService(ApplicationDbContext context)
+    public CollinderFilterService(ApplicationDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
 
-    public async Task<List<CollinderCatalog>> GetFilteredDataAsync(Dictionary<string, object> parameters)
+    public async Task<List<CollinderCatalog>?> GetFilteredDataAsync(Dictionary<string, object> parameters)
     {
         string? nameOtherCat = parameters.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() : null;
         var constellationsJson = parameters.TryGetValue("constellations", out var obj)
@@ -55,8 +58,12 @@ public class CollinderFilterService : ICollinderFilterService
         int? rowOnPage = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
 
 
-        var result = await _context.CollinderCatalog
-            .FromSqlInterpolated($@"
+        string cacheKey = parameters.ToCacheKey("CollinderData");
+
+        return await _cache.GetOrAddAsync(cacheKey, async () =>
+        {
+            var result = await _context.CollinderCatalog
+                .FromSqlInterpolated($@"
                 EXEC GetFilteredCollinderData 
                     @NameOtherCat = {nameOtherCat},
                     @Constellations = {constellationsJson},
@@ -79,11 +86,12 @@ public class CollinderFilterService : ICollinderFilterService
                     @ObjectTypes = {objectTypesJson},
                     @PageNumber = {pageNumber},
                     @RowOnPage = {rowOnPage}
-            ")
-            .AsNoTracking()
-            .ToListAsync();
+                ")
+                .AsNoTracking()
+                .ToListAsync();
 
-        return result;
+            return result;
+        });
     }
 
 }

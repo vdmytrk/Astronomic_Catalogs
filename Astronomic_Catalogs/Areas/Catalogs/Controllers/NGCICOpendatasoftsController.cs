@@ -62,7 +62,7 @@ public class NGCICOpendatasoftsController : Controller
     {
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
 
-        List<NGCICOpendatasoft> selectedList;
+        List<NGCICOpendatasoft>? selectedList;
 
         try
         {

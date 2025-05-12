@@ -42,6 +42,7 @@ public class Program
         builder.Services.AddSignalR();
         builder.Services.AddRazorPages();
         builder.Services.AddAutoMapper(typeof(Program));
+        builder.Services.AddMemoryCache();
 
         var app = builder.Build();
 
@@ -78,6 +79,7 @@ public class Program
         builder.Services.AddScoped<IExcelImport, ExcelImportService_OpenXml>();
         builder.Services.AddScoped<INGCICFilterService, NGCICFilterService>();
         builder.Services.AddScoped<ICollinderFilterService, CollinderFilterService>();
+        builder.Services.AddScoped<ICacheService, StoredPprocedureCacheService>();
     }
 
     private static IConfiguration LoadConfiguration()

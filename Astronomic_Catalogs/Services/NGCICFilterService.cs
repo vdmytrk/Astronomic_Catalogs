@@ -10,13 +10,15 @@ namespace Astronomic_Catalogs.Services;
 public class NGCICFilterService : INGCICFilterService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICacheService _cache;
 
-    public NGCICFilterService(ApplicationDbContext context)
+    public NGCICFilterService(ApplicationDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
 
-    public async Task<List<NGCICOpendatasoft>> GetFilteredDataAsync(Dictionary<string, object> parameters)
+    public async Task<List<NGCICOpendatasoft>?> GetFilteredDataAsync(Dictionary<string, object> parameters)
     {
         string? name = parameters.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() : null;
         var constellationsJson = parameters.TryGetValue("constellations", out var obj)
@@ -59,7 +61,12 @@ public class NGCICFilterService : INGCICFilterService
         int? pageNumber = parameters.GetInt("PageNumberVaulue");
         int? rowOnPage = parameters.GetInt("RowOnPageCatalog");
 
-        var result = await _context.NGCIC_Catalog
+
+        string cacheKey = parameters.ToCacheKey("CollinderData");
+
+        return await _cache.GetOrAddAsync(cacheKey, async () =>
+        {
+            var result = await _context.NGCIC_Catalog
             .FromSqlInterpolated($@"
                 EXEC GetFilteredNGCICData 
                     @Name = {name},
@@ -90,7 +97,8 @@ public class NGCICFilterService : INGCICFilterService
             .AsNoTracking()
             .ToListAsync();
 
-        return result;
+            return result;
+        });
     }
 
 }
