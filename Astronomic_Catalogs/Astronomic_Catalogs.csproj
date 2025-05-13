@@ -49,6 +49,7 @@
 		<TypeScriptCompile Remove="Scripts\ts\metrics.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\progresImportBar.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\scriptTSC.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\telescopeViewCalculator.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\theme.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\themeC.ts" />
 		<None Update="NLog.config.Release.xml">
