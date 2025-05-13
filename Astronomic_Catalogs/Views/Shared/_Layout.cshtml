@@ -41,7 +41,7 @@
                                 Telescopes
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="" asp-action="">Field of View Calculator</a></li>
+                                <li><a class="dropdown-item" asp-area="TelescopeTools" asp-controller="TelescopeViewCalculator" asp-action="Index">Field of View Calculator</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
@@ -94,13 +94,10 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    @* <script src="~/js/main.min.js" asp-append-version="true"></script>
-    <script src="~/js/theme.min.js" asp-append-version="true"></script> *@
     <script src="~/js/scriptTS.min.js" asp-append-version="true"></script>
     <script src="~/js/development.min.js" asp-append-version="true"></script>
-    @* <script src="~/js/AstroTableFilters.min.js" asp-append-version="true"></script> *@
-    <script src="~/js/AstroTableFilters.js" asp-append-version="true"></script>
+    <script src="~/js/AstroTableFilters.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
+    @await RenderSectionAsync("ScriptsTelescopViewCalculator", required: false)
 </body>
 </html>
