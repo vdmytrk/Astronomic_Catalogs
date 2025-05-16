@@ -9,6 +9,8 @@ using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Services;
+using Astronomic_Catalogs.Utils;
+using System.Linq.Expressions;
 
 namespace Astronomic_Catalogs.Areas.Planets.Controllers;
 
@@ -17,23 +19,75 @@ public class PlanetsCatalogController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly IExcelImport _excelImportService;
-    private readonly IImportCancellationService _importCancellationService; 
+    private readonly IImportCancellationService _importCancellationService;
+    private readonly IPlanetFilterService _filterService;
 
     public PlanetsCatalogController(
-        ApplicationDbContext context, 
+        ApplicationDbContext context,
         IExcelImport excelImport_OpenXml,
-        IImportCancellationService importCancellationService)
+        IImportCancellationService importCancellationService,
+        IPlanetFilterService filterService
+        )
     {
         _context = context;
         _excelImportService = excelImport_OpenXml;
         _importCancellationService = importCancellationService;
+        _filterService = filterService;
     }
 
     // GET: Planets/PlanetsCatalog
     public async Task<IActionResult> Index()
     {
-        return View(await _context.PlanetsCatalog.Take(300).ToListAsync());
+        var count = await _context.PlanetsCatalog.CountAsync();
+        ViewBag.RowsCount = count;
+
+        ViewBag.PlanetNames = await GetDistinctSelectListAsync(c => c.PlLetter);
+        ViewBag.TelescopNames = await GetDistinctSelectListAsync(c => c.DiscTelescope);
+        ViewBag.DiscoveryMethod = await GetDistinctSelectListAsync(c => c.DiscoveryMethod);
+
+        return View(await _context.PlanetsCatalog.Take(10).ToListAsync());
     }
+
+
+    [HttpPost]
+    public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
+    {
+        string rowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
+        ViewBag.RowOnPageCatalog = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
+
+        List<NASAExoplanetCatalog>? selectedList;
+
+        try
+        {
+            selectedList = await _filterService.GetFilteredDataAsync(parameters);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error fetching filtered data: {ex.Message}");
+        }
+
+        if (selectedList == null)
+            return NotFound();
+
+        var firstItem = selectedList.FirstOrDefault();
+
+        ViewBag.RowsCount = firstItem?.PageCount ?? 1;
+        ViewBag.AmountRowsResult = firstItem?.PageNumber ?? 0; // Using the PageNumber field of the database table to pass a value.
+        ViewBag.Contorller = "PlanetsCatalog";
+
+        try
+        {
+            var tableHtml = await this.RenderViewAsync("_CollinderTable", selectedList, true);
+            var paginationHtml = await this.RenderViewAsync("_PaginationLine", null, true);
+
+            return Json(new { tableHtml, paginationHtml });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"RenderViewAsync error: {ex.Message}");
+        }
+    }
+
 
     // GET: Planets/PlanetsCatalog/Details/5
     public async Task<IActionResult> Details(int? id)
@@ -245,5 +299,20 @@ public class PlanetsCatalogController : Controller
     {
         var planets = await _context.PlanetsCatalog.Take(300).ToListAsync();
         return PartialView("_PlanetsTable", planets);
+    }
+
+    private async Task<List<SelectListItem>> GetDistinctSelectListAsync(Expression<Func<NASAExoplanetCatalog, string?>> selector)
+    {
+        return await _context.PlanetsCatalog
+            .Select(selector)
+            .Distinct()
+            .Where(x => x != null)
+            .OrderBy(x => x)
+            .Select(x => new SelectListItem
+            {
+                Value = x!,
+                Text = x!
+            })
+            .ToListAsync();
     }
 }

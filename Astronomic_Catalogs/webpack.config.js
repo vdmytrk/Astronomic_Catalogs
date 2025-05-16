@@ -14,7 +14,8 @@ module.exports = {
         scriptTS: "./Scripts/ts/scriptTS.ts",
         theme: "./Scripts/ts/theme.ts",
         astroTableFilters: "./wwwroot/js/AstroTableFilters.js",
-        telescopeViewCalculator: "./wwwroot/js/telescopeViewCalculator.js",
+        telescopeViewCalculator: "./Scripts/ts/telescopeViewCalculator.ts",
+        calendarHandler: "./Scripts/ts/calendarHandler.ts",
     },
     output: {
         filename: "[name].min.js",

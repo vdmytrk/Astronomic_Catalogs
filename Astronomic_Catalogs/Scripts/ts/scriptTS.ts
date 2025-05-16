@@ -2,6 +2,7 @@
 import * as FormHandler from "./formHandler";
 import * as Main from "./main";
 import * as ProgresImportBar from "./progresImportBar";
+import { calendarHandler } from "./calendarHandler";
 
 let remInPixels: number;
 
@@ -12,5 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     Behavior.initialize();
     ProgresImportBar.initialize();
     FormHandler.initialize();
+    calendarHandler();
 
 });

@@ -22,14 +22,14 @@
     <div class="row justify-content-center">
         <!-- Input data -->
         <div class="col-12 col-lg-auto telescopeViewCalculatorInputs">
-            <h3 class="fullWidthHeader mt-5 pHeader text-center">CHARACTERISTICS</h3>
+            <h4 class="fullWidthHeader mt-5 pHeader text-center">CHARACTERISTICS</h4>
             <div class="row telescopeCharacteristics">
                 <div class="col-12 col-md-6">
-                    <h3 class="pHeader">Characteristics of telescope</h3>
+                    <h4 class="pHeader">Characteristics of telescope</h4>
                     <div class="telescopeCharacteristicsContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5 class="me-1">Aperture:</h5>
+                                <h6 class="me-1">Aperture:</h6>
                             </div>
                             <div class="col-md-6">
                                 @Html.TextBox("Aperture", "", new { @class = "text-Aperture" })
@@ -39,7 +39,7 @@
                     <div class="telescopeCharacteristicsContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5 class="me-1">Focal length:</h5>
+                                <h6 class="me-1">Focal length:</h6>
                             </div>
                             <div class="col-md-6">
                                 @Html.TextBox("focalLengthT", "", new { @class = "text-FocalLengthT" })
@@ -49,7 +49,7 @@
                     <div class="telescopeCharacteristicsContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5 class="me-1">Barlow lens:</h5>
+                                <h6 class="me-1">Barlow lens:</h6>
                             </div>
                             <div class="col-md-6">
                                 @Html.DropDownList("focuserDiameter", new SelectList(focuserDiameter, "Value", "Text", "1.5"), new { @class = "text-FocuserDiameter", id = "", data_default = "0" })
@@ -58,11 +58,11 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h3 class="pHeader">Characteristics of eyepiece</h3>
+                    <h4 class="pHeader">Characteristics of eyepiece</h4>
                     <div class="telescopeCharacteristicsContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5 class="me-1">Eyepiece field of view:</h5>
+                                <h6 class="me-1">Eyepiece field of view:</h6>
                             </div>
                             <div class="col-md-6">
                                 @Html.TextBox("FieldViewE", "", new { @class = "text-FieldViewE" })
@@ -72,7 +72,7 @@
                     <div class="telescopeCharacteristicsContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5 class="me-1">Eyepiece focal length:</h5>
+                                <h6 class="me-1">Eyepiece focal length:</h6>
                             </div>
                             <div class="col-md-6">
                                 @Html.TextBox("focalLengthE", "", new { @class = "text-FocalLengthE" })
@@ -82,7 +82,7 @@
                     <div class="telescopeCharacteristicsContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5 class="me-1">Barlow lens:</h5>
+                                <h6 class="me-1">Barlow lens:</h6>
                             </div>
                             <div class="col-md-6">
                                 @Html.DropDownList("BarlowLens", new SelectList(barlowLens, "Value", "Text"), new { @class = "barlowLens", id = "", data_default = "0" })
@@ -98,15 +98,15 @@
 
         <!-- Output data -->
         <div class="col-12 col-lg-auto telescopeViewCalculatorOutputs">
-            <h3 class="fullWidthHeader mt-5 pHeader text-center">PARAMETERS</h3>
+            <h4 class="fullWidthHeader mt-5 pHeader text-center">PARAMETERS</h4>
             <div class="row">
                 <!-- View provided by the eyepiece -->
                 <div class="col-12 col-xl-auto viewProvidedEyepiece">
-                    <h3 class="pHeader">View provided by the eyepiece:</h3>
+                    <h4 class="pHeader">View provided by the eyepiece:</h4>
                     <div class="viewProvidedEyepieceContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5>Magnification:</h5>
+                                <h6>Magnification:</h6>
                             </div>
                             <div class="col-md-6">
                                 <span class="magnification"></span>
@@ -114,7 +114,7 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5>Field of view:</h5>
+                                <h6>Field of view:</h6>
                             </div>
                             <div class="col-md-6">
                                 <span class="fieldView"></span>
@@ -122,7 +122,7 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h5>Exit pupil:</h5>
+                                <h6>Exit pupil:</h6>
                             </div>
                             <div class="col-md-6">
                                 <span class="exitPupil"></span>
@@ -132,45 +132,45 @@
                 </div>
                 <!-- Telescope parameters -->
                 <div class="col-12 col-xl-auto telescopeParameters">
-                    <h3 class="pHeader">Telescope parameters:</h3>
+                    <h4 class="pHeader">Telescope parameters:</h4>
                     <div class="row">
                         <!-- Other parameters -->
                         <div class="col-12 col-md-4 otherParameters d-flex flex-column">
-                            <h4 class="pHeader">Parameters</h4>
+                            <h5 class="pHeader">Parameters</h5>
                             <div class="d-flex flex-wrap mb-3">
-                                <h5 class="me-2">Focal ratio:</h5>
+                                <h6 class="me-2">Focal ratio:</h6>
                                 <span class="focalRatio"></span>
                             </div>
                             <div class="d-flex flex-wrap mb-3">
-                                <h5 class="me-2">Resolving power:</h5>
+                                <h6 class="me-2">Resolving power:</h6>
                                 <span class="resolvingPower"></span>
                             </div>
                             <div class="d-flex flex-wrap mb-3">
-                                <h5 class="me-2">Limiting stellar magnitude:</h5>
+                                <h6 class="me-2">Limiting stellar magnitude:</h6>
                                 <span class="limitingStellarMagnitude"></span>
                             </div>
                             <div class="d-flex flex-wrap mb-3">
-                                <h5 class="me-2">Maximum field of view:</h5>
+                                <h6 class="me-2">Maximum field of view:</h6>
                                 <span class="maximumFieldOfView"></span>
                             </div>
                             <div class="d-flex flex-wrap mb-3 crateSizeDescription">
-                                <h5 class="me-2">Minimum visible crater size on the Moon:</h5>
+                                <h6 class="me-2">Minimum visible crater size on the Moon:</h6>
                                 <span class="minimumMoonCrater"></span>
                             </div>
                             <div class="d-flex flex-wrap mb-3 crateSizeDescription">
-                                <h5 class="me-2">
+                                <h6 class="me-2">
                                     Minimum visible crater size on the Moon with the specified eyepiece:
-                                </h5>
+                                </h6>
                                 <span class="minimumMoonCraterWithEyepiece"></span>
                             </div>
                         </div>
 
                         <!-- Typical magnifications -->
                         <div class="col-12 col-xxl-auto typicalMagnifications">
-                            <h4 class="pHeader">Typical magnifications</h4>
+                            <h5 class="pHeader">Typical magnifications</h5>
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <h5>Low Power (D/5 and greater):</h5>
+                                    <h6>Low Power (D/5 and greater):</h6>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="typicalMagnificationsD5value"></span>
@@ -191,7 +191,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <h5>Moderately Low Power (D/3):</h5>
+                                    <h6>Moderately Low Power (D/3):</h6>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="typicalMagnificationsD3value"></span>
@@ -212,7 +212,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <h5>Medium Power (D/2):</h5>
+                                    <h6>Medium Power (D/2):</h6>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="typicalMagnificationsD2value"></span>
@@ -233,7 +233,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <h5>Moderate-High Power (0.7 * D):</h5>
+                                    <h6>Moderate-High Power (0.7 * D):</h6>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="typicalMagnifications07Dvalue"></span>
@@ -254,7 +254,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <h5>High Power (D):</h5>
+                                    <h6>High Power (D):</h6>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="typicalMagnificationsDvalue"></span>
@@ -275,7 +275,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <h5>Very High Power (1.4 * D):</h5>
+                                    <h6>Very High Power (1.4 * D):</h6>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="typicalMagnifications14Dvalue"></span>
@@ -296,7 +296,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <h5>Maximum Useful Power (2 * D):</h5>
+                                    <h6>Maximum Useful Power (2 * D):</h6>
                                 </div>
                                 <div class="col-md-6">
                                     <span class="typicalMagnifications2Dvalue"></span>

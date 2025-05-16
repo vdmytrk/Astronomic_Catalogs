@@ -43,6 +43,7 @@
 		<Content Include="Scripts\ts\**\*.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\alertOfSwal.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\behavior.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\calendarHandler.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\development.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\formHandler.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\mainCO.ts" />

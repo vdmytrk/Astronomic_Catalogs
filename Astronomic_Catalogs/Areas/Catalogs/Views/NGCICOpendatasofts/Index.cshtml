@@ -30,7 +30,7 @@
     <div class="restrictedWrapper">
         <div class="allTopMenuFilters restrictedBlock">
             <div class="fieldsCheckBoks">
-                <h5 class="pHeader mt-4 p-2">Table fields:</h5>
+                <h5 class="pHeader mt-4 p-2">Table columns:</h5>
                 <span class="">   SubObject: @Html.CheckBox("SubObject", true, new { @class = "chb-SubObject", onclick = "toggleCheckbox(this, 'SubObject')" })                                           <span class="borderBlock pe-2">|</span></span>
                 <span class="">   Messier: @Html.CheckBox("Messier", true, new { @class = "chb-Messier", onclick = "toggleCheckbox(this, 'Messier')" })                                                   <span class="borderBlock pe-2">|</span></span>
                 <span class="">   Name UK: @Html.CheckBox("Name_UK", false, new { @class = "chb-Name_UK", onclick = "toggleCheckbox(this, 'Name_UK')" })                                                   <span class="borderBlock pe-2">|</span></span>
@@ -87,9 +87,8 @@
                 <div>
                     <h5 class="pHeader mt-4 p-2">Objects filters:</h5>
                     <div class="row m-0">
-                        <div class="col-6" style="min-width: 40rem;">
-
-                            <div class="filter-grid" style="width: 40rem;">
+                        <div class="col-6 nameConstellationFilterBlock">
+                            <div class="filter-grid constellationFilterBlock">
                                 <div class="filter-row">
                                     <span class="label fw-bold">Object other name:</span>
                                     <div class="filter-fields">
@@ -99,7 +98,7 @@
                                 <div class="filter-row mt-3">
                                     <span class="label fw-bold">Constellation:</span>
                                     <div class="filter-fields">
-                                        <select id="constellationSelect" name="constellations" class="form-select" style="height: 10rem;" multiple>
+                                        <select id="constellationSelect" name="constellations" class="form-select constellationSelectNGCIC" multiple>
                                             @foreach (var item in ViewBag.Constellations)
                                             {
                                                 <option value="@item.ShortName">
@@ -112,11 +111,11 @@
                             </div>
 
                             <div class="dropdown pt-3 text-center">
-                                <button class="btn btn-secondary dropdown-toggle w-100" style="max-width: 30rem" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-secondary dropdown-toggle w-100 selectContelCollCatBtn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Select constellation
                                 </button>
-                                <div class="constallationSelectTableWindow dropdown-menu p-0" style="width: 44rem; max-height: 20rem; overflow-y: auto;">
-                                    <table class="table constallationSelectTable table-bordered table-sm m-0" style="font-family: 'JetBrains Mono', monospace">
+                                <div class="constellationSelectTableWindow dropdown-menu p-0">
+                                    <table class="table constellationSelectTable table-bordered table-sm m-0">
                                         <thead class="table-light position-sticky top-0">
                                             <tr>
                                                 <th style="width: 2rem;">✓</th>
@@ -146,7 +145,7 @@
 
                         </div>
                         <div class="col-6">
-                            <div class="filter-grid" style="max-width: 90rem;">
+                            <div class="filter-grid nGCICObjectPropertyBlock">
                                 @********************************************************************************************************@
                                 <!--°-->
                                 <div class="filter-row">
@@ -156,7 +155,7 @@
                                         <div class="col-6">
                                             <div class="fw-semibold">from:</div>
                                             <div class="row g-1">
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Ang_Diameter_min", new SelectList(angDiameterValues, "Value", "Text", "0"), new { @class = "form-select text-Ang_Diameter_min", id = "Ang_Diameter_min", data_default = "0" })
                                                         Arcminute ( ' )
@@ -169,7 +168,7 @@
                                         <div class="col-6">
                                             <div class="fw-semibold">to:</div>
                                             <div class="row g-1">
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Ang_Diameter_max", new SelectList(angDiameterValues, "Value", "Text", "300"), new { @class = "form-select text-Ang_Diameter_max", id = "Ang_Diameter_max", data_default = "300" })
                                                         Arcminute  ( ' )
@@ -188,19 +187,19 @@
                                         <div class="col-6" style="min-width: 20rem;">
                                             <div class="fw-semibold">from:</div>
                                             <div class="row g-1">
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("RA_From_Hours", new SelectList(hoursValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Hours", data_default = "00" })
                                                         h
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("RA_From_Minutes", new SelectList(minsSecsValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Minutes", data_default = "00" })
                                                         m
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("RA_From_Seconds", new SelectList(minsSecsValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Seconds", data_default = "00" })
                                                         s
@@ -213,19 +212,19 @@
                                         <div class="col-6" style="min-width: 20rem;">
                                             <div class="fw-semibold">to:</div>
                                             <div class="row g-1">
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("RA_To_Hours", new SelectList(hoursValues, "Value", "Text", "23"), new { @class = "form-select", id = "RA_To_Hours", data_default = "23" })
                                                         h
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("RA_To_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "RA_To_Minutes", data_default = "59" })
                                                         m
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("RA_To_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "RA_To_Seconds", data_default = "59" })
                                                         s
@@ -244,25 +243,25 @@
                                         <div class="col-6" style="min-width: 20rem;">
                                             <div class="fw-semibold">from:</div>
                                             <div class="row g-1">
-                                                <div class="col" style="min-width: 4rem">
+                                                <div class="col dropDownListBlockPole">
                                                     <div class="flex-wrap text-center">
                                                         @Html.DropDownList("Dec_From_Pole", new SelectList(poleOptions, "Value", "Text", "-"), new { @class = "form-select text-center", id = "Dec_From_Pole", data_default = "-" })
                                                         Pole
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Dec_From_Degrees", new SelectList(degreesValues, "Value", "Text", "89"), new { @class = "form-select", id = "Dec_From_Degrees", data_default = "89" })
                                                         °
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Dec_From_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_From_Minutes", data_default = "59" })
                                                         '
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Dec_From_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_From_Seconds", data_default = "59" })
                                                         "
@@ -275,25 +274,25 @@
                                         <div class="col-6" style="min-width: 20rem;">
                                             <div class="fw-semibold">to:</div>
                                             <div class="row g-1">
-                                                <div class="col" style="min-width: 4rem">
+                                                <div class="col dropDownListBlockPole">
                                                     <div class="flex-wrap text-center">
                                                         @Html.DropDownList("Dec_To_Pole", new SelectList(poleOptions, "Value", "Text", "+"), new { @class = "form-select text-center", id = "Dec_To_Pole", data_default = "+" })
                                                         Pole
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Dec_To_Degrees", new SelectList(degreesValues, "Value", "Text", "89"), new { @class = "form-select", id = "Dec_To_Degrees", data_default = "89" })
                                                         °
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Dec_To_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_To_Minutes", data_default = "59" })
                                                         '
                                                     </div>
                                                 </div>
-                                                <div class="col" style="min-width: 5rem">
+                                                <div class="col dropDownListBlock">
                                                     <div class="flex-wrap">
                                                         @Html.DropDownList("Dec_To_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_To_Seconds", data_default = "59" })
                                                         "
@@ -308,7 +307,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="line"></div>
+
                 <div class="m-0">
                     <h5 class="pHeader mt-4 p-2">Objects type:</h5>
                     <div class="responsiveColumnsContainer">
@@ -335,45 +334,46 @@
                     </div>
                 </div>
 
-                <div class="line"></div>
-                <h5 class="pHeader mt-4 p-2">Additional:</h5>
-                <div class="row" style="margin: 0 !important;">
-                    <div class="col-4">
-                        <div class="d-flex flex-wrap align-items-center typeCatalogFilters">
-                            <h6 class="m-2">Catalogs:</h6>
-                            <span class="m-2">NGC: </span> @Html.CheckBox("NGC_Catalog", true, new { @class = "chb-NGC-Catalog" })
-                            <span class="m-2 ms-4">IC: </span> @Html.CheckBox("IC_Catalog", true, new { @class = "chb-IC-Catalog" })
-                            <span class="m-2 ms-4">Messier: </span> @Html.CheckBox("Messier_Catalog", true, new { @class = "chb-Messier-Catalog" })
+                <div class="mt-0 additionalBlock">
+                    <h5 class="pHeader mt-4 p-2">Additional:</h5>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="d-flex flex-wrap align-items-center typeCatalogFilters">
+                                <h6 class="mx-2">Catalogs:</h6>
+                                <span class="ms-4 me-2">NGC: </span> @Html.CheckBox("NGC_Catalog", true, new { @class = "chb-NGC-Catalog" })
+                                <span class="ms-4 me-2">IC: </span> @Html.CheckBox("IC_Catalog", true, new { @class = "chb-IC-Catalog" })
+                                <span class="ms-4">Messier: </span> @Html.CheckBox("Messier_Catalog", true, new { @class = "chb-Messier-Catalog" })
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="d-flex flex-wrap align-items-center">
-                            <h6 class="pe-2">Number of elements on the page:</h6>
-                            @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50", "100" }, "50"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "50" })
+                        <div class="col-4">
+                            <div class="d-flex flex-wrap align-items-center">
+                                <h6 class="pe-2">Number of elements on the page:</h6>
+                                @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50", "100" }, "50"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "50" })
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="d-flex flex-wrap">
-                            <div class="me-3">Fix the column width: </div>
-                            <label class="switchButton">
-                                <input type="checkbox" checked>
-                                <span class="slider">
-                                    @* In testing:                                        
+                        <div class="col-4">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-3">Fix the column width: </div>
+                                <label class="switchButton switchButtonFixColumnWidth">
+                                    <input type="checkbox" checked>
+                                    <span class="slider">
+                                        @* In testing:                                        
                                     <span class="text-on">ON</span>
                                     <span class="text-off">OFF</span> *@
-                                </span>
-                            </label>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="marginButton">
-                    <button type="button" id="" class="btn btn-danger applyFiltersBtn" style="margin: 0.5rem" data-controller="@ViewBag.Contorller">
+                    <button type="button" id="" class="btn btn-danger applyFiltersBtn m-2" data-controller="@ViewBag.Contorller">
                         APPLY FILTERS
                     </button>
-                    <button type="button" class="btn btn-primary resetObjectSelection" style="margin: 0.5rem" onclick="resetObjectSelection()">
+                    <button type="button" class="btn btn-primary resetObjectSelection m-2" onclick="resetObjectSelection()">
                         Reset object selection
                     </button>
-                    <button type="button" class="btn btn-primary " style="margin: 0.5rem" onclick="resetAllFilters()">
+                    <button type="button" class="btn btn-primary  m-2" onclick="resetAllFilters()">
                         Reset all filters
                     </button>
                 </div>

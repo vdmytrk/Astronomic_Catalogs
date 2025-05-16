@@ -2,8 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////////// 
 export function initialize(): void {
     setupShowTextBlockToggles();
-    setupShowFilsersToggles();
-    setColumnWidthAstroCatalogTable();
+    setupShowFilsersToggles();    
 }
 
 
@@ -46,20 +45,4 @@ function setupShowFilsersToggles(): void {
 
 
 
-/////////////////////////////////////////////
-// Table property block
-/////////////////////////////////////////////
-function setColumnWidthAstroCatalogTable(): void {
-    const checkbox = document.querySelector("label.switchButton input[type='checkbox']") as HTMLInputElement | null;
-    if (!checkbox) return;
 
-    checkbox.addEventListener("change", () => {
-        const table = document.querySelector("table.astroCatalogTable") as HTMLElement | null;
-        if (table) {
-            console.log("######## switchButton");
-            console.log("Before toggle:", table.classList.toString());
-            table.classList.toggle("setColumnWidth", checkbox.checked);
-            console.log("After toggle:", table.classList.toString());
-        }
-    });
-}
