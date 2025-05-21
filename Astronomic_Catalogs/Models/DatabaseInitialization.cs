@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Astronomic_Catalogs.Models;
 
-//[Keyless]
 public class DatabaseInitialization
 {
     [DatabaseGenerated(DatabaseGeneratedOption.None)]

@@ -1,6 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Telescope View Calculator";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
     var focuserDiameter = new List<SelectListItem>
     {
         new SelectListItem { Value = "1.25", Text = "1.25"},
@@ -9,6 +11,7 @@
     var barlowLens = new List<SelectListItem>
     {
         new SelectListItem { Value = "1", Text = "Х"},
+        new SelectListItem { Value = "0.7", Text = "0.7x"},
         new SelectListItem { Value = "2", Text = "2x"},
         new SelectListItem { Value = "3", Text = "3x"},
         new SelectListItem { Value = "4", Text = "4x"},
@@ -16,13 +19,19 @@
     };
 }
 
+<meta name="description" content="The interactive telescope calculator makes it easy to determine the optimal parameters for astronomical observations. It calculates the magnification range achievable with a specific telescope, as well as the field of view when used with different eyepieces. This tool is useful for both beginners and experienced astronomers — it helps select suitable eyepieces for standard magnification levels and guides you in choosing the right telescope based on your needs." />
+<meta name="description" content="Інтерактивний калькулятор для телескопів дозволяє легко визначити оптимальні параметри для спостереження: обчислює діапазон збільшень, яке можна отримати з конкретним телескопом, а також поле зору, що формується в комбінації з різними окулярами. Цей інструмент стане у пригоді як початківцям, так і досвідченим астрономам — він допоможе підібрати відповідні окуляри для досягнення стандартних рівнів збільшення, а також зорієнтує у виборі самого телескопа залежно від ваших потреб." />
+<meta name="keywords" content="telescope calculator, choose a telescope, telescope selection, find a telescope, choose eyepieces, eyepiece selection, telescope magnification, telescope field of view, telescope focal length, exit pupil, apparent magnitude, aperture ratio, resolving power, objective diameter, minimum magnification, maximum magnification" />
+<meta name="keywords" content="калькулятор телескопа, вибрати телескоп, підібрати телескоп, вибір телескопа, вибрати окуляри, підбір окулярів, збільшення телескопа, поле зору телескопа, фокусна відстань телескопа, вихідна зіниця, зоряна величина, світлосила, роздільна здатність, діаметр об'єктива, мінімальне збільшення, максимальне збільшення" />
+<meta name="keywords" content="калькулятор телескопа, выбрать телескоп, подобрать телескоп, выбор телескопа, выбрать окуляры, выбор окуляров, увеличение телескопа, поле зрения телескопа, фокусное расстояние телескопа, выходной зрачок, звездная величина, относительное отверстие, разрешающая способность, диаметр объектива, минимальное увеличение, максимальное увеличение" />
+
 <h1>@ViewData["Title"]</h1>
 
 <div id="telescopeViewCalculator" class="container my-4 px-3">
     <div class="row justify-content-center">
         <!-- Input data -->
         <div class="col-12 col-lg-auto telescopeViewCalculatorInputs">
-            <h4 class="fullWidthHeader mt-5 pHeader text-center">CHARACTERISTICS</h4>
+            <h3 class="fullWidthHeader mt-5 pHeader text-center">CHARACTERISTICS</h3>
             <div class="row telescopeCharacteristics">
                 <div class="col-12 col-md-6">
                     <h4 class="pHeader">Characteristics of telescope</h4>
@@ -98,33 +107,52 @@
 
         <!-- Output data -->
         <div class="col-12 col-lg-auto telescopeViewCalculatorOutputs">
-            <h4 class="fullWidthHeader mt-5 pHeader text-center">PARAMETERS</h4>
+            <h3 class="fullWidthHeader mt-5 pHeader text-center">PARAMETERS</h3>
             <div class="row">
                 <!-- View provided by the eyepiece -->
                 <div class="col-12 col-xl-auto viewProvidedEyepiece">
-                    <h4 class="pHeader">View provided by the eyepiece:</h4>
+                    <h4 class="pHeader">View provided by the eyepiece and barlow lens:</h4>
                     <div class="viewProvidedEyepieceContent">
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <h6>Magnification:</h6>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-auto">
                                 <span class="magnification"></span>
                             </div>
                         </div>
+                    @if (User.IsInRole("OwnerAdministratorPower"))
+                    {
+                            <div class="row mb-3">
+                            <div class="col-md-7">
+                                <h6 class="me-2">Focal ratio:</h6>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="focalRatioE"></span>
+                            </div>
+                        </div>
+                    }
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <h6>Field of view:</h6>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-auto">
                                 <span class="fieldView"></span>
                             </div>
                         </div>
+                        <div class="row mb-3 crateSizeDescription">
+                            <div class="col-md-7">
+                                <h6 class="me-2">Minimum visible crater size on the Moon:</h6>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="minimumMoonCraterWithEyepiece minWidth5rem"></span>
+                            </div>
+                        </div>
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <h6>Exit pupil:</h6>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-auto">
                                 <span class="exitPupil"></span>
                             </div>
                         </div>
@@ -135,38 +163,54 @@
                     <h4 class="pHeader">Telescope parameters:</h4>
                     <div class="row">
                         <!-- Other parameters -->
-                        <div class="col-12 col-md-4 otherParameters d-flex flex-column">
-                            <h5 class="pHeader">Parameters</h5>
-                            <div class="d-flex flex-wrap mb-3">
-                                <h6 class="me-2">Focal ratio:</h6>
-                                <span class="focalRatio"></span>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3">
-                                <h6 class="me-2">Resolving power:</h6>
-                                <span class="resolvingPower"></span>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3">
-                                <h6 class="me-2">Limiting stellar magnitude:</h6>
-                                <span class="limitingStellarMagnitude"></span>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3">
-                                <h6 class="me-2">Maximum field of view:</h6>
-                                <span class="maximumFieldOfView"></span>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3 crateSizeDescription">
-                                <h6 class="me-2">Minimum visible crater size on the Moon:</h6>
-                                <span class="minimumMoonCrater"></span>
-                            </div>
-                            <div class="d-flex flex-wrap mb-3 crateSizeDescription">
-                                <h6 class="me-2">
-                                    Minimum visible crater size on the Moon with the specified eyepiece:
-                                </h6>
-                                <span class="minimumMoonCraterWithEyepiece"></span>
+                        <div class="col-12 col-xl-7 otherParameters">
+                            <div class="otherParametersContent">
+                                <h5 class="pHeader">Parameters</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Focal ratio:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="focalRatio"></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Maximum field of view (without reducer):</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="maximumFieldOfView"></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Resolving power:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="resolvingPower"></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3 crateSizeDescription">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Minimum visible crater size on the Moon:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="minimumMoonCrater minWidth5rem "></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Limiting stellar magnitude:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="limitingStellarMagnitude"></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Typical magnifications -->
-                        <div class="col-12 col-xxl-auto typicalMagnifications">
+                        <div class="col-12 col-xl-auto typicalMagnifications">
                             <h5 class="pHeader">Typical magnifications</h5>
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -319,12 +363,15 @@
             </div> <!-- row -->
         </div>
     </div> <!-- row -->
-
 </div> <!-- container -->
 
 <div hidden>
     <p>Get a link to this calculation.</p>
 </div>
+
+<script>
+    window.isAuthenticated = @(isAuthenticated.ToString().ToLower());
+</script>
 
 @section ScriptsTelescopViewCalculator {
     <script src="~/js/telescopeViewCalculator.min.js" asp-append-version="true"></script>

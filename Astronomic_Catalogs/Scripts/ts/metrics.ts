@@ -70,7 +70,8 @@ function updateFixedColumnLeftOffset(): void {
     let totalReduction = 0;
 
     for (let i = 1; i <= fixedColumns; i++) {
-        const cells = document.querySelectorAll<HTMLElement>(`th:nth-child(${i}), td:nth-child(${i})`);
+        const cells = document.querySelectorAll<HTMLElement>(`.table-set-size th:nth-child(${i}), .table-set-size td:nth-child(${i})`);
+
         if (cells.length > 0) {
             const width = cells[0].offsetWidth;
             offset += width;

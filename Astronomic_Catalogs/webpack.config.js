@@ -16,6 +16,7 @@ module.exports = {
         astroTableFilters: "./wwwroot/js/AstroTableFilters.js",
         telescopeViewCalculator: "./Scripts/ts/telescopeViewCalculator.ts",
         calendarHandler: "./Scripts/ts/calendarHandler.ts",
+        switchTableType: "./Scripts/ts/switchTableType.ts",
     },
     output: {
         filename: "[name].min.js",

@@ -1,8 +1,6 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models.Services;
 using Astronomic_Catalogs.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Astronomic_Catalogs.Infrastructure;
 
@@ -15,7 +13,7 @@ public class RequestLoggingMiddleware (RequestDelegate next, ILogger<RequestLogg
     private readonly ILogger<RequestLoggingMiddleware> _logger = logger;
     private readonly PublicIpService _publicIpService = publicIpService;
 
-    public async Task InvokeAsync(HttpContext context, ApplicationDbContext dbContext)
+    public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
     {
         var log = new RequestLog
         {
@@ -39,6 +37,9 @@ public class RequestLoggingMiddleware (RequestDelegate next, ILogger<RequestLogg
             log.ErrorMessage = ex.Message;
             _logger.LogError(ex, "Error while saving RequestLog to the database.");
         }
+
+        using var scope = serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         dbContext.RequestLogs.Add(log);
         await dbContext.SaveChangesAsync();

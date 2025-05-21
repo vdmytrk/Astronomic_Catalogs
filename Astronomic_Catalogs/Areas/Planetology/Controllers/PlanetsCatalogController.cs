@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Data;
+﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
-using Astronomic_Catalogs.Services;
 using Astronomic_Catalogs.Utils;
-using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Astronomic_Catalogs.Areas.Planetology.Controllers;
 
@@ -21,18 +14,21 @@ public class PlanetsCatalogController : Controller
     private readonly IExcelImport _excelImportService;
     private readonly IImportCancellationService _importCancellationService;
     private readonly IPlanetFilterService _filterService;
+    private readonly IDistinctSelectListService _distinctSelectListService;
 
     public PlanetsCatalogController(
         ApplicationDbContext context,
         IExcelImport excelImport_OpenXml,
         IImportCancellationService importCancellationService,
-        IPlanetFilterService filterService
+        IPlanetFilterService filterService,
+        IDistinctSelectListService distinctSelectListService
         )
     {
         _context = context;
         _excelImportService = excelImport_OpenXml;
         _importCancellationService = importCancellationService;
         _filterService = filterService;
+        _distinctSelectListService = distinctSelectListService;
     }
 
     // GET: Planetology/PlanetsCatalog
@@ -41,19 +37,18 @@ public class PlanetsCatalogController : Controller
         var count = await _context.PlanetsCatalog.CountAsync();
         ViewBag.RowsCount = count;
 
-        ViewBag.PlanetNames = await GetDistinctSelectListAsync(c => c.PlLetter);
-        ViewBag.TelescopNames = await GetDistinctSelectListAsync(c => c.DiscTelescope);
-        ViewBag.DiscoveryMethod = await GetDistinctSelectListAsync(c => c.DiscoveryMethod);
+        ViewBag.PlanetNames = await _distinctSelectListService.GetDistinctSelectListAsync(c => c.PlLetter);
+        ViewBag.TelescopNames = await _distinctSelectListService.GetDistinctSelectListAsync(c => c.DiscTelescope);
+        ViewBag.DiscoveryMethod = await _distinctSelectListService.GetDistinctSelectListAsync(c => c.DiscoveryMethod);
 
-        return View(await _context.PlanetsCatalog.Take(10).ToListAsync());
+        return View(await _context.PlanetsCatalog.Take(50).ToListAsync());
     }
 
 
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
-        string rowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
-        ViewBag.RowOnPageCatalog = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
 
         List<NASAExoplanetCatalog>? selectedList;
 
@@ -77,7 +72,7 @@ public class PlanetsCatalogController : Controller
 
         try
         {
-            var tableHtml = await this.RenderViewAsync("_CollinderTable", selectedList, true);
+            var tableHtml = await this.RenderViewAsync("_PlanetsTableHeaders", selectedList, true);
             var paginationHtml = await this.RenderViewAsync("_PaginationLine", null, true);
 
             return Json(new { tableHtml, paginationHtml });
@@ -295,24 +290,4 @@ public class PlanetsCatalogController : Controller
         return Ok();
     }
 
-    public async Task<IActionResult> GetPlanetsTable()
-    {
-        var planets = await _context.PlanetsCatalog.Take(300).ToListAsync();
-        return PartialView("_PlanetsTable", planets);
-    }
-
-    private async Task<List<SelectListItem>> GetDistinctSelectListAsync(Expression<Func<NASAExoplanetCatalog, string?>> selector)
-    {
-        return await _context.PlanetsCatalog
-            .Select(selector)
-            .Distinct()
-            .Where(x => x != null)
-            .OrderBy(x => x)
-            .Select(x => new SelectListItem
-            {
-                Value = x!,
-                Text = x!
-            })
-            .ToListAsync();
-    }
 }

@@ -62,7 +62,8 @@ function calculateTelescopeView(): void {
     const magnification = (effectiveFocalLength / focalLengthEyepiece) * barlowLens;
     const exitPupil = aperture / magnification;
 
-    const focalRatio = effectiveFocalLength / aperture;
+    const focalRatioE = effectiveFocalLength / aperture;
+    const focalRatio = focalLengthTelescope / aperture;
     const resolvingPower = 116 / aperture; // Dawes limit (where 116 is a constant factor in angular seconds)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +79,12 @@ function calculateTelescopeView(): void {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //const maximumFieldOfView = fieldViewE / magnification;
     // Ця формула використовує безпосередні параметри окуляра та збільшення.
-    const maximumFieldOfView = (focuserDiameterMM / effectiveFocalLength) * (180 / Math.PI);
+    const maximumFieldOfView = (focuserDiameterMM / focalLengthTelescope) * (180 / Math.PI);
     // Ця формула враховує діаметр фокусера та фокусну відстань телескопа, а також перетворює радіани в градуси.
 
 
-    const fieldOfViewE = Math.min(fieldViewEyepiece / magnification, maximumFieldOfView);
+    //const fieldOfViewE = Math.min(fieldViewEyepiece / magnification, maximumFieldOfView);
+    const fieldOfViewE = fieldViewEyepiece / magnification;
 
     let formatDegreesToDMS = (decimalDegrees: number): string => {
         const degrees = Math.floor(decimalDegrees);
@@ -92,7 +94,15 @@ function calculateTelescopeView(): void {
 
         return `${degrees}° ${minutes}' ${seconds}"`;
     }
-    const maximumFieldOfViewFormatted = formatDegreesToDMS(fieldOfViewE);
+    const maximumFieldOfViewFormatted = formatDegreesToDMS(maximumFieldOfView);
+    const maximumFieldOfViewFormattedE = formatDegreesToDMS(fieldOfViewE);
+
+    let formatDegreesToMinutesOnly = (decimalDegrees: number): string => {
+        const totalMinutes = decimalDegrees * 60;
+        return `${totalMinutes.toFixed(2)}`;
+    };
+    const maximumFieldOfViewInMinutes = formatDegreesToMinutesOnly(maximumFieldOfView);
+    const maximumFieldOfViewInMinutesE = formatDegreesToMinutesOnly(fieldOfViewE);
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,22 +123,24 @@ function calculateTelescopeView(): void {
     //      206265 — кількість кутових секунд в одному радіані.
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const minMoonCraterWithMagnificatoin = 3423 / magnification  *  resolvingPower;
+    const minMoonCraterWithMagnific = 3423 / magnification  *  resolvingPower;
     // Ця формула пов’язана з безпосереднім збільшенням телескопа та враховує окуляр.
     ///////////////
     ///// Висновок:
     // Формула з числом 3474 найбільш точна, оскільки вона ґрунтується на реальному діаметрі Місяця та оптичній роздільній 
     // здатності телескопа. Інші формули дають лише наближені значення.
 
+    const minMoonCraterWithMagnificatoin = Math.min(minMoonCrater, minMoonCraterWithMagnific);
 
     setOutputText(".magnification", magnification.toFixed(1) + "×");
-    setOutputText(".fieldView", maximumFieldOfViewFormatted + "   (" + fieldOfViewE.toFixed(2) + "°)");
+    setOutputText(".fieldView", maximumFieldOfViewFormattedE + "   (" + fieldOfViewE.toFixed(2) + "° | " + maximumFieldOfViewInMinutesE + "\")");
     setOutputText(".exitPupil", exitPupil.toFixed(1) + " mm");
 
-    setOutputText(".focalRatio", "f/" + focalRatio.toFixed(1));
-    setOutputText(".resolvingPower", resolvingPower.toFixed(2) + " arcsec");
+    setOutputText(".focalRatioE", "f/" + focalRatioE.toFixed(1));
+    setOutputText(".focalRatio", "f/" + focalRatio.toFixed(2));
+    setOutputText(".resolvingPower", resolvingPower.toFixed(3) + " arcsec");
     setOutputText(".limitingStellarMagnitude", limitingStellarMagnitude.toFixed(1));
-    setOutputText(".maximumFieldOfView", maximumFieldOfViewFormatted + "   (" + maximumFieldOfView.toFixed(3) + "°)");
+    setOutputText(".maximumFieldOfView", maximumFieldOfViewFormatted + "   (" + maximumFieldOfView.toFixed(3) + "° | " + maximumFieldOfViewInMinutes + "\")");
     setOutputText(".minimumMoonCrater", minMoonCrater.toFixed(1) + " km"); 
     setOutputText(".minimumMoonCraterWithEyepiece", minMoonCraterWithMagnificatoin.toFixed(1) + " km"); 
 
@@ -138,19 +150,22 @@ function calculateTelescopeView(): void {
         valueSelector: string,
         eyepieceSelector: string
     ): void => {
-        const eyepieceFocalLength = effectiveFocalLength / magn;
+        const eyepieceFocalLength = focalLengthTelescope / magn;
+        console.log(`$$$$ aperture2: ${aperture}, focalLengthTelescope2: ${focalLengthTelescope}, 
+                        magn: ${magn.toFixed(1)}, valueSelector: ${valueSelector}, eyepieceSelector: ${eyepieceSelector}, 
+                        eyepieceFocalLength: ${eyepieceFocalLength.toFixed(0)}.`);
         setOutputText(valueSelector, magn.toFixed(1));
         setOutputText(eyepieceSelector, "× (with the eyepiece: " + eyepieceFocalLength.toFixed(0) + "mm )");
     };
 
     const magnifications = [
-        { ratio: aperture / 5, val: ".typicalMagnificationsD5value", ep: ".eyepieceSizeD5" },
-        { ratio: aperture / 3, val: ".typicalMagnificationsD3value", ep: ".eyepieceSizeD3" },
-        { ratio: aperture / 2, val: ".typicalMagnificationsD2value", ep: ".eyepieceSizeD2" },
+        { ratio:   aperture / 5, val: ".typicalMagnificationsD5value" , ep: ".eyepieceSizeD5" },
+        { ratio:   aperture / 3, val: ".typicalMagnificationsD3value" , ep: ".eyepieceSizeD3" },
+        { ratio:   aperture / 2, val: ".typicalMagnificationsD2value" , ep: ".eyepieceSizeD2" },
         { ratio: 0.7 * aperture, val: ".typicalMagnifications07Dvalue", ep: ".eyepieceSize07D" },
-        { ratio: aperture, val: ".typicalMagnificationsDvalue", ep: ".eyepieceSizeD" },
+        { ratio:       aperture, val: ".typicalMagnificationsDvalue"  , ep: ".eyepieceSizeD" },
         { ratio: 1.4 * aperture, val: ".typicalMagnifications14Dvalue", ep: ".eyepieceSize14D" },
-        { ratio: 2 * aperture, val: ".typicalMagnifications2Dvalue", ep: ".eyepieceSize2D" },
+        { ratio:   2 * aperture, val: ".typicalMagnifications2Dvalue" , ep: ".eyepieceSize2D" },
     ];
 
     magnifications.forEach(({ ratio, val, ep }) =>

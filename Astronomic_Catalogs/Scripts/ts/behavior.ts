@@ -2,7 +2,8 @@
 ////////////////////////////////////////////////////////////////////////////////////// 
 export function initialize(): void {
     setupShowTextBlockToggles();
-    setupShowFilsersToggles();    
+    setupShowFiltersToggles();
+    handleHabitableZoneDependency();
 }
 
 
@@ -30,7 +31,7 @@ function setupShowTextBlockToggles(): void {
     });
 }
 
-function setupShowFilsersToggles(): void {
+function setupShowFiltersToggles(): void {
     document.addEventListener("click", (e) => {
         const target = e.target as HTMLElement;
         if (target.classList.contains("hideFilters")) {
@@ -43,6 +44,35 @@ function setupShowFilsersToggles(): void {
     });
 }
 
+export function hideShowBlockDownAnime(target: HTMLElement, show: boolean, delay: number = 0): void {
+    if (!target) return;
 
+    setTimeout(() => {
+        if (show)
+            target.classList.remove("collapsed");
+        else
+            target.classList.add("collapsed");
+    }, delay);
+}
 
+function handleHabitableZoneDependency(): void {
+    const habitableZoneCheckbox = document.querySelector<HTMLInputElement>('.chb-habitableZonePlanets');
+    const terrestrialCheckbox = document.querySelector<HTMLInputElement>('.chb-terrestrialHabitableZonePlanets');
 
+    if (!habitableZoneCheckbox || !terrestrialCheckbox) return;
+
+    const updateTerrestrialCheckboxState = () => {
+        if (habitableZoneCheckbox.checked) {
+            terrestrialCheckbox.disabled = false;
+        } else {
+            terrestrialCheckbox.disabled = true;
+            terrestrialCheckbox.checked = false;
+        }
+    };
+
+    // Початковий стан
+    updateTerrestrialCheckboxState();
+
+    // Обробник зміни
+    habitableZoneCheckbox.addEventListener('change', updateTerrestrialCheckboxState);
+}

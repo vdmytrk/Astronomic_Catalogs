@@ -1,12 +1,17 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
-//import { distributeItemsIntoColumns } from "./metrics"
+if (!(window as any).__formHandlerInitialized) {
+    (window as any).__formHandlerInitialized = true;
 
-export function initialize(): void {
-    astronomicCatalogFormHandler();
+    document.addEventListener("DOMContentLoaded", () => {
+        astronomicCatalogFormHandler();
+    });
 }
 
 function astronomicCatalogFormHandler() {
+
+    console.log('astronomicCatalogFormHandler initialized');
+
     document.addEventListener("click", (e: MouseEvent) => {
         const target = e.target as HTMLElement;
         const paginationCell = target.classList.contains("paginationCell");
@@ -36,7 +41,7 @@ function getCountChecked_fieldsCheckBoks_Checkbox(): number {
     return checkedCount + 2; // Becouse some columns have not chackbox
 }
 
-function createSpinnerHTML(): string {
+export function createSpinnerHTML(): string {
     const columnCount: number = getCountChecked_fieldsCheckBoks_Checkbox();
     const spinnerHTML = `
         <tr id="spinnerTr">
@@ -53,8 +58,8 @@ interface FormData {
     [key: string]: string | string[];
 }
 
-function serializeForm(rootElement: HTMLElement, pageNumber: string): FormData {
-    const data: FormData = {};
+export function serializeForm(rootElement: HTMLElement, pageNumber: string): FormData {
+    let data: FormData = {};
 
     // Text inputs, selects (single & multiple), dropdowns
     const inputs = rootElement.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input:not([type="hidden"]), select');
@@ -108,11 +113,28 @@ function serializeForm(rootElement: HTMLElement, pageNumber: string): FormData {
     }
 
     data["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
+
+    const checkbox = document.querySelector("label.switchTableType input[type='checkbox']") as HTMLInputElement;
+    if (checkbox)
+        data = getPartialViewName(data, checkbox);
+
     console.log("serializeForm (after): ", data);
     return data;
 }
 
+function getPartialViewName(data, checkbox: HTMLInputElement): FormData {
+    console.log("FUNCTION: getPartialViewName");
+
+    const showGrouped = checkbox.checked;
+    const partialViewName = showGrouped ? "_PlanetarySystemTable" : "_PlanetarySystemTableInGroups";
+
+    data["PartialViewName"] = partialViewName;
+
+    return data;
+}
+
 async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partialSelector: string, pageNumber: string = '1') {
+    console.log(`FUNCTOIN: submitFormAndUpdatePartial(form: ${form}, url: ${url}, partialSelector: ${partialSelector}, pageNumber: ${pageNumber}!!!`);
     const tableHeader = document.querySelector(partialSelector);
     const paginationBodyBlock = document.getElementById("paginationBodyBlockContainer");
     let tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement | null;
@@ -143,9 +165,8 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
         });
 
         // 4. Check for success
-        if (!response.ok) {
+        if (!response.ok) 
             throw new Error(`HTTP error! status: ${response.status}`);
-        }
 
         // 5. Receive partial HTML
         const data = await response.json();
@@ -184,9 +205,23 @@ function updateCatalogData(catalog: string, pageButton: HTMLElement) {
     if (pageButton)
         pageNumber = pageButton.textContent?.trim() || '1';
 
-    if (catalog === 'NGCICOpendatasofts')
+    if (catalog === 'NGCICOpendatasofts') {
+        console.log("catalog === 'NGCICOpendatasofts' 1111"); //////////////////////////////////////////////////////////////////////
         submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable', pageNumber);
+    }
 
-    if (catalog === 'CollinderCatalogs')
+    if (catalog === 'CollinderCatalogs') {
+        console.log("catalog === 'CollinderCatalogs' 2222"); //////////////////////////////////////////////////////////////////////
         submitFormAndUpdatePartial(form, '/Catalogs/CollinderCatalogs/Index', '#sizeFilterTable', pageNumber);
+    }
+
+    if (catalog === 'PlanetsCatalog') {
+        console.log("catalog === 'PlanetsCatalog' 3333"); //////////////////////////////////////////////////////////////////////
+        submitFormAndUpdatePartial(form, '/Planetology/PlanetsCatalog/Index', '#sizeFilterTable', pageNumber);
+    }
+
+    if (catalog === 'PlanetarySystem') {
+        console.log("catalog === 'PlanetarySystem 4444'"); //////////////////////////////////////////////////////////////////////
+        submitFormAndUpdatePartial(form, '/Planetology/PlanetarySystem/Index', '#sizeFilterTable', pageNumber);
+    }
 }

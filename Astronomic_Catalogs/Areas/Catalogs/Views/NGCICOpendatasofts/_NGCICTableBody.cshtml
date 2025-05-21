@@ -143,12 +143,6 @@
         <td hidden>
             @Html.DisplayFor(modelItem => item.Image)
         </td>
-        <td hidden>
-            @Html.DisplayFor(modelItem => item.PageNumber)
-        </td>
-        <td hidden>
-            @Html.DisplayFor(modelItem => item.PageCount)
-        </td>
         @if (User.IsInRole("OwnerAdministratorPower"))
         {
             <td>

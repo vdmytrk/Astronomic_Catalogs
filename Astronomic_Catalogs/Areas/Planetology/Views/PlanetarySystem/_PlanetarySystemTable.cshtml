@@ -1,0 +1,75 @@
+﻿@model IList<Astronomic_Catalogs.DTO.PlanetarySystem>
+
+@{
+    var dummy = new Astronomic_Catalogs.DTO.PlanetarySystem();
+}
+<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size">
+    <thead>
+        <tr>
+            <!-- Planetary System Info -->
+            <th class="Hostname">@Html.DisplayNameFor(m => dummy.Hostname)</th>
+            <th class="OtherCatalogsColumns HdName" hidden>@Html.DisplayNameFor(m => dummy.HdName)</th>
+            <th class="OtherCatalogsColumns HipName" hidden>@Html.DisplayNameFor(m => dummy.HipName)</th>
+            <th class="OtherCatalogsColumns TicId" hidden>@Html.DisplayNameFor(m => dummy.TicId)</th>
+            <th class="OtherCatalogsColumns GaiaId" hidden>@Html.DisplayNameFor(m => dummy.GaiaId)</th>
+            <th class="StarColumns StSpectype">@Html.DisplayNameFor(m => dummy.StSpectype)</th>
+            <th class="StarColumns StTeff">@Html.DisplayNameFor(m => dummy.StTeff)</th>
+            <th class="StarColumns StRad">@Html.DisplayNameFor(m => dummy.StRad)</th>
+            <th class="StarColumns StMass">@Html.DisplayNameFor(m => dummy.StMass)</th>
+            <th class="StarColumns StMet">@Html.DisplayNameFor(m => dummy.StMet)</th>
+            <th class="StarColumns StMetratio">@Html.DisplayNameFor(m => dummy.StMetratio)</th>
+            <th class="StarColumns StLum">@Html.DisplayNameFor(m => dummy.StLum)</th>
+            <th class="StarColumns StAge">@Html.DisplayNameFor(m => dummy.StAge)</th>
+            <th class="StarColumns SyDist">@Html.DisplayNameFor(m => dummy.SyDist)</th>
+
+            <!-- Exoplanet Info -->
+            <th class="PlanetColumns">Letter</th>
+            <th class="PlanetColumns">Radius (Earth)</th>
+            <th class="PlanetColumns">Radius (Jupiter)</th>
+            <th class="PlanetColumns">Mass (Earth)</th>
+            <th class="PlanetColumns">Mass (Jupiter)</th>
+            <th class="PlanetColumns">Orbital Semi-Major Axis</th>
+        </tr>
+    </thead>
+    <tbody id="catalogTableBody">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var system = Model[i];
+            bool isFirstSystem = i == 0;
+
+            for (int j = 0; j < system.Exoplanets.Count; j++)
+            {
+                var planet = system.Exoplanets[j];
+                bool isFirst = (j == 0);
+                string rowClass = string.Empty;
+                if (!isFirstSystem && isFirst) rowClass += "thickTopBorder";
+
+                <tr class="@rowClass">
+                    <!-- Planetary System Info -->
+                    <td>@system.Hostname</td>
+                    <td hidden>@system.HdName</td>
+                    <td hidden>@system.HipName</td>
+                    <td hidden>@system.TicId</td>
+                    <td hidden>@system.GaiaId</td>
+                    <td>@system.StSpectype</td>
+                    <td>@system.StTeff</td>
+                    <td>@system.StRad</td>
+                    <td>@system.StMass</td>
+                    <td>@system.StMet</td>
+                    <td>@system.StMetratio</td>
+                    <td>@system.StLum</td>
+                    <td>@system.StAge</td>
+                    <td>@system.SyDist</td>
+
+                    <!-- Planet Info -->
+                    <td>@planet.PlLetter</td>
+                    <td>@planet.PlRade</td>
+                    <td>@planet.PlRadJ</td>
+                    <td>@planet.PlMasse</td>
+                    <td>@planet.PlMassJ</td>
+                    <td>@planet.PlOrbsmax</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

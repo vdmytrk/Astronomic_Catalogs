@@ -190,19 +190,6 @@ function CollinderCatalogCommentNote() {
         60: "Cr.471: Associated with the nebula identified by IC 5146; this number does not apply directly to the cluster."
     };
 
-    //table.addEventListener("click", (event) => {
-    //    const target = event.target as HTMLElement;
-
-    //    if (target.tagName.toLowerCase() === "td") {
-    //        const text = target.textContent?.trim() ?? "";
-    //        const number = parseInt(text, 10);
-
-    //        if (!isNaN(number) && clusterInfo[number]) {
-    //            alert(clusterInfo[number]);
-    //        }
-    //    }
-    //});
-
     table.addEventListener("click", (event) => {
         const target = event.target as HTMLElement;
         const parentTable = target.closest("table");
@@ -218,26 +205,5 @@ function CollinderCatalogCommentNote() {
             }
         }
     });
-
-    //table.addEventListener("click", (event) => {
-    //    const table = document.getElementById("sizeFilterTable") as HTMLTableElement;
-
-    //    //if (table) {
-    //    const target = event.target as HTMLElement;
-
-    //    // Перевірка: клік був по <td> в межах tbody цієї конкретної таблиці
-    //    if (target.tagName.toLowerCase() === "td" && table.contains(target)) {
-    //        const parentTable = target.closest("table");
-    //        if (parentTable?.id === "sizeFilterTable") {
-    //            const text = target.textContent?.trim() ?? "";
-    //            const number = parseInt(text, 10);
-
-    //            if (!isNaN(number) && clusterInfo[number]) {
-    //                showAlert(clusterInfo[number]);
-    //            }
-    //        }
-    //    }
-    //});
-
 
 }

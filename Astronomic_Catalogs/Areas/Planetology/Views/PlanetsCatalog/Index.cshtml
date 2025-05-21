@@ -1,6 +1,4 @@
 ﻿@model IEnumerable<Astronomic_Catalogs.Models.NASAExoplanetCatalog>
-@using Astronomic_Catalogs.Helpers
-@using DocumentFormat.OpenXml.EMMA
 
 @{
     ViewData["Title"] = "Planets";
@@ -19,17 +17,6 @@
         new ExtendedSelectListItem { Value = "7", Text = "Sub-Jupiter\u2003\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "5.1", Value_2 = "8.3" },
         new ExtendedSelectListItem { Value = "8", Text = "Jupiter-size\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "8.3", Value_2 = "13.7" },
         new ExtendedSelectListItem { Value = "9", Text = "Super(hot)-Jupiter", Value_1 = "13.7", Value_2 = "50" }
-    };
-
-    var orderBy = new List<SelectListItem>
-    {
-        new ExtendedSelectListItem { Value = "0", Text = "Unsorted data" },
-        new ExtendedSelectListItem { Value = "1", Text = "By the distance of the closest-in planet" },
-        new ExtendedSelectListItem { Value = "2", Text = "By the distance of the outermost planet" },
-        new ExtendedSelectListItem { Value = "3", Text = "By the remoteness of the closest-in planet" },
-        new ExtendedSelectListItem { Value = "4", Text = "By the remoteness of the outermost planet" },
-        new ExtendedSelectListItem { Value = "5", Text = "By the size of the smallest planet" },
-        new ExtendedSelectListItem { Value = "6", Text = "By the size of the largest planet" }
     };
 
     var planetsCount = Enumerable.Range(1, 8).Select(i => new SelectListItem { Value = i.ToString(), Text = i.ToString() }).ToList();
@@ -100,13 +87,13 @@
             <div class="row mt-0">
                 <div class="fieldsCheckBoks">
                     <h5 class="pHeader mt-2">Table columns:</h5>
-                    <span class="">   Other catalogs columns: @Html.CheckBox("OtherCatalogsColumns", false, new { @class = "chb-OtherCatalogsColumns", onclick = "toggleCheckbox(this, 'OtherCatalogsColumns')" }) <span class="borderBlock pe-2">|</span></span>
-                    <span class="">   System columns: @Html.CheckBox("SystemColumns", false, new { @class = "chb-SystemColumns", onclick = "toggleCheckbox(this, 'SystemColumns')" })                              <span class="borderBlock pe-2">|</span></span>
-                    <span class="">   Discovery data columns: @Html.CheckBox("DiscoveryDataColumns", false, new { @class = "chb-DiscoveryDataColumns", onclick = "toggleCheckbox(this, 'DiscoveryDataColumns')" }) <span class="borderBlock pe-2">|</span></span>
-                    <span class="">   Article columns: @Html.CheckBox("ArticleColumns", false, new { @class = "chb-ArticleColumns", onclick = "toggleCheckbox(this, 'ArticleColumns')" })                          <span class="borderBlock pe-2">|</span></span>
-                    <span class="">   Planet columns: @Html.CheckBox("PlanetColumns", true, new { @class = "chb-PlanetColumns", onclick = "toggleCheckbox(this, 'PlanetColumns')" })                               <span class="borderBlock pe-2">|</span></span>
-                    <span class="">   Star columns: @Html.CheckBox("StarColumns", false, new { @class = "chb-StarColumns", onclick = "toggleCheckbox(this, 'StarColumns')" })                                      <span class="borderBlock pe-2">|</span></span>
-                    <span class="">   Coordinates columns: @Html.CheckBox("CoordinatesColumns", false, new { @class = "chb-CoordinatesColumns", onclick = "toggleCheckbox(this, 'CoordinatesColumns')" })          </span>
+                    <span>Other catalogs columns: @Html.CheckBox("OtherCatalogsColumns", false, new { @class = "chb-OtherCatalogsColumns", onclick = "toggleCheckbox(this, 'OtherCatalogsColumns')" }) <span class="borderBlock pe-2">|</span></span>
+                    <span>System columns: @Html.CheckBox("SystemColumns", false, new { @class = "chb-SystemColumns", onclick = "toggleCheckbox(this, 'SystemColumns')" })                              <span class="borderBlock pe-2">|</span></span>
+                    <span>Discovery data columns: @Html.CheckBox("DiscoveryDataColumns", false, new { @class = "chb-DiscoveryDataColumns", onclick = "toggleCheckbox(this, 'DiscoveryDataColumns')" }) <span class="borderBlock pe-2">|</span></span>
+                    <span>Article columns: @Html.CheckBox("ArticleColumns", false, new { @class = "chb-ArticleColumns", onclick = "toggleCheckbox(this, 'ArticleColumns')" })                          <span class="borderBlock pe-2">|</span></span>
+                    <span>Planet columns: @Html.CheckBox("PlanetColumns", true, new { @class = "chb-PlanetColumns", onclick = "toggleCheckbox(this, 'PlanetColumns')" })                               <span class="borderBlock pe-2">|</span></span>
+                    <span>Star columns: @Html.CheckBox("StarColumns", false, new { @class = "chb-StarColumns", onclick = "toggleCheckbox(this, 'StarColumns')" })                                      <span class="borderBlock pe-2">|</span></span>
+                    <span>Coordinates columns: @Html.CheckBox("CoordinatesColumns", false, new { @class = "chb-CoordinatesColumns", onclick = "toggleCheckbox(this, 'CoordinatesColumns')" })          </span>
                 </div>
                 <div class="marginButton">
                     <button type="button" class="btn btn-primary setDefaultValueForAllFieldsCheckBox">
@@ -127,154 +114,187 @@
             <div class="row topMenuFiltersCatalogs">
                 <div class="m-0">
                     <h5 class="pHeader mt-4">Objects filters:</h5>
-                    <div class="row m-0">
-                        @********************************************************************************************************@
-                        <div class="col-12 col-md-6 planetSizeBlock">
-                            <div class="planetTypeBlock d-flex flex-column align-items-center text-center">
-                                <span class="label fw-bold text-start">Planet syze:</span>
-                                <div class="w-100 d-flex justify-content-center mb-3">
-                                    <span class="label text-start">
-                                        <span>Show only planets with a defined size:</span>
-                                        <span>
-                                            @Html.CheckBox("PlanetWithSize",
-                                                     false,
-                                                     new
-                                                     {
-                                                         @class = "chb-PlanetWithSize ms-3",
-                                                         onclick = "toggleCheckbox(this, 'PlanetWithSize')"
-                                                     })
-                                        </span>
-                                    </span>
+                    <div class="row gx-0 gy-3 m-0">
+                        <div class="col-12 col-xl">
+                            <div class="d-flex flex-wrap gap-3">
+                                <!-- Planet size block -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column align-items-center text-center planetFilterSizeBlock">
+                                        <div class="mt-3 mt-md-3">
+                                            <div class="w-100 text-start">
+                                                <div class="d-flex justify-content-center">
+                                                    <span class="label fw-bold text-start">Planet syze:</span>
+                                                </div>
+                                                <div class="d-flex justify-content-center text-start">
+                                                    <span class="label">Show only planets with a defined size:</span>
+                                                    <span class="label">
+                                                        <span>
+                                                            @Html.CheckBox("PlanetWithSize", false, new { @class = "chb-PlanetWithSize ms-2", onclick = "toggleCheckbox(this, 'PlanetWithSize')" })
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-center mt-4">
+                                                <span class="label fw-bold text-start">Choose which planet sizes to show (all are selected by default):</span>
+                                            </div>
+                                            <select id="planetTypeSelect" name="PlanetType"
+                                                    class="form-select mx-auto"
+                                                    multiple>
+                                                @foreach (var item in planetType)
+                                                {
+                                                    <option value="@item.Value">
+                                                        @item.Text — Size from @item.Value_1 to @item.Value_2 radius of Earth
+                                                    </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="w-100 d-flex justify-content-center">
-                                    <span class="label fw-bold text-start">Planet type:</span>
+
+                                <!-- Telescope block -->
+                                <div class="flex-grow-1 mt-3 mt-md-3">
+                                    <div class="d-flex flex-column align-items-center text-center telescopFilterSizeBlock">
+                                        <div class="mt-1">
+                                            <div class="d-flex justify-content-center">
+                                                <span class="label fw-bold text-start">Discovered with a telescope:</span>
+                                            </div>
+                                            <select id="exoplanetTelescope" name="Telescope"
+                                                    class="form-select mx-auto"
+                                                    multiple>
+                                                @foreach (var item in telescopeNames)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <select id="planetTypeSelect" name="planetType"
-                                        class="form-select mx-auto"
-                                        multiple>
-                                    @foreach (var item in planetType)
-                                    {
-                                        <option value="@item.Value">
-                                            @item.Text — Size from @item.Value_1 to @item.Value_2 radius of Earth
-                                        </option>
-                                    }
-                                </select>
                             </div>
                         </div>
                         @********************************************************************************************************@
-                        <div class="col-12 col-md-auto fieldsBlock mt-3">
-                            <div class="row">
-                                <div class="col-12 col-md-6 col-lg-6 definedDataBlock mt-3">
-                                    <div class="planetarySystemNameBlock mt-3">
-                                        <div class="">
-                                            <span class="label fw-bold">Planetary system name:</span>
-                                            <div class="filter-fields">
-                                                @Html.TextBox("Name", "", new { @class = "text-Name w-100" })
-                                            </div>
+                        <div class="col-12 col-xl mt-3 ps-4">
+                            <div class="d-flex flex-wrap gap-3 align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column">
+                                        <!-- Planet name -->
+                                        <div class="mt-3 exoplanetPlanetName">
+                                            <span class="label fw-bold">Planet name:</span>
+                                            <select id="exoplanetPlanetName" name="PlanetName"
+                                                    class="form-select mx-auto"
+                                                    multiple>
+                                                @foreach (var item in planetNames)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
                                         </div>
-                                    </div>
 
-                                    <div class="discoveredPlenetCountBlock mt-3">
-                                        <div class="label fw-bold">Discovered planets in planetary systems:</div>
-                                        <div class="filter-fields row">
-                                            <!-- FROM -->
-                                            <div class="col-6">
-                                                <div class="fw-semibold">from:</div>
-                                                <div class="row g-1">
-                                                    <div class="col dropDownListBlock">
-                                                        <div class="flex-wrap">
-                                                            @Html.DropDownList("discoveredPlenetCountFom", new SelectList(planetsCount, "Value", "Text", "1"), new { @class = "form-select", id = "discoveredPlenetCountFom", data_default = "1" })
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- TO -->
-                                            <div class="col-6">
-                                                <div class="fw-semibold">to:</div>
-                                                <div class="row g-1">
-                                                    <div class="col dropDownListBlock">
-                                                        <div class="flex-wrap">
-                                                            @Html.DropDownList("discoveredPlenetCountTo", new SelectList(planetsCount, "Value", "Text", "8"), new { @class = "form-select", id = "discoveredPlenetCountTo", data_default = "8" })
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    @* Calendars *@
-                                    <div class="discoveredDateBlock mt-3">
-                                        <div class="row">
-                                            <!-- FROM -->
-                                            <div class="col-md-6">
-                                                <label for="dateFrom" class="form-label fw-bold">Date From:</label>
-                                                <input type="date" id="dateFrom" name="dateFrom"
-                                                       class="form-control"
-                                                       min="1992-01-01"
-                                                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                                            </div>
-                                            <!-- TO -->
-                                            <div class="col-md-6">
-                                                <label for="dateTo" class="form-label fw-bold">Date To:</label>
-                                                <input type="date" id="dateTo" name="dateTo"
-                                                       class="form-control"
-                                                       min="1992-01-01"
-                                                       max="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                                            </div>
+                                        <!-- Discovery method -->
+                                        <div class="mt-3 exoplanetDiscoveryMethod">
+                                            <span class="label fw-bold">Discovered with a method:</span>
+                                            <select id="exoplanetDiscoveryMethod" name="DiscoveryMethod"
+                                                    class="form-select mx-auto"
+                                                    multiple>
+                                                @foreach (var item in discoveryMethods)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 @********************************************************************************************************@
-                                <div class="col-12 col-md-auto col-lg-6 DropDownListBlock">
-                                    <div class="mt-3">
-                                        <span class="label fw-bold">Order by:</span>
-                                        <div class="col dropDownListBlock">
-                                            <div class="flex-wrap">
-                                                @Html.DropDownList("OrderBy", new SelectList(orderBy, "Value", "Text", "0"), new { 
-                                                    @class = "form-select", 
-                                                    id = "exoplanetOrderby", 
-                                                    data_default = "0" })
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column">
+                                        <!-- Planetary system name -->
+                                        <div class="planetarySystemNameBlock mt-3">
+                                            <div class="mt-1">
+                                                <span class="label fw-bold">Planetary system name:</span>
+                                                <div class="filter-fields">
+                                                    @Html.TextBox("Name", "", new { @class = "text-Name w-100" })
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="mt-3">
-                                        <span class="label fw-bold">Planet name:</span>
-                                        <div class="col dropDownListBlock">
-                                            <div class="flex-wrap">
-                                                @Html.DropDownList("PlanetName", planetNames, new { 
-                                                    @class = "form-select", 
-                                                    id = "exoplanetPlanetName", 
-                                                    data_default = "0" })
+                                        <!-- Discovered planet count -->
+                                        <div class="discoveredPlenetCountBlock mt-3">
+                                            <div class="label fw-bold">Discovered planets in planetary systems:</div>
+                                            <div class="filter-fields row">
+                                                <!-- FROM -->
+                                                <div class="col-6">
+                                                    <div class="fw-semibold">from:</div>
+                                                    <div class="row g-1">
+                                                        <div class="col minWidth5rem">
+                                                            <div class="flex-wrap">
+                                                                @Html.DropDownList("DiscoveredPlenetCountFom", new SelectList(planetsCount, "Value", "Text", "1"), new { @class = "form-select", id = "discoveredPlenetCountFom", data_default = "1" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- TO -->
+                                                <div class="col-6">
+                                                    <div class="fw-semibold">to:</div>
+                                                    <div class="row g-1">
+                                                        <div class="col minWidth5rem">
+                                                            <div class="flex-wrap">
+                                                                @Html.DropDownList("DiscoveredPlenetCountTo", new SelectList(planetsCount, "Value", "Text", "8"), new { @class = "form-select", id = "discoveredPlenetCountTo", data_default = "8" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-
-                                    <div class="mt-3">
-                                        <span class="label fw-bold">Discovered with a telescope:</span>
-                                        <div class="col dropDownListBlock">
-                                            <div class="flex-wrap">
-                                                @Html.DropDownList("Telescope", telescopeNames, new { 
-                                                    @class = "form-select", 
-                                                    id = "exoplanetTelescope", 
-                                                    data_default = "0" })
+                                        <!-- Calendar -->
+                                        <div class="discoveredDateBlock mt-3">
+                                            <div class="label fw-bold">The period during which the planet was discovered:</div>
+                                            <div class="row">
+                                                <!-- FROM -->
+                                                <div class="col-md-6">
+                                                    <div for="dateFrom" class="form-label fw-bold">Date From:</div>
+                                                    <input type="date" id="dateFrom" name="DateFrom"
+                                                           class="form-control"
+                                                           min="1992-01-01"
+                                                           max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                                </div>
+                                                <!-- TO -->
+                                                <div class="col-md-6">
+                                                    <div for="dateTo" class="form-label fw-bold">Date To:</div>
+                                                    <input type="date" id="dateTo" name="DateTo"
+                                                           class="form-control"
+                                                           min="1992-01-01"
+                                                           max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
+                                        <!-- Habitable zone -->
+                                        <div class="habitableZoneBlock mt-3">
+                                            <div class="d-flex mt-3">
+                                                <span class="label fw-bold">Habitable zone:</span>
+                                            </div>
 
-                                    <div class="mt-3">
-                                        <span class="label fw-bold">Discovered with a method:</span>
-                                        <div class="col dropDownListBlock">
-                                            <div class="flex-wrap">
-                                                @Html.DropDownList("DiscoveryMethod", discoveryMethods, new { 
-                                                    @class = "form-select", 
-                                                    id = "exoplanetDiscoveryMethod", 
-                                                    data_default = "0" })
+                                            <div class="row">
+                                                <div class="row">
+                                                    <div class="col habitableZoneTextColuns">
+                                                        <span class="habitableZoneAllPalanetText">Systems with habitable zone planets:</span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span>@Html.CheckBox("HabitableZonePlanets", false, new { @class = "chb-habitableZonePlanets ms-2" })</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col habitableZoneTextColuns">
+                                                        <span class="habitableZoneTerrestrialPalanetText">Systems with terrestrial planets:</span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span>@Html.CheckBox("TerrestrialHabitableZonePlanets", false, new { @class = "chb-terrestrialHabitableZonePlanets ms-2" }) </span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -282,6 +302,7 @@
                         @********************************************************************************************************@
                     </div>
                 </div>
+
 
 
                 <div class="mt-0 additionalBlock">
@@ -296,9 +317,9 @@
                         <div class="col-6">
                             <div class="d-flex flex-wrap">
                                 <div class="me-3">Fix the column width: </div>
-                                <label class="switchButton switchButtonFixColumnWidth">
+                                <label class="switchButton switchButtonDualColor switchButtonFixColumnWidth">
                                     <input type="checkbox" checked>
-                                    <span class="slider"></span>
+                                    <span class="slider sliderDualColor"></span>
                                 </label>
                             </div>
                         </div>
@@ -337,6 +358,15 @@
     window.isAuthenticated = @(isAuthenticated.ToString().ToLower());
 </script>
 
-@section ScriptsPlanetViewCalendar {
-    <script src="~/js/telescopeViewCalculator.min.js" asp-append-version="true"></script>
+@section ScriptsAstroTableFilters {
+    <script src="~/js/AstroTableFilters.min.js" asp-append-version="true"></script>
+}
+@section ScriptsCalendarHandler {
+    <script src="~/js/calendarHandler.min.js" asp-append-version="true"></script>
+}
+@section ScriptsProgresImportBar {
+    <script src="~/js/progresImportBar.min.js" asp-append-version="true"></script>
+}
+@section ScriptsFormHandler {
+    <script src="~/js/formHandler.min.js" asp-append-version="true"></script>
 }
