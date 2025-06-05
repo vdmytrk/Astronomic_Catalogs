@@ -2,19 +2,11 @@
 using Astronomic_Catalogs.Infrastructure.LogingIfrastructure;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
-using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using ExcelDataReader;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace Astronomic_Catalogs.Services;
@@ -26,19 +18,22 @@ public class ExcelImportService_OpenXml : IExcelImport
     private readonly ILogger<ExcelImportService_OpenXml> _logger;
     private readonly IHubContext<ProgressHub> _hub;
     private readonly IImportCancellationService _importCancellationService;
+    private readonly DatabaseInitializer _databaseInitializer;
     private int rowNumber = 0;
 
     public ExcelImportService_OpenXml(
         IDbContextFactory<ApplicationDbContext> contextFactory,
         ILogger<ExcelImportService_OpenXml> logger,
         IHubContext<ProgressHub> hub,
-        IImportCancellationService importCancellationService)
+        IImportCancellationService importCancellationService,
+        DatabaseInitializer databaseInitializer)
     {
         _contextFactory = contextFactory;
         _filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Excel", "PS_2025.03.13_23.08.05 - Converted – Clear.xlsx");
         _logger = logger;
         _hub = hub;
         _importCancellationService = importCancellationService;
+        _databaseInitializer = databaseInitializer;
     }
 
 
@@ -116,6 +111,7 @@ public class ExcelImportService_OpenXml : IExcelImport
         {
             await Task.WhenAll(tasks);
             await _hub.Clients.Group(jobId).SendAsync("ReceiveProgress", 100, cancellationToken);
+            await FillTablesAsync();
         }
         catch (OperationCanceledException)
         {
@@ -128,6 +124,7 @@ public class ExcelImportService_OpenXml : IExcelImport
 
         _logger.LogInformation($"[IMPORT FINISH] Kyiv Time: {FileLogService.GetKyivTime()} | Total Saved: {savedRows}");
     }
+
 
     public T MapRowToModel<T>(Row row, SharedStringTable? sharedStrings) where T : new()
     {
@@ -253,6 +250,13 @@ public class ExcelImportService_OpenXml : IExcelImport
         using var context = _contextFactory.CreateDbContext();
         await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE [NASAExoplanetCatalog]");
         _logger.LogInformation("Table NASAExoplanetCatalog cleared before import.");
+    }
+
+    private async Task FillTablesAsync()
+    {
+        await _databaseInitializer.ExecuteStoredProcedureAsync("FillNASAExoplanetCatalogLastUpdate");
+        await _databaseInitializer.ExecuteStoredProcedureAsync("FillNASAExoplanetCatalogUniquePlanets");
+        await _databaseInitializer.ExecuteStoredProcedureAsync("CalculationPlanetarySystemData"); 
     }
 
 }

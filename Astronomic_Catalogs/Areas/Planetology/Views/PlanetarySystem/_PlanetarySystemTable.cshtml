@@ -1,7 +1,7 @@
-﻿@model IList<Astronomic_Catalogs.DTO.PlanetarySystem>
+﻿@model IList<Astronomic_Catalogs.Entities.PlanetarySystem>
 
 @{
-    var dummy = new Astronomic_Catalogs.DTO.PlanetarySystem();
+    var dummy = new Astronomic_Catalogs.Entities.PlanetarySystem();
 }
 <table id="sizeFilterTable" class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size">
     <thead>
@@ -19,6 +19,8 @@
             <th class="StarColumns StMet">@Html.DisplayNameFor(m => dummy.StMet)</th>
             <th class="StarColumns StMetratio">@Html.DisplayNameFor(m => dummy.StMetratio)</th>
             <th class="StarColumns StLum">@Html.DisplayNameFor(m => dummy.StLum)</th>
+            <th class="StarColumns StLumSunAbsol">@Html.DisplayNameFor(m => dummy.StLumSunAbsol)</th>
+            <th class="StarColumns HabitablZone">@Html.DisplayNameFor(m => dummy.HabitablZone)</th>
             <th class="StarColumns StAge">@Html.DisplayNameFor(m => dummy.StAge)</th>
             <th class="StarColumns SyDist">@Html.DisplayNameFor(m => dummy.SyDist)</th>
 
@@ -52,22 +54,24 @@
                     <td hidden>@system.TicId</td>
                     <td hidden>@system.GaiaId</td>
                     <td>@system.StSpectype</td>
-                    <td>@system.StTeff</td>
-                    <td>@system.StRad</td>
-                    <td>@system.StMass</td>
-                    <td>@system.StMet</td>
+                    <td>@system.StTeff?.ToString("0.######")</td>
+                    <td>@system.StRad?.ToString("0.######")</td>
+                    <td>@system.StMass?.ToString("0.######")</td>
+                    <td>@system.StMet?.ToString("0.######")</td>
                     <td>@system.StMetratio</td>
-                    <td>@system.StLum</td>
-                    <td>@system.StAge</td>
-                    <td>@system.SyDist</td>
+                    <td>@system.StLum?.ToString("0.######")</td>
+                    <td>@system.StLumSunAbsol?.ToString("0.######")</td>
+                    <td>@system.HabitablZone?.ToString("0.######")</td>
+                    <td>@system.StAge?.ToString("0.######")</td>
+                    <td>@system.SyDist?.ToString("0.######")</td>
 
                     <!-- Planet Info -->
                     <td>@planet.PlLetter</td>
-                    <td>@planet.PlRade</td>
-                    <td>@planet.PlRadJ</td>
-                    <td>@planet.PlMasse</td>
-                    <td>@planet.PlMassJ</td>
-                    <td>@planet.PlOrbsmax</td>
+                    <td>@planet.PlRade?.ToString("0.######")</td>
+                    <td>@planet.PlRadJ?.ToString("0.######")</td>
+                    <td>@planet.PlMasse?.ToString("0.######")</td>
+                    <td>@planet.PlMassJ?.ToString("0.######")</td>
+                    <td>@planet.PlOrbsmax?.ToString("0.######")</td>
                 </tr>
             }
         }

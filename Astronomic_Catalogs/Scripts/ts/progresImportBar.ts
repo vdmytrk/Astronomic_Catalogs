@@ -10,7 +10,6 @@ let isImportInProgress: boolean = false;
 export function initialize(): void {
     const startImportButton = document.getElementById("importPlanetDataButton") as HTMLElement | null;
     const stopImportButton = document.getElementById("stopImportingPlanetDataButton") as HTMLElement | null;
-
     progresParHendler();
     startImport(startImportButton);
     stopImport(stopImportButton);
@@ -38,7 +37,9 @@ function progresParHendler() {
 }
 
 function startImport(btn: HTMLElement): void {
+    const TestVariable = 1;
     if (btn) {
+        const TestVariable = 1;
         btn.addEventListener("click", () => {
             if (isImportInProgress) return;
             isImportInProgress = true;
@@ -53,7 +54,7 @@ function startImport(btn: HTMLElement): void {
             stopButton.disabled = false;
             stopButton.style.display = 'inline-block';
 
-            fetch(`/Planets/PlanetsCatalog/ImportData_OpenXml?jobId=${jobId}`, {
+            fetch(`/Planetology/PlanetsCatalog/ImportData_OpenXml?jobId=${jobId}`, {
                 method: 'POST',
                 signal: abortController.signal
             }).then(response => {
@@ -73,7 +74,9 @@ function startImport(btn: HTMLElement): void {
 }
 
 function stopImport(btn: HTMLElement): void {
+    const TestVariable = 1;
     if (btn) {
+        const TestVariable = 1;
         btn.addEventListener("click", () => {
             // To stop .fetch from startImport() to free up user resources
             if (abortController) {
@@ -81,7 +84,7 @@ function stopImport(btn: HTMLElement): void {
             }
 
             // To stop server process
-            fetch(`/Planets/PlanetsCatalog/CancelImport?jobId=${jobId}`, {
+            fetch(`/Planetology/PlanetsCatalog/CancelImport?jobId=${jobId}`, {
                 method: 'POST'
             });
 
@@ -107,7 +110,7 @@ function resetUI(): void {
     isImportInProgress = false;
     abortController = null;
 
-    fetch('/Planets/PlanetsCatalog/GetPlanetsTable')
+    fetch('/Planetology/PlanetsCatalog/GetPlanetsTable')
         .then(response => response.text())
         .then(html => {
             const tableContainer = document.getElementById('planetsTableContainer') as HTMLElement;

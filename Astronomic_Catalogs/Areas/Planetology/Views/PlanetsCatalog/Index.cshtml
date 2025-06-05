@@ -19,7 +19,11 @@
         new ExtendedSelectListItem { Value = "9", Text = "Super(hot)-Jupiter", Value_1 = "13.7", Value_2 = "50" }
     };
 
-    var planetsCount = Enumerable.Range(1, 8).Select(i => new SelectListItem { Value = i.ToString(), Text = i.ToString() }).ToList();
+    var distanceToStar = Enumerable.Range(0, 101)
+        .Concat(Enumerable.Range(1, 9).Select(i => i * 100))
+        .Concat(Enumerable.Range(1, 20).Select(i => i * 1000))
+        .Select(i => new SelectListItem { Value = i.ToString(), Text = i.ToString() })
+        .ToList();
 
     var planetNames = ViewBag.PlanetNames as List<SelectListItem> ?? new();
     planetNames.Insert(0, new SelectListItem { Value = "0", Text = "All planets" });
@@ -43,9 +47,6 @@
                     <p class="mx-3 mt-2">
                         <a asp-action="Create">Create New</a>
                     </p>
-                }
-                @if (User.IsInRole("OwnerAdministratorPower"))
-                {
                     <div class="col mx-3">
                         <button id="importPlanetDataButton" type="button" class="btn btn-primary">Import planet data</button>
                     </div>
@@ -71,13 +72,16 @@
                             <button id="stopImportingPlanetDataButton" type="button" class="btn btn-primary">Stop importing planet data</button>
                         </div>
                     </div>
-                    <div class="my-2 mx-2">
-                        <div id="progressContainer" class="progress">
-                            <div id="importProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar">0%</div>
-                        </div>
-                    </div>
                 }
             </div>
+        </div>
+        <div class="my-2 mx-2">
+            @if (User.IsInRole("OwnerAdministratorPower"))
+            {
+                <div id="progressContainer" class="progress ms-1 me-3">
+                    <div id="importProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar">0%</div>
+                </div>
+            }
         </div>
     </div>
 
@@ -134,19 +138,21 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-center mt-4">
-                                                <span class="label fw-bold text-start">Choose which planet sizes to show (all are selected by default):</span>
+                                            <div class="chooseWhichPlanetSizes">
+                                                <div class="d-flex justify-content-center mt-4">
+                                                    <span class="label fw-bold text-start">Choose which planet sizes to show (all are selected by default):</span>
+                                                </div>
+                                                <select id="planetTypeSelect" name="PlanetType"
+                                                        class="form-select mx-auto"
+                                                        multiple>
+                                                    @foreach (var item in planetType)
+                                                    {
+                                                        <option value="@item.Value">
+                                                            @item.Text — Size from @item.Value_1 to @item.Value_2 radius of Earth
+                                                        </option>
+                                                    }
+                                                </select>
                                             </div>
-                                            <select id="planetTypeSelect" name="PlanetType"
-                                                    class="form-select mx-auto"
-                                                    multiple>
-                                                @foreach (var item in planetType)
-                                                {
-                                                    <option value="@item.Value">
-                                                        @item.Text — Size from @item.Value_1 to @item.Value_2 radius of Earth
-                                                    </option>
-                                                }
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -203,7 +209,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @********************************************************************************************************@
+                                @*----------------------------------------------------------------------------------------------*@
                                 <div class="flex-grow-1">
                                     <div class="d-flex flex-column">
                                         <!-- Planetary system name -->
@@ -216,9 +222,9 @@
                                             </div>
                                         </div>
 
-                                        <!-- Discovered planet count -->
+                                        <!-- Distance from planet to star -->
                                         <div class="discoveredPlenetCountBlock mt-3">
-                                            <div class="label fw-bold">Discovered planets in planetary systems:</div>
+                                            <div class="label fw-bold">The distance from the planet to its star, AU:</div>
                                             <div class="filter-fields row">
                                                 <!-- FROM -->
                                                 <div class="col-6">
@@ -226,7 +232,7 @@
                                                     <div class="row g-1">
                                                         <div class="col minWidth5rem">
                                                             <div class="flex-wrap">
-                                                                @Html.DropDownList("DiscoveredPlenetCountFom", new SelectList(planetsCount, "Value", "Text", "1"), new { @class = "form-select", id = "discoveredPlenetCountFom", data_default = "1" })
+                                                                @Html.DropDownList("DistanceToStarFrom", new SelectList(distanceToStar, "Value", "Text", "0"), new { @class = "form-select", id = "distanceToStarFrom", data_default = "0" })
                                                             </div>
                                                         </div>
                                                     </div>
@@ -238,7 +244,7 @@
                                                     <div class="row g-1">
                                                         <div class="col minWidth5rem">
                                                             <div class="flex-wrap">
-                                                                @Html.DropDownList("DiscoveredPlenetCountTo", new SelectList(planetsCount, "Value", "Text", "8"), new { @class = "form-select", id = "discoveredPlenetCountTo", data_default = "8" })
+                                                                @Html.DropDownList("DistanceToStarTo", new SelectList(distanceToStar, "Value", "Text", "20000"), new { @class = "form-select", id = "distanceToStarTo", data_default = "20000" })
                                                             </div>
                                                         </div>
                                                     </div>
@@ -278,7 +284,7 @@
                                             <div class="row">
                                                 <div class="row">
                                                     <div class="col habitableZoneTextColuns">
-                                                        <span class="habitableZoneAllPalanetText">Systems with habitable zone planets:</span>
+                                                        <span class="habitableZoneAllPalanetText">Planets in habitable zone:</span>
                                                     </div>
                                                     <div class="col">
                                                         <span>@Html.CheckBox("HabitableZonePlanets", false, new { @class = "chb-habitableZonePlanets ms-2" })</span>
@@ -286,7 +292,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col habitableZoneTextColuns">
-                                                        <span class="habitableZoneTerrestrialPalanetText">Systems with terrestrial planets:</span>
+                                                        <span class="habitableZoneTerrestrialPalanetText">Terrestrial planets:</span>
                                                     </div>
                                                     <div class="col">
                                                         <span>@Html.CheckBox("TerrestrialHabitableZonePlanets", false, new { @class = "chb-terrestrialHabitableZonePlanets ms-2" }) </span>

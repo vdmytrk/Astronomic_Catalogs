@@ -82,7 +82,6 @@ public class Program
         builder.Services.AddScoped<ICollinderFilterService, CollinderFilterService>();
         builder.Services.AddScoped<ICacheService, StoredPprocedureCacheService>();
         builder.Services.AddScoped<IPlanetarySystemFilterService, PlanetarySystemFilterService>();
-        builder.Services.AddScoped<IDistinctSelectListService, DistinctSelectListService>();
     }
 
     private static IConfiguration LoadConfiguration()

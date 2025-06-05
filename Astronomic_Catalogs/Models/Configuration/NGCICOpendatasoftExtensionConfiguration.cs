@@ -90,8 +90,7 @@ public class NGCICOpendatasoftExtensionConfiguration : IEntityTypeConfiguration<
         builder.Property(e => e.OpenngcNotes).HasColumnType("varchar(max)");
         builder.Property(e => e.Image).HasColumnName("Image"); // The name matches, but "Image" is a reserved word, so explicit specification is appropriate.
 
-        builder.Property(e => e.PageNumber).IsRequired(false);
-        builder.Property(e => e.PageCount).IsRequired(false);
+        builder.Property(e => e.RowOnPage).IsRequired(false);
         builder.Property(e => e.SourceTable).IsRequired(false);
 
     }

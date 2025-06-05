@@ -62,7 +62,6 @@ public class NGCICViewModel
     public string? Image { get; set; }
 
 
-    public int? PageNumber { get; set; }
-    public int? PageCount { get; set; }
+    public int? RowOnPage { get; set; }
     public string? SourceTable { get; set; }
 }

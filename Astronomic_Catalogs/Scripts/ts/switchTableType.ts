@@ -29,7 +29,7 @@ function switchTable(checkbox: HTMLInputElement): void {
     let pageNumber = '1';
     const currentPageElement = document.querySelector(".paginationBodyBlock .currentPage");
     if (currentPageElement) {
-        pageNumber = currentPageElement.textContent?.trim() || '1';
+        pageNumber = currentPageElement.textContent?.trim() || pageNumber;
     }
 
     const showGrouped = checkbox.checked;

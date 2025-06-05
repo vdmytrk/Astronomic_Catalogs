@@ -45,7 +45,6 @@ public class CollinderCatalogConfiguration : IEntityTypeConfiguration<CollinderC
         builder.Property(e => e.Class).HasMaxLength(10);
 
 
-        builder.Property(e => e.PageNumber).HasDefaultValue(1);
-        builder.Property(e => e.PageCount).HasDefaultValue(133);
+        builder.Property(e => e.RowOnPage).HasDefaultValue(1);
     }
 }

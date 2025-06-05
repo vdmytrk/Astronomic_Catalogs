@@ -1,9 +1,11 @@
 ﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
+using System.Data;
 using System.Text.Json;
 
 namespace Astronomic_Catalogs.Services;
@@ -92,6 +94,55 @@ public class CollinderFilterService : ICollinderFilterService
 
             return result;
         });
+    }
+
+    public async Task<(int count, List<CollinderCatalog> rawData, List<ConstellationDto> constellations)> GetCollinderCatalogDataAsync()
+    {
+        using var conn = _context.Database.GetDbConnection();
+
+        if (conn.State != ConnectionState.Open)
+            await conn.OpenAsync();
+
+        var sql = @"
+                SELECT COUNT(*) FROM CollinderCatalog;
+                SELECT TOP 50 
+                    Id, 
+	                [Namber_name] AS NamberName, 
+	                NameOtherCat, 
+	                Constellation,
+	                Right_ascension AS RightAscension, 
+	                Right_ascension_H AS RightAscensionH, 
+	                Right_ascension_M AS RightAscensionM, 
+	                Right_ascension_S AS RightAscensionS,
+	                Declination, 
+	                NS, 
+	                Declination_D AS DeclinationD, 
+	                Declination_M AS DeclinationM, 
+	                Declination_S AS DeclinationS,
+	                App_Mag AS AppMag, 
+	                App_Mag_Flag AS AppMagFlag,
+	                CountStars, 
+	                CountStars_ToFinding AS CountStarsToFinding,
+	                [Ang_Diameter] AS AngDiameter, 
+	                Ang_Diameter_Max AS AngDiameterNew,
+	                Class, 
+	                Comment
+                FROM CollinderCatalog;
+                SELECT 
+                    Short_name AS ShortName, 
+                    Latine_name_Nominative_case AS LatineNameNominativeCase, 
+                    English_name AS EnglishName, 
+                    Ukraine_name AS UkraineName
+                FROM Constellation;
+            ";
+
+        using var multi = await conn.QueryMultipleAsync(sql);
+
+        int count = await multi.ReadFirstAsync<int>();
+        var rawData = (await multi.ReadAsync<CollinderCatalog>()).ToList();
+        var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
+
+        return (count, rawData, constellations);
     }
 
 }

@@ -380,7 +380,6 @@ public class NASAExoplanetCatalogConfiguration : IEntityTypeConfiguration<NASAEx
         builder.Property(e => e.PlNtranspec).HasColumnName("Pl_ntranspec");
         builder.Property(e => e.PlNdispec).HasColumnName("Pl_ndispec");
 
-        builder.Property(e => e.PageNumber).IsRequired(false);
-        builder.Property(e => e.PageCount).IsRequired(false);
+        builder.Property(e => e.RowOnPage).IsRequired(false);
     }
 }

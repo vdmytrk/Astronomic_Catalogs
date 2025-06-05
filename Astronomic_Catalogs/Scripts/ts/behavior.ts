@@ -4,6 +4,7 @@ export function initialize(): void {
     setupShowTextBlockToggles();
     setupShowFiltersToggles();
     handleHabitableZoneDependency();
+    handlePlanetSyzeDependency();
 }
 
 
@@ -55,6 +56,31 @@ export function hideShowBlockDownAnime(target: HTMLElement, show: boolean, delay
     }, delay);
 }
 
+function handlePlanetSyzeDependency(): void {
+    const planetSyzeCheckbox = document.querySelector<HTMLInputElement>('.chb-PlanetWithSize');
+    const planetSizeSelect = document.querySelector<HTMLSelectElement>('#planetTypeSelect');
+    const choosePlanetSizes = document.querySelector<HTMLElement>('.chooseWhichPlanetSizes');
+
+    if (!planetSyzeCheckbox || !planetSizeSelect || !choosePlanetSizes) return;
+
+    const updateChoosePlanetSizesAccessibility = () => {
+        if (planetSyzeCheckbox.checked) {
+            planetSizeSelect.disabled = false;
+            choosePlanetSizes.classList.remove('disabled-opacity');
+        } else {
+            planetSizeSelect.disabled = true;
+            planetSizeSelect.selectedIndex = -1;
+            const options = planetSizeSelect.querySelectorAll<HTMLOptionElement>('option');
+            options.forEach(option => option.classList.remove('selected-fix'));
+            choosePlanetSizes.classList.add('disabled-opacity');
+        }
+    };
+
+    updateChoosePlanetSizesAccessibility();
+
+    planetSyzeCheckbox.addEventListener('change', updateChoosePlanetSizesAccessibility);
+}
+
 function handleHabitableZoneDependency(): void {
     const habitableZoneCheckbox = document.querySelector<HTMLInputElement>('.chb-habitableZonePlanets');
     const terrestrialCheckbox = document.querySelector<HTMLInputElement>('.chb-terrestrialHabitableZonePlanets');
@@ -70,9 +96,7 @@ function handleHabitableZoneDependency(): void {
         }
     };
 
-    // Початковий стан
     updateTerrestrialCheckboxState();
 
-    // Обробник зміни
     habitableZoneCheckbox.addEventListener('change', updateTerrestrialCheckboxState);
 }

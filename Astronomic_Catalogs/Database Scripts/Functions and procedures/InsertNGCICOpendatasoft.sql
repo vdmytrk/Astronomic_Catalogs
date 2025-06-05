@@ -44,14 +44,6 @@ BEGIN
 
     DECLARE @SQL NVARCHAR(MAX);
 
-	-- For error hendling
-	DECLARE @FuncProc AS VARCHAR(50), 
-			@Line AS INT, 
-			@ErrorNumber AS INT, 
-			@ErrorMessage NVARCHAR(MAX), 
-			@ErrorSeverity INT, 
-			@ErrorState INT;
-
 	BEGIN TRY
 		INSERT INTO NGCICOpendatasoft (
 			NGC_IC, [Name], SubObject, Messier, NGC, IC, Limit_Ang_Diameter, Ang_Diameter, ObjectTypeAbrev, ObjectType, 
@@ -108,13 +100,30 @@ BEGIN
 			'NGCICOpendatasoft'
 		);		
 	END TRY
-	BEGIN CATCH						
-			SET @ErrorMessage = 'An error occurred during handling error from OuterTransaction transaction INTO INNER STORES PROCEDURE: ' +
-				' Error_number: ' + CAST(ERROR_NUMBER() AS VARCHAR(10)) + 
-				' Error_message: ' + CAST(ERROR_MESSAGE() AS NVARCHAR(MAX)) +
-				' Error_severity: ' + CAST(ERROR_SEVERITY() AS VARCHAR(2)) +
-				' Error_state: ' +  CAST(ERROR_STATE() AS VARCHAR(3)) + 
-				' Error_line: ' + CAST(ERROR_LINE() AS VARCHAR(10));
-		THROW 50003, @ErrorMessage, 3;
-	END CATCH
+    BEGIN CATCH 
+        DECLARE @FuncProcErr AS NVARCHAR(MAX), 
+                @Line AS INT, 
+                @ErrorNumber AS INT, 
+                @ErrorMessage NVARCHAR(MAX),  
+                @FullEerrorMessage NVARCHAR(MAX),
+                @ErrorSeverity INT, 
+                @ErrorState INT;
+        
+        SET @FuncProcErr = ISNULL(ERROR_PROCEDURE(), N'UnknownProcedure');
+        SET @Line = ERROR_LINE();
+        SET @ErrorNumber = ERROR_NUMBER();
+        SET @ErrorSeverity = ERROR_SEVERITY();
+        SET @ErrorState = ERROR_STATE();
+        SET @ErrorMessage = ERROR_MESSAGE();
+           
+        SET @FullEerrorMessage = 
+           N'An error occurred in ' + @FuncProcErr + N': ' +
+           N' Error_number: ' + CAST(@ErrorNumber AS NVARCHAR) + 
+           N' Error_message: ' + ISNULL(@ErrorMessage, N'N/A') + 
+           N' Error_severity: ' + CAST(@ErrorSeverity AS NVARCHAR) +
+           N' Error_state: ' + CAST(@ErrorState AS NVARCHAR) + 
+           N' Error_line: ' + CAST(@Line AS NVARCHAR);
+        
+		THROW 51003, @FullEerrorMessage, 3;
+    END CATCH
 END;

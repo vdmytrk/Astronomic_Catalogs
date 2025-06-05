@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Astronomic_Catalogs.DTO.PlanetarySystem>
+﻿@model IEnumerable<Astronomic_Catalogs.Entities.PlanetarySystem>
 
 @{
     ViewData["Title"] = "Planetary system";
@@ -197,7 +197,7 @@
                         <div class="col-6">
                             <div class="d-flex flex-wrap align-items-center">
                                 <h6 class="pe-2">Number of elements on the page:</h6>
-                                @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50" }, "30"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30" })
+                                @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50" }, "10"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "10" })
                             </div>
                         </div>
                         <div class="col-6">

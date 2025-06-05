@@ -30,16 +30,7 @@ CREATE OR ALTER PROC GetFilteredCollinderData
 AS
 BEGIN		
 	DECLARE @TotalCount INT = 0, @PageCountInResult INT = 0, @Offset INT = 0;
-
-    -- For error hendling
-	DECLARE @FuncProc AS VARCHAR(50), 
-			@Line AS INT, 
-			@ErrorNumber AS INT, 
-			@ErrorMessage NVARCHAR(MAX),
-			@FullEerrorMessage NVARCHAR(MAX),
-			@ErrorSeverity INT, 
-			@ErrorState INT;
-	
+		
     SET NOCOUNT ON; 
 
 	BEGIN TRY
@@ -74,8 +65,7 @@ BEGIN
 			END;
 
 
-
-		SELECT * INTO #TemporaryTable
+		SELECT * INTO #SummaryTable
 		FROM CollinderCatalog
 		WHERE
 			(@NameOtherCat IS NULL OR [NameOtherCat] LIKE '%' + @NameOtherCat + '%')
@@ -87,7 +77,7 @@ BEGIN
 				)
 			)
 			AND (
-				[Ang_Diameter_Max] >= CAST(@Ang_Diameter_min AS FLOAT) 
+				[Ang_Diameter_Max] >= CAST(@Ang_Diameter_min AS FLOAT)
 				OR (@Ang_Diameter_min = 0 AND [Ang_Diameter_Max] IS NULL)
 			)
 			AND (
@@ -107,12 +97,13 @@ BEGIN
 				@ObjectTypes IS NULL OR EXISTS (
 					SELECT 1 
 					FROM OPENJSON(@ObjectTypes) AS j
-					WHERE [Class] LIKE j.[value]
+					WHERE [Class] LIKE j.[value] 
 				)
 			);
 
-		
-		SELECT @TotalCount = COUNT(*) FROM #TemporaryTable;
+
+		-- Paggination		
+		SELECT @TotalCount = COUNT(*) FROM #SummaryTable;
 		SET @PageCountInResult = CEILING(1.0 * @TotalCount / @RowOnPage);
 		
 		IF @PageCountInResult = 0
@@ -127,10 +118,8 @@ BEGIN
 		ELSE 
 			BEGIN -- To return the last available page.
 				SET @Offset = (@PageCountInResult - 1) * @RowOnPage; 
-				SET @PageNumber = @PageCountInResult;
 			END
 			
-
 		SELECT 
 			Id, [Namber_name], NameOtherCat, Constellation
 			, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S
@@ -139,41 +128,54 @@ BEGIN
 			, CountStars, CountStars_ToFinding
 			, [Ang_Diameter], Ang_Diameter_Max
 			, Class, Comment
-			, COUNT(*) OVER() AS [PageCount]
-			, @PageNumber AS PageNumber -- Using the PageNumber field of the database table to pass a value of @PageCountInResult.
-		FROM #TemporaryTable
+			, COUNT(*) OVER() AS RowOnPage 
+		FROM #SummaryTable
 		ORDER BY Id
 		OFFSET @Offset ROWS FETCH NEXT @RowOnPage ROWS ONLY;
-		
-		DROP TABLE #TemporaryTable;
+
+		DROP TABLE #SummaryTable;
 
 	END TRY
-	BEGIN CATCH
-		BEGIN TRY
-			PRINT 'BEGIN CATCH';
-			SET @FuncProc = ERROR_PROCEDURE();
-			SET @Line = ERROR_LINE();
-			SET @ErrorNumber = ERROR_NUMBER();
-			SET @ErrorSeverity = ERROR_SEVERITY();
-			SET @ErrorState = ERROR_STATE();
-			SET @ErrorMessage = ERROR_MESSAGE();
+    BEGIN CATCH
+        BEGIN TRY
+            DECLARE @FuncProcErr AS NVARCHAR(MAX), 
+                @Line AS INT, 
+                @ErrorNumber AS INT, 
+                @ErrorMessage NVARCHAR(MAX),  
+                @FullEerrorMessage NVARCHAR(MAX),
+                @ErrorSeverity INT,
+                @ErrorState INT,
+                @xstate INT;
 
-			INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorSeverity, ErrorState, ErrorMessage) 
-			VALUES (@FuncProc, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
-			
-			SET @FullEerrorMessage = 'An error occurred in GetFilteredCollinderData: ' +
-				' Error_number: ' + CAST(@ErrorNumber AS VARCHAR(10)) + 
-				' Error_message: ' + CAST(@ErrorMessage AS NVARCHAR(MAX)) +
-				' Error_severity: ' + CAST(@ErrorSeverity AS VARCHAR(2)) +
-				' Error_state: ' +  CAST(@ErrorState AS VARCHAR(3)) + 
-				' Error_line: ' + CAST(@Line AS VARCHAR(10));
-			
-			THROW 50004, @FullEerrorMessage, 4; 
-		END TRY
-		BEGIN CATCH
-			PRINT 'An error occurred during handling error in GetFilteredCollinderData stored procedure: ' + @ErrorMessage;
-		END CATCH
-	END CATCH
+            SET @FuncProcErr = ISNULL(ERROR_PROCEDURE(), N'UnknownProcedure');
+            SET @Line = ERROR_LINE();
+            SET @ErrorNumber = ERROR_NUMBER();
+            SET @ErrorSeverity = ERROR_SEVERITY();
+            SET @ErrorState = ERROR_STATE();
+            SET @ErrorMessage = ERROR_MESSAGE();               
+
+            SET @FullEerrorMessage = 
+                N'An error occurred in ' + @FuncProcErr + N': ' +
+                N' Error_number: ' + CAST(@ErrorNumber AS NVARCHAR) + 
+                N' Error_message: ' + ISNULL(@ErrorMessage, N'N/A') +  
+                N' Error_severity: ' + CAST(@ErrorSeverity AS NVARCHAR) +
+                N' Error_state: ' + CAST(@ErrorState AS NVARCHAR) + 
+                N' Error_line: ' + CAST(@Line AS NVARCHAR);
+
+            INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorSeverity, ErrorState, ErrorMessage) 
+            VALUES (@FuncProcErr, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
+
+            THROW 51000, @FullEerrorMessage, 0;
+        END TRY
+        BEGIN CATCH
+            DECLARE @SecondErrorMessage NVARCHAR(MAX);
+            IF @FullEerrorMessage IS NULL SET @FullEerrorMessage = 'Unknown error occurred and logging also failed.';
+            SET @SecondErrorMessage = 
+                'An error occurred during handling error in ' + @FuncProcErr + ' stored procedure: ' + @FullEerrorMessage;
+				
+            THROW 52000, @SecondErrorMessage, 0;
+        END CATCH
+    END CATCH
 END
 
 

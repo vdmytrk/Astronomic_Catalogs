@@ -8,15 +8,6 @@
 CREATE OR ALTER PROC InsertCollinderCatalog
 AS
 BEGIN
-    -- For error hendling
-	DECLARE @FuncProc AS VARCHAR(50), 
-			@Line AS INT, 
-			@ErrorNumber AS INT, 
-			@ErrorMessage NVARCHAR(MAX), 
-			@FullEerrorMessage NVARCHAR(MAX),
-			@ErrorSeverity INT, 
-			@ErrorState INT;
-	
     SET NOCOUNT ON; 
 	
 	BEGIN TRY
@@ -134,31 +125,47 @@ BEGIN
 		FROM CollinderCatalog_Temporarily AS T1;
 
 	END TRY
-	BEGIN CATCH
-		BEGIN TRY
-			PRINT 'BEGIN CATCH';
-			SET @FuncProc = ERROR_PROCEDURE();
-			SET @Line = ERROR_LINE();
-			SET @ErrorNumber = ERROR_NUMBER();
-			SET @ErrorSeverity = ERROR_SEVERITY();
-			SET @ErrorState = ERROR_STATE();
-			SET @ErrorMessage = ERROR_MESSAGE();
+    BEGIN CATCH
+        BEGIN TRY
+            DECLARE @FuncProcErr AS NVARCHAR(MAX), 
+                @Line AS INT, 
+                @ErrorNumber AS INT, 
+                @ErrorMessage NVARCHAR(MAX),
+                @FullEerrorMessage NVARCHAR(MAX),
+                @ErrorSeverity INT,
+                @ErrorState INT,
+                @xstate INT;
 
-			INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorSeverity, ErrorState, ErrorMessage) 
-			VALUES (@FuncProc, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
-			
-			SET @FullEerrorMessage = 'An error occurred in GetFilteredCollinderData: ' +
-				' Error_number: ' + CAST(@ErrorNumber AS VARCHAR(10)) + 
-				' Error_message: ' + CAST(@ErrorMessage AS NVARCHAR(MAX)) +
-				' Error_severity: ' + CAST(@ErrorSeverity AS VARCHAR(2)) +
-				' Error_state: ' +  CAST(@ErrorState AS VARCHAR(3)) + 
-				' Error_line: ' + CAST(@Line AS VARCHAR(10));
-			
-			THROW 50004, @FullEerrorMessage, 4;
-		END TRY
-		BEGIN CATCH
-			PRINT 'An error occurred during handling error in GetFilteredCollinderData stored procedure: ' + @ErrorMessage;
-		END CATCH
-	END CATCH
+            SET @FuncProcErr = ISNULL(ERROR_PROCEDURE(), N'UnknownProcedure');
+            SET @Line = ERROR_LINE();
+            SET @ErrorNumber = ERROR_NUMBER();
+            SET @ErrorSeverity = ERROR_SEVERITY();
+            SET @ErrorState = ERROR_STATE();
+            SET @ErrorMessage = ERROR_MESSAGE();            
+    
+
+            SET @FullEerrorMessage = 
+                N'An error occurred in ' + @FuncProcErr + N': ' +
+                N' Error_number: ' + CAST(@ErrorNumber AS NVARCHAR) + 
+                N' Error_message: ' + ISNULL(@ErrorMessage, N'N/A') +  
+                N' Error_severity: ' + CAST(@ErrorSeverity AS NVARCHAR) +
+                N' Error_state: ' + CAST(@ErrorState AS NVARCHAR) + 
+                N' Error_line: ' + CAST(@Line AS NVARCHAR);
+
+
+            INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorSeverity, ErrorState, ErrorMessage) 
+            VALUES (@FuncProcErr, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
+            
+            THROW 51000, @FullEerrorMessage, 0;
+        END TRY
+        BEGIN CATCH
+            DECLARE @SecondErrorMessage NVARCHAR(MAX);
+            IF @FullEerrorMessage IS NULL SET @FullEerrorMessage = 'Unknown error occurred and logging also failed.';
+            SET @SecondErrorMessage = 
+                'An error occurred during handling error in ' + @FuncProcErr + ' stored procedure: ' + @FullEerrorMessage;
+            
+            THROW 52000, @SecondErrorMessage, 0;
+        END CATCH
+    END CATCH
 END
 

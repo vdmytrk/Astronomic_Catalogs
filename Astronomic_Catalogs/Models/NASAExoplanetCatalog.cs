@@ -307,6 +307,5 @@ public class NASAExoplanetCatalog
     public int PlNdispec { get; set; }
 
 
-    public int? PageNumber { get; set; }
-    public int? PageCount { get; set; }
+    public int? RowOnPage { get; set; }
 }

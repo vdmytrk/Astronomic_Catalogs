@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Data;
+﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
-using Microsoft.AspNetCore.Authorization;
-using System.Text.RegularExpressions;
-using Astronomic_Catalogs.Utils;
-using Astronomic_Catalogs.ViewModels;
 using Astronomic_Catalogs.Services.Interfaces;
-using AutoMapper;
+using Astronomic_Catalogs.Utils;
+using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Text.RegularExpressions;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
 {
@@ -22,47 +18,39 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ICollinderFilterService _filterService;
+        private readonly ICacheService _cache;
 
-        public CollinderCatalogsController(ApplicationDbContext context, ICollinderFilterService filterService)
+        public CollinderCatalogsController(ApplicationDbContext context, ICollinderFilterService filterService, ICacheService cache)
         {
             _context = context;
             _filterService = filterService;
+            _cache = cache;
         }
 
         // GET: Catalogs/CollinderCatalogs
         public async Task<IActionResult> Index()
         {
-            var data = await _context.CollinderCatalog.ToListAsync();
-            var count = data.Count;
+            var (count, rawData, constellations) = await _filterService.GetCollinderCatalogDataAsync();
 
-            var sorted = data
+            var data = rawData
                 .OrderBy(x => ExtractLeadingNumber(x.NamberName))
                 .ThenBy(x => x.NamberName)
-                .Take(50)
                 .ToList();
 
-            var constellations = await _context.Constellations
-            .Select(c => new
-            {
-                c.ShortName,
-                c.LatineNameNominativeCase,
-                c.EnglishName,
-                c.UkraineName
-            })
-            .ToListAsync();
-
-
-            ViewBag.RowsCount = count;
+            ViewBag.RowOnPageCatalog = "50";
+            ViewBag.AmountRowsResult = count;
             ViewBag.Constellations = constellations;
 
-            return View(sorted);
+            return View(data);
         }
 
         [HttpPost]
         public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
-        {            
+        {
             string rowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
             ViewBag.RowOnPageCatalog = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
+            int? pageNumber = parameters.GetInt("PageNumberVaulue");
+            ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
 
             List<CollinderCatalog>? selectedList;
 
@@ -80,8 +68,8 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
 
             var firstItem = selectedList.FirstOrDefault();
 
-            ViewBag.RowsCount = firstItem?.PageCount ?? 1;
-            ViewBag.AmountRowsResult = firstItem?.PageNumber ?? 0; // Using the PageNumber field of the database table to pass a value.
+            // TODO: Use Dapper to return an output parameter
+            ViewBag.AmountRowsResult = firstItem?.RowOnPage ?? 0; // Using the RowOnPage field of the database table to pass a value.
             ViewBag.Contorller = "CollinderCatalogs";
 
             try
@@ -137,7 +125,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         [Authorize(Policy = "UsersAccessClaim")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameter,AngDiameterNew,Class,Comment,PageNumber,PageCount")] CollinderCatalog collinderCatalog)
+        public async Task<IActionResult> Create([Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameter,AngDiameterNew,Class,Comment,RowOnPage")] CollinderCatalog collinderCatalog)
         {
             if (ModelState.IsValid)
             {
@@ -175,7 +163,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         [Authorize(Policy = "UsersAccessClaim")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameter,AngDiameterNew,Class,Comment,PageNumber,PageCount")] CollinderCatalog collinderCatalog)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,NamberName,NameOtherCat,Constellation,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,Declination,NS,DeclinationD,DeclinationM,DeclinationS,AppMag,AppMagFlag,CountStars,CountStarsToFinding,AngDiameter,AngDiameterNew,Class,Comment,RowOnPage")] CollinderCatalog collinderCatalog)
         {
             if (id != collinderCatalog.Id)
             {
@@ -188,6 +176,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
                 {
                     _context.Update(collinderCatalog);
                     await _context.SaveChangesAsync();
+                    // TODO: Clear cache
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -241,6 +230,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             }
 
             await _context.SaveChangesAsync();
+            // TODO: Clear cache
             return RedirectToAction(nameof(Index));
         }
         #endregion
@@ -258,5 +248,6 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             var match = Regex.Match(input, @"^\d+");
             return match.Success ? int.Parse(match.Value) : int.MaxValue;
         }
+
     }
 }

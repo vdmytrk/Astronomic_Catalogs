@@ -45,8 +45,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 const formHandler = __importStar(require("./formHandler"));
-//import { serializeForm  } from "./formHandler";
-//import { createSpinnerHTML } from "./formHandler";
 const behavior_1 = require("./behavior");
 document.addEventListener("DOMContentLoaded", () => {
     initialize();
@@ -73,7 +71,7 @@ function switchTable(checkbox) {
     let pageNumber = '1';
     const currentPageElement = document.querySelector(".paginationBodyBlock .currentPage");
     if (currentPageElement) {
-        pageNumber = ((_a = currentPageElement.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || '1';
+        pageNumber = ((_a = currentPageElement.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || pageNumber;
     }
     const showGrouped = checkbox.checked;
     const url = showGrouped

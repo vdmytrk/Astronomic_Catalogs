@@ -1,4 +1,5 @@
 ﻿using Astronomic_Catalogs.DTO;
+using Astronomic_Catalogs.Entities;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Configuration;
@@ -37,7 +38,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<NGCICOpendatasoft> NGCIC_Catalog { get; set; } = null!;
     public DbSet<NGCICOpendatasoftExtension> NGCICOpendatasoft_E { get; set; } = null!;
     public DbSet<NASAExoplanetCatalog> PlanetsCatalog { get; set; } = null!;
-    public DbSet<PlanetarySystem> PlanetarySystemsCatalog { get; set; } = null!;
+    public DbSet<PlanetarySystemFlatRow> PlanetarySystemsCatalog { get; set; } = null!;
 
 
     public DbSet<LogProcFunc> LogProcFuncs { get; set; } = null!;

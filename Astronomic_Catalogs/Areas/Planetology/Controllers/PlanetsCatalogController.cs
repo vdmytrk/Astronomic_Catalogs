@@ -4,6 +4,7 @@ using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Astronomic_Catalogs.Areas.Planetology.Controllers;
 
@@ -14,41 +15,43 @@ public class PlanetsCatalogController : Controller
     private readonly IExcelImport _excelImportService;
     private readonly IImportCancellationService _importCancellationService;
     private readonly IPlanetFilterService _filterService;
-    private readonly IDistinctSelectListService _distinctSelectListService;
 
     public PlanetsCatalogController(
         ApplicationDbContext context,
         IExcelImport excelImport_OpenXml,
         IImportCancellationService importCancellationService,
-        IPlanetFilterService filterService,
-        IDistinctSelectListService distinctSelectListService
+        IPlanetFilterService filterService
         )
     {
         _context = context;
         _excelImportService = excelImport_OpenXml;
         _importCancellationService = importCancellationService;
         _filterService = filterService;
-        _distinctSelectListService = distinctSelectListService;
     }
 
     // GET: Planetology/PlanetsCatalog
     public async Task<IActionResult> Index()
     {
-        var count = await _context.PlanetsCatalog.CountAsync();
-        ViewBag.RowsCount = count;
+        var (plLetters, telescopes, discoveryMethods) = await _filterService.GetCatalogStatsAsync();
+        ViewBag.RowOnPageCatalog = "30";
+        ViewBag.PlanetNames = plLetters;
+        ViewBag.TelescopNames = telescopes;
+        ViewBag.DiscoveryMethod = discoveryMethods;
 
-        ViewBag.PlanetNames = await _distinctSelectListService.GetDistinctSelectListAsync(c => c.PlLetter);
-        ViewBag.TelescopNames = await _distinctSelectListService.GetDistinctSelectListAsync(c => c.DiscTelescope);
-        ViewBag.DiscoveryMethod = await _distinctSelectListService.GetDistinctSelectListAsync(c => c.DiscoveryMethod);
+        // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
+        var result = await _filterService.GetFilteredDataAsync(new() { ["pageNumber"] = 1, ["rowOnPage"] = 30 });
+        ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
 
-        return View(await _context.PlanetsCatalog.Take(50).ToListAsync());
+        return View(result);
     }
 
 
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
-        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "30";
+        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
 
         List<NASAExoplanetCatalog>? selectedList;
 
@@ -66,8 +69,8 @@ public class PlanetsCatalogController : Controller
 
         var firstItem = selectedList.FirstOrDefault();
 
-        ViewBag.RowsCount = firstItem?.PageCount ?? 1;
-        ViewBag.AmountRowsResult = firstItem?.PageNumber ?? 0; // Using the PageNumber field of the database table to pass a value.
+        // TODO: Use Dapper to return an output parameter
+        ViewBag.AmountRowsResult = firstItem?.RowOnPage ?? 0; // Using the RowOnPage field of the database table to pass a value.
         ViewBag.Contorller = "PlanetsCatalog";
 
         try
@@ -102,7 +105,7 @@ public class PlanetsCatalogController : Controller
         return View(nASAExoplanetCatalog);
     }
 
-    #region unnecessary methods
+    #region Optional methods
     // GET: Planetology/PlanetsCatalog/Create
     public IActionResult Create()
     {
@@ -139,12 +142,13 @@ public class PlanetsCatalogController : Controller
         "SyImagErr2,SyZmag,SyZmagErr1,SyZmagErr2,SyW1mag,SyW1magErr1,SyW1magErr2,SyW2mag,SyW2magErr1,SyW2magErr2,SyW3mag,SyW3magErr1," +
         "SyW3magErr2,SyW4mag,SyW4magErr1,SyW4magErr2,SyGaiaMag,SyGaiamagerr1,SyGaiamagerr2,SyIcmag,SyIcmagerr1,SyIcmagerr2,SyTmag," +
         "SyTmagerr1,SyTmagerr2,SyKepmag,SyKepmagerr1,SyKepmagerr2,Rowupdate,PlPubdate,Releasedate,PlNnotes,StNphot,StNrvc,StNspec," +
-        "PlNespec,PlNtranspec,PlNdispec,PageNumber,PageCount")] NASAExoplanetCatalog nASAExoplanetCatalog)
+        "PlNespec,PlNtranspec,PlNdispec,RowOnPage,PageCount")] NASAExoplanetCatalog nASAExoplanetCatalog)
     {
         if (ModelState.IsValid)
         {
             _context.Add(nASAExoplanetCatalog);
             await _context.SaveChangesAsync();
+            // TODO: Clear cache
             return RedirectToAction(nameof(Index));
         }
         return View(nASAExoplanetCatalog);
@@ -196,7 +200,7 @@ public class PlanetsCatalogController : Controller
         "SyImagErr2,SyZmag,SyZmagErr1,SyZmagErr2,SyW1mag,SyW1magErr1,SyW1magErr2,SyW2mag,SyW2magErr1,SyW2magErr2,SyW3mag,SyW3magErr1," +
         "SyW3magErr2,SyW4mag,SyW4magErr1,SyW4magErr2,SyGaiaMag,SyGaiamagerr1,SyGaiamagerr2,SyIcmag,SyIcmagerr1,SyIcmagerr2,SyTmag," +
         "SyTmagerr1,SyTmagerr2,SyKepmag,SyKepmagerr1,SyKepmagerr2,Rowupdate,PlPubdate,Releasedate,PlNnotes,StNphot,StNrvc,StNspec," +
-        "PlNespec,PlNtranspec,PlNdispec,PageNumber,PageCount")] NASAExoplanetCatalog nASAExoplanetCatalog)
+        "PlNespec,PlNtranspec,PlNdispec,RowOnPage,PageCount")] NASAExoplanetCatalog nASAExoplanetCatalog)
     {
         if (id != nASAExoplanetCatalog.RowId)
         {
@@ -209,6 +213,7 @@ public class PlanetsCatalogController : Controller
             {
                 _context.Update(nASAExoplanetCatalog);
                 await _context.SaveChangesAsync();
+                // TODO: Clear cache
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -256,6 +261,7 @@ public class PlanetsCatalogController : Controller
         }
 
         await _context.SaveChangesAsync();
+        // TODO: Clear cache
         return RedirectToAction(nameof(Index));
     }
 
@@ -289,5 +295,6 @@ public class PlanetsCatalogController : Controller
         _importCancellationService.Cancel(jobId);
         return Ok();
     }
+
 
 }

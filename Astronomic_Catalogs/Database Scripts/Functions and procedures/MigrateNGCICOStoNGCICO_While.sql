@@ -37,24 +37,16 @@ BEGIN
             @Cstar_VMag FLOAT,
             @Cstar_Names VARCHAR(21),
             @CommonNames VARCHAR(110),
-            @NedNotes VARCHAR(MAX),
-            @OpenngcNotes VARCHAR(MAX),
+            @NedNotes NVARCHAR(MAX),
+            @OpenngcNotes NVARCHAR(MAX),
             @Image VARCHAR(MAX);
 
 	DECLARE @COUNTER INT,
 			@SUM_ROWS INT;
 
-    -- For error hendling
-	DECLARE @FuncProc AS VARCHAR(50), 
-			@Line AS INT, 
-			@ErrorNumber AS INT, 
-			@ErrorMessage NVARCHAR(MAX), 
-			@FullEerrorMessage NVARCHAR(MAX),
-			@ErrorSeverity INT, 
-			@ErrorState INT;
-
-    DECLARE @trancount INT;
-    SET @trancount = @@TRANCOUNT; 
+	DECLARE @FuncProc AS NVARCHAR(100) = 'MigrateNGCICOStoNGCICO_C';
+		
+    DECLARE @StartedTran BIT = 0;
 
     SET NOCOUNT ON; 
 
@@ -79,21 +71,24 @@ BEGIN
             WHERE SubObject <> '')
 		) AS ST
     WHERE ST.RN = 1 AND ST.SubObject <> '';		
+	
+
+	IF @@TRANCOUNT = 0
+    BEGIN                
+        BEGIN TRANSACTION MigrateNGCICOStoNGCICO_W_Tran;
+        SET @StartedTran = 1;
+    END;    
+    ELSE IF @@TRANCOUNT > 0 
+    BEGIN
+        DECLARE @ErrorMsg NVARCHAR(200) = 'Procedure ' + @FuncProc + ' cannot be executed inside another open transaction.';    
+        THROW 50001, @ErrorMsg, 1;
+    END;
 
     TRUNCATE TABLE NGCICOpendatasoft;
     TRUNCATE TABLE NGCICOpendatasoft_Extension;
 
-    BEGIN TRY
-        IF @trancount = 0
-			BEGIN	            
-				BEGIN TRANSACTION NGC_IC_Opendatasoft_W_Tran;
-			END;
-        ELSE
-			BEGIN
-				COMMIT TRANSACTION NGC_IC_Opendatasoft_W_Tran;
-				THROW 50001, 'There was an error becose there is more then one open transaction.', 1;
-			END;
-		
+
+    BEGIN TRY		
 		SET @COUNTER = 1; 
 		SET @SUM_ROWS = (SELECT COUNT(Id) FROM NGCICOpendatasoft_Source);
 
@@ -145,7 +140,8 @@ BEGIN
 				BEGIN
 					INSERT INTO NGCICOpendatasoft (NGC_IC, [Name], SubObject, SourceTable) VALUES (@NGC_IC, @Name, 'DUPLICATE', 'NGCICOpendatasoft');
 				
-					EXEC [dbo].[InsertNGCICOpendatasoft_Extension]
+					EXEC [dbo].[InsertNGCICOpendatasoft_Extension] 
+					--'NGCICOpendatasoft_Extension',
 					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
 					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
 					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
@@ -153,7 +149,8 @@ BEGIN
 				END;
             ELSE IF @SubObject IN ('A', 'B', 'C', 'D', 'E', 'F', 'N', 'NW', 'S', 'SE') OR @SubObject LIKE 'NED0%'
 				BEGIN
-					EXEC [dbo].[InsertNGCICOpendatasoft_Extension]
+					EXEC [dbo].[InsertNGCICOpendatasoft_Extension] 
+					--'NGCICOpendatasoft_Extension',
 					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
 					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
 					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
@@ -162,6 +159,7 @@ BEGIN
 			ELSE
 				BEGIN
 					EXEC [dbo].[InsertNGCICOpendatasoft] 
+					--'NGCICOpendatasoft',
 					@Id, @NGC_IC, @Name, @SubObject, @Messier, @NGC, @IC, @Limit_Ang_Diameter, @Ang_Diameter, @ObjectTypeAbrev, 
 					@ObjectType, @RA, @DEC, @Constellation, @MajorAxis, @MinorAxis, @PositionAngle, @b_mag, @v_mag, @j_mag, @h_mag, @k_mag, 
 					@Surface_Brigthness, @Hubble_OnlyGalaxies, @Cstar_UMag, @Cstar_BMag, @Cstar_VMag, @Cstar_Names, @CommonNames, 
@@ -185,55 +183,79 @@ BEGIN
 		FROM NGCICOpendatasoft AS T1
 		JOIN NGCWikipedia_TemporarilySource AS T3
 		ON T1.NGC_IC + CAST(T1.[Name] AS VARCHAR) = 'NGC' + CAST(T3.NGC_number AS VARCHAR);
-
-		COMMIT TRANSACTION NGC_IC_Opendatasoft_W_Tran;
+		
+		IF @StartedTran = 1 AND XACT_STATE() = 1
+            BEGIN
+			COMMIT TRANSACTION MigrateNGCICOStoNGCICO_W_Tran; 
+        END
 
 		DROP TABLE ##IDTODUBLICATE;
 
     END TRY
-    BEGIN CATCH 
-		BEGIN TRY
-			DECLARE @xstate INT;
-			SET @xstate = XACT_STATE();
+    BEGIN CATCH
+        BEGIN TRY
+            DECLARE @FuncProcErr AS NVARCHAR(MAX), 
+                    @Line AS INT, 
+                    @ErrorNumber AS INT, 
+                    @ErrorMessage NVARCHAR(MAX),  
+                    @FullEerrorMessage NVARCHAR(MAX),
+                    @ErrorSeverity INT, 
+                    @ErrorState INT;
+        
+            DECLARE @RollebackMassage NVARCHAR(MAX);
+         
+            SET @FuncProcErr = ISNULL(ERROR_PROCEDURE(), N'UnknownProcedure');
+            SET @Line = ERROR_LINE();
+            SET @ErrorNumber = ERROR_NUMBER();
+            SET @ErrorSeverity = ERROR_SEVERITY();
+            SET @ErrorState = ERROR_STATE();
+            SET @ErrorMessage = ERROR_MESSAGE();
 
-			IF @xstate = -1
-				BEGIN
-					PRINT 'EXCEPTION STATE: @xstate = ' + CAST(@xstate AS VARCHAR);
-					ROLLBACK;
-				END;
-			IF @xstate = 1 and @trancount = 0
-				BEGIN
-					PRINT 'EXCEPTION STATE: @xstate = ' + CAST(@xstate AS VARCHAR) + ', @trancount = ' + CAST(@trancount AS VARCHAR);
-					ROLLBACK;
-				END;
-			IF @xstate = 1 and @trancount > 0				
-				BEGIN
-					PRINT 'EXCEPTION STATE: @xstate = ' + CAST(@xstate AS VARCHAR) + ', @trancount = ' + CAST(@trancount AS VARCHAR);
-					ROLLBACK TRANSACTION NGC_IC_Opendatasoft_W_Tran;
-				END;
-				   
-			SET @FuncProc = ERROR_PROCEDURE();
-			SET @Line = ERROR_LINE();
-			SET @ErrorNumber = ERROR_NUMBER();
-			SET @ErrorSeverity = ERROR_SEVERITY();
-			SET @ErrorState = ERROR_STATE();
-			SET @ErrorMessage = ERROR_MESSAGE();
+            DECLARE @xstate INT = XACT_STATE();
+         
+            IF @xstate = -1
+            BEGIN
+                SET @RollebackMassage = N'ROLLBACK TRANSACTION STATE: @xstate = ' + CAST(@xstate AS VARCHAR);
+                
+                INSERT INTO LogProcFunc (FuncProc, ErrorSeverity, ErrorState, ErrorMessage) 
+                VALUES (@FuncProc, 0, 0, @RollebackMassage);
+        
+                ROLLBACK TRANSACTION MigrateNGCICOStoNGCICO_W_Tran; 
+            END;
+            IF @xstate = 1 AND @StartedTran = 1 
+            BEGIN
+                SET @RollebackMassage = N'ROLLBACK TRANSACTION STATE: @xstate = ' + CAST(@xstate AS VARCHAR) + 
+				        N' AND @StartedTran = ' + CAST(@StartedTran AS VARCHAR);
+                
+                INSERT INTO LogProcFunc (FuncProc, ErrorSeverity, ErrorState, ErrorMessage) 
+                VALUES (@FuncProc, 0, 0, @RollebackMassage);
 
-			INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorSeverity, ErrorState, ErrorMessage) 
-			VALUES (@FuncProc, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
-			
-			SET @FullEerrorMessage = N'An error occurred in MigrateNGCICOStoNGCICO_W: ' +
-				' Error_number: ' + CAST(@ErrorNumber AS VARCHAR(10)) + 
-				' Error_message: ' + CAST(@ErrorMessage AS NVARCHAR(MAX)) + 
-				' Error_severity: ' + CAST(@ErrorSeverity AS VARCHAR(2)) +
-				' Error_state: ' +  CAST(@ErrorState AS VARCHAR(3)) + 
-				' Error_line: ' + CAST(@Line AS VARCHAR(10));
+                ROLLBACK TRANSACTION MigrateNGCICOStoNGCICO_W_Tran; 
+            END;
+               
+         
+            SET @FullEerrorMessage = 
+               N'An error occurred in ' + @FuncProcErr + N': ' +
+               N' Error_number: ' + CAST(@ErrorNumber AS NVARCHAR) + 
+               N' Error_message: ' + ISNULL(@ErrorMessage, N'N/A') + 
+               N' Error_severity: ' + CAST(@ErrorSeverity AS NVARCHAR) +
+               N' Error_state: ' + CAST(@ErrorState AS NVARCHAR) + 
+               N' Error_line: ' + CAST(@Line AS NVARCHAR);
 
-			THROW 50004, @FullEerrorMessage, 4;
-
-		END TRY
-		BEGIN CATCH
-			PRINT 'An error occurred during handling error from NGC_IC_Opendatasoft_W_Tran transaction: ' + @ErrorMessage;
-		END CATCH
-	END CATCH;
+            INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorSeverity, ErrorState, ErrorMessage) 
+            VALUES (@FuncProcErr, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
+            
+            THROW 51000, @FullEerrorMessage, 0;
+        END TRY        
+        BEGIN CATCH        
+            IF @FullEerrorMessage IS NULL 
+                SET @FullEerrorMessage = 'Unknown error occurred and logging also failed.';
+                    
+            DECLARE @SecondErrorMessage NVARCHAR(MAX);
+            SET @SecondErrorMessage = 
+            'An error occurred during handling error in ' + @FuncProcErr + ' stored procedure: ' + @FullEerrorMessage;
+        
+            THROW 52000, @FullEerrorMessage, 0;
+        END CATCH
+    END CATCH;
 END;

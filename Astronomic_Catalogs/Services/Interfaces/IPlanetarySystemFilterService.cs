@@ -1,4 +1,5 @@
-﻿using Astronomic_Catalogs.DTO;
+﻿using Astronomic_Catalogs.Entities;
+using Astronomic_Catalogs.Results;
 
 namespace Astronomic_Catalogs.Services.Interfaces;
 

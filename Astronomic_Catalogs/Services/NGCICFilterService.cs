@@ -1,8 +1,11 @@
 ﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Text.Json;
 
 namespace Astronomic_Catalogs.Services;
@@ -99,6 +102,93 @@ public class NGCICFilterService : INGCICFilterService
 
             return result;
         });
+    }
+
+    public async Task<(int countNGCTask, int countNGCE_Task, List<ConstellationDto> constellations, List<NGCICOpendatasoft>? catalogItems)> GetNGCICOpendatasoftDataAsync()
+    {
+        using var conn = _context.Database.GetDbConnection();
+
+        if (conn.State != ConnectionState.Open)
+            await conn.OpenAsync();
+
+        var sql = @"
+                SELECT COUNT(*) FROM NGCICOpendatasoft;
+                SELECT COUNT(*) FROM NGCICOpendatasoft_Extension;
+                SELECT 
+                    Short_name AS ShortName, 
+                    Latine_name_Nominative_case AS LatineNameNominativeCase, 
+                    English_name AS EnglishName, 
+                    Ukraine_name AS UkraineName
+                FROM Constellation;
+                SELECT TOP 50 
+                    Id,
+                    NGC_IC,
+                    [Name],
+                    SubObject,
+                    Messier,
+                    Name_UK,
+                    Comment,
+                    Other_names AS OtherNames,
+                    NGC,
+                    IC,
+                    Limit_Ang_Diameter AS LimitAngDiameter,
+                    Ang_Diameter AS AngDiameter,
+                    ObjectTypeAbrev,
+                    ObjectType,
+                    Object_type AS ObjectTypeFull,
+                    Source_Type AS SourceType,
+
+                    RA,
+                    Right_ascension AS RightAscension,
+                    Right_ascension_H AS RightAscensionH,
+                    Right_ascension_M AS RightAscensionM,
+                    Right_ascension_S AS RightAscensionS,
+
+                    DEC,
+                    Declination,
+                    NS,
+                    Declination_D AS DeclinationD,
+                    Declination_M AS DeclinationM,
+                    Declination_S AS DeclinationS,
+
+                    Constellation,
+                    MajorAxis,
+                    MinorAxis,
+                    PositionAngle,
+
+                    App_Mag AS AppMag,
+                    App_Mag_Flag AS AppMagFlag,
+                    b_mag AS BMag,
+                    v_mag AS VMag,
+                    j_mag AS JMag,
+                    h_mag AS HMag,
+                    k_mag AS KMag,
+
+                    Surface_Brigthness AS SurfaceBrightness,
+                    Hubble_OnlyGalaxies AS HubbleOnlyGalaxies,
+                    Cstar_UMag AS CstarUMag,
+                    Cstar_BMag AS CstarBMag,
+                    Cstar_VMag AS CstarVMag,
+                    Cstar_Names AS CstarNames,
+                    CommonNames,
+                    NedNotes,
+                    OpenngcNotes,
+                    Image,
+
+                    RowOnPage,
+                    SourceTable
+                FROM NGCICOpendatasoft
+                ORDER BY NGC_IC DESC, Name ASC;
+            ";
+
+        using var multi = await conn.QueryMultipleAsync(sql);
+
+        int countNGCTask = await multi.ReadFirstAsync<int>();
+        var countNGCE_Task = await multi.ReadFirstAsync<int>();
+        var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
+        var catalogItems = (await multi.ReadAsync<NGCICOpendatasoft>()).ToList();
+
+        return (countNGCTask, countNGCE_Task, constellations, catalogItems);
     }
 
 }

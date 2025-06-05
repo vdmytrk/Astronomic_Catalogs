@@ -20,12 +20,12 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 public class HomeAdminController : Controller
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<DatabaseInitializer> _logger;
+    private readonly ILogger<HomeAdminController> _logger;
     private string connectionString = null!;
 
     public HomeAdminController(
         ApplicationDbContext context,
-        ILogger<DatabaseInitializer> logger,
+        ILogger<HomeAdminController> logger,
         IConnectionStringProvider connectionStringProvider)
     {
         _logger = logger;

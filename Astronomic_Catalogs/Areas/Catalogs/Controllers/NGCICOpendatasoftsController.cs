@@ -28,29 +28,11 @@ public class NGCICOpendatasoftsController : Controller
     // GET: Catalogs/NGCICOpendatasofts
     public async Task<IActionResult> Index()
     {
-        var countNGCTask = await _context.NGCIC_Catalog.CountAsync();
-        var countNGCE_Task = await _context.NGCICOpendatasoft_E.CountAsync();
+        var (countNGCTask, countNGCE_Task, constellations, catalogItems) = await _filterService.GetNGCICOpendatasoftDataAsync();
+        var catalogViewModels = _mapper.Map<List<NGCICViewModel>>(catalogItems); 
 
-        var catalogItems = await _context.NGCIC_Catalog
-            .OrderByDescending(x => x.NGC_IC)
-            .ThenBy(x => x.Name)
-            .Take(50)
-            .ToListAsync();
-
-        var catalogViewModels = _mapper.Map<List<NGCICViewModel>>(catalogItems);
-
-        var constellations = await _context.Constellations
-            .Select(c => new
-            {
-                c.ShortName,
-                c.LatineNameNominativeCase,
-                c.EnglishName,
-                c.UkraineName
-            })
-            .ToListAsync();
-
-
-        ViewBag.RowsCount = countNGCTask + countNGCE_Task;
+        ViewBag.RowOnPageCatalog = "50";
+        ViewBag.AmountRowsResult = countNGCTask + countNGCE_Task;
         ViewBag.Constellations = constellations;
 
         return View(catalogViewModels);
@@ -61,6 +43,8 @@ public class NGCICOpendatasoftsController : Controller
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
+        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
 
         List<NGCICOpendatasoft>? selectedList;
 
@@ -79,8 +63,8 @@ public class NGCICOpendatasoftsController : Controller
         var viewModelList = _mapper.Map<List<NGCICViewModel>>(selectedList);
         var firstItem = viewModelList.FirstOrDefault();
 
-        ViewBag.RowsCount = firstItem?.PageCount ?? 1;
-        ViewBag.AmountRowsResult = firstItem?.PageNumber ?? 0; // Using the PageNumber field of the database table to pass a value.
+        // TODO: Use Dapper to return an output parameter
+        ViewBag.AmountRowsResult = firstItem?.RowOnPage ?? 0; // Using the RowOnPage field of the database table to pass a value.
         ViewBag.Contorller = "NGCICOpendatasofts";
 
         try

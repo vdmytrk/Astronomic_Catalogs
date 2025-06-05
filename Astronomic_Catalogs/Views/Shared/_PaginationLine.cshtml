@@ -1,8 +1,9 @@
 ﻿@{
     int rowOnPageCatalog = Convert.ToInt32(ViewBag.RowOnPageCatalog == null ? 50 : ViewBag.RowOnPageCatalog);
-    int rowCount = Convert.ToInt32(ViewBag.RowsCount == null ? 10000000 : ViewBag.RowsCount);
     int amountRowsResult = Convert.ToInt32(ViewBag.AmountRowsResult == null ? 1 : ViewBag.AmountRowsResult);
-    int pageCount = (int)Math.Ceiling((double)rowCount / rowOnPageCatalog);
+    int pageNumber = Convert.ToInt32(ViewBag.PageNumber == null ? 1 : ViewBag.PageNumber);
+    int pageCount = (int)Math.Ceiling((double)amountRowsResult / rowOnPageCatalog);
+    pageNumber = pageNumber > pageCount ? pageCount : pageNumber;
     string controller = ViewBag.Contorller;
 }
 
@@ -11,14 +12,10 @@
     <input class="ActualPegeNumber1" type="hidden" value="1" />
     @for (var i = 1; i <= pageCount; i++)
     {
-        @if (i != amountRowsResult)
+        @if (i != pageNumber)
         {
             <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
-                @i
-                @if (i < pageCount)
-                {
-                    <span class="borderBlock">|</span>
-                }
+                @i <span class="borderBlock">|</span>
             </div>
         }
         else
@@ -26,15 +23,16 @@
             @if (rowOnPageCatalog != 500)
             {
                 <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
-        <span class="currentPage">@i</span>
-    </div>
+                    <span class="currentPage">@i</span>
+                    <span class="borderBlock">|</span>
+                </div>
             }
             else
             {
                 <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
                     <span class="currentPage">@i</span>
                     <span class="borderBlock">|</span>
-                    <span>Row in result: @rowCount</span>
+                    <span>Row in result: @amountRowsResult</span>
                 </div>
             }
         }
