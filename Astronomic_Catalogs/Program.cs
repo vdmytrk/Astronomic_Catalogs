@@ -3,7 +3,6 @@ using Astronomic_Catalogs.Authorization;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.Interfaces;
-using Astronomic_Catalogs.Infrastructure.LogingIfrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Astronomic_Catalogs.Models.Services;
 using Astronomic_Catalogs.Services;
@@ -82,6 +81,7 @@ public class Program
         builder.Services.AddScoped<ICollinderFilterService, CollinderFilterService>();
         builder.Services.AddScoped<ICacheService, StoredPprocedureCacheService>();
         builder.Services.AddScoped<IPlanetarySystemFilterService, PlanetarySystemFilterService>();
+        builder.Services.AddTransient<IExceptionRedirectUrlService, ExceptionRedirectUrlService>();
     }
 
     private static IConfiguration LoadConfiguration()
@@ -306,7 +306,7 @@ public class Program
                 CreateSlidingWindowLimiter(600, TimeSpan.FromHours(1), 4),
             #endregion
             #region For unregistered useers
-                CreateTokenBucketLimiter(10, 1, TimeSpan.FromSeconds(10), 1),
+                CreateTokenBucketLimiter(15, 1, TimeSpan.FromSeconds(10), 1),
                 CreateTokenBucketLimiter(70, 0, TimeSpan.FromMinutes(10), 1),
                 CreateTokenBucketLimiter(400, 0, TimeSpan.FromHours(1), 1)
             #endregion
@@ -409,6 +409,8 @@ public class Program
 
     private static void ConfigureMiddleware(WebApplication app, WebApplicationBuilder builder)
     {
+        app.UseRouting();
+
         app.Use(async (context, next) =>
         {
             var userAgent = context.Request.Headers["User-Agent"].ToString();
@@ -422,17 +424,29 @@ public class Program
 
         if (app.Environment.IsDevelopment())
         {
+            app.UseDeveloperExceptionPage();
             app.UseMigrationsEndPoint();
         }
         else
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
 
+        app.UseStatusCodePagesWithReExecute("/Error/StatusCode", "?code={0}");
+
+        app.Use(async (context, next) =>
+        {
+            await next();
+
+            if (!context.Response.HasStarted && context.Response.StatusCode >= 400)
+            {
+                context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+            }
+        });
+
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseRateLimiter();

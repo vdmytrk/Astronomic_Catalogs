@@ -4,6 +4,7 @@ using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text.Json;
@@ -14,11 +15,13 @@ public class NGCICFilterService : INGCICFilterService
 {
     private readonly ApplicationDbContext _context;
     private readonly ICacheService _cache;
+    private readonly ILogger<NGCICFilterService> _logger;
 
-    public NGCICFilterService(ApplicationDbContext context, ICacheService cache)
+    public NGCICFilterService(ApplicationDbContext context, ICacheService cache, ILogger<NGCICFilterService> logger)
     {
         _context = context;
         _cache = cache;
+        _logger = logger;
     }
 
     public async Task<List<NGCICOpendatasoft>?> GetFilteredDataAsync(Dictionary<string, object> parameters)
@@ -67,10 +70,12 @@ public class NGCICFilterService : INGCICFilterService
 
         string cacheKey = parameters.ToCacheKey("CollinderData");
 
-        return await _cache.GetOrAddAsync(cacheKey, async () =>
+        try
         {
-            var result = await _context.NGCIC_Catalog
-            .FromSqlInterpolated($@"
+            return await _cache.GetOrAddAsync(cacheKey, async () =>
+            {
+                var result = await _context.NGCIC_Catalog
+                .FromSqlInterpolated($@"
                 EXEC GetFilteredNGCICData 
                     @Name = {name},
                     @Constellations = {constellationsJson},
@@ -97,21 +102,30 @@ public class NGCICFilterService : INGCICFilterService
                     @PageNumber = {pageNumber},
                     @RowOnPage = {rowOnPage}
             ")
-            .AsNoTracking()
-            .ToListAsync();
+                .AsNoTracking()
+                .ToListAsync();
 
-            return result;
-        });
+                return result;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception occurred in List<NGCICOpendatasoft> GetFilteredDataAsync.");
+            throw;
+        }
+
     }
 
     public async Task<(int countNGCTask, int countNGCE_Task, List<ConstellationDto> constellations, List<NGCICOpendatasoft>? catalogItems)> GetNGCICOpendatasoftDataAsync()
     {
-        using var conn = _context.Database.GetDbConnection();
+        try
+        {
+            using var conn = _context.Database.GetDbConnection();
 
-        if (conn.State != ConnectionState.Open)
-            await conn.OpenAsync();
+            if (conn.State != ConnectionState.Open)
+                await conn.OpenAsync();
 
-        var sql = @"
+            var sql = @"
                 SELECT COUNT(*) FROM NGCICOpendatasoft;
                 SELECT COUNT(*) FROM NGCICOpendatasoft_Extension;
                 SELECT 
@@ -181,14 +195,37 @@ public class NGCICFilterService : INGCICFilterService
                 ORDER BY NGC_IC DESC, Name ASC;
             ";
 
-        using var multi = await conn.QueryMultipleAsync(sql);
+            using var multi = await conn.QueryMultipleAsync(sql);
+            int countNGCTask = await multi.ReadFirstAsync<int>();
+            var countNGCE_Task = await multi.ReadFirstAsync<int>();
+            var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
+            var catalogItems = (await multi.ReadAsync<NGCICOpendatasoft>()).ToList();
 
-        int countNGCTask = await multi.ReadFirstAsync<int>();
-        var countNGCE_Task = await multi.ReadFirstAsync<int>();
-        var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
-        var catalogItems = (await multi.ReadAsync<NGCICOpendatasoft>()).ToList();
+            return (countNGCTask, countNGCE_Task, constellations, catalogItems);
+        }
+        catch (Exception sqlEx) when (sqlEx is SqlException || sqlEx is InvalidOperationException)
+        {
+            string message = sqlEx switch
+            {
+                SqlException => "SQL exception in GetNGCICOpendatasoftDataAsync.",
+                InvalidOperationException => "Invalid operation in GetNGCICOpendatasoftDataAsync. Possibly wrong DB state or context misuse.",
+                _ => "An unexpected rendering error occurred."
+            };
+            _logger.LogError(sqlEx, message);
+            sqlEx.Data["ErrorMessage"] = message;
+            sqlEx.Data["IsLogged"] = true;
 
-        return (countNGCTask, countNGCE_Task, constellations, catalogItems);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            string message = "Unexpected exception in GetCollinderCatalogDataAsync";
+            _logger.LogError(ex, message);
+            ex.Data["ErrorMessage"] = message;
+            ex.Data["IsLogged"] = true;
+
+            throw;
+        }
     }
 
 }

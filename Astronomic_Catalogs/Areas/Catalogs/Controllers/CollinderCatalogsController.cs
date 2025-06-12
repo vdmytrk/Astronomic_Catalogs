@@ -1,14 +1,16 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.DTO;
+using Astronomic_Catalogs.Exceptions;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
-using Dapper;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
@@ -18,19 +20,55 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ICollinderFilterService _filterService;
-        private readonly ICacheService _cache;
+        private readonly ILogger<CollinderCatalogsController> _logger;
+        private readonly IExceptionRedirectUrlService _exRedirectService;
 
-        public CollinderCatalogsController(ApplicationDbContext context, ICollinderFilterService filterService, ICacheService cache)
+        public CollinderCatalogsController(
+            ApplicationDbContext context,
+            ICollinderFilterService filterService,
+            ILogger<CollinderCatalogsController> logger,
+            IExceptionRedirectUrlService exceptionRedirectService)
         {
             _context = context;
             _filterService = filterService;
-            _cache = cache;
+            _logger = logger;
+            _exRedirectService = exceptionRedirectService;
         }
 
         // GET: Catalogs/CollinderCatalogs
         public async Task<IActionResult> Index()
         {
-            var (count, rawData, constellations) = await _filterService.GetCollinderCatalogDataAsync();
+            int count;
+            List<CollinderCatalog> rawData;
+            List<ConstellationDto> constellations;
+
+            try
+            {
+                (count, rawData, constellations) = await _filterService.GetCollinderCatalogDataAsync();
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                string messageTemplate = "An unexpected error occurred during data retrieval in CollinderCatalogsController.";
+                _logger.LogError(ex, "{Message} RequestId: {RequestId}", messageTemplate, requestId);
+
+                var message = ex.Data.Contains("ErrorMessage")
+                    ? ex.Data["ErrorMessage"]?.ToString()
+                    : string.IsNullOrEmpty(ex.Message)
+                        ? $"{messageTemplate} RequestId : {requestId}"
+                        : ex.Message;
+
+                TempData["RequestId"] = requestId;
+                TempData["IsLogged"] = true;
+                TempData["ErrorMessage"] = message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                throw;
+#else
+                return RedirectToAction("Error", "Error");
+#endif
+            }
 
             var data = rawData
                 .OrderBy(x => ExtractLeadingNumber(x.NamberName))
@@ -42,6 +80,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             ViewBag.Constellations = constellations;
 
             return View(data);
+
         }
 
         [HttpPost]
@@ -51,7 +90,6 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             ViewBag.RowOnPageCatalog = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
             int? pageNumber = parameters.GetInt("PageNumberVaulue");
             ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
-
             List<CollinderCatalog>? selectedList;
 
             try
@@ -60,7 +98,13 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error fetching filtered data: {ex.Message}");
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+#if DEBUG
+                throw;
+#else
+                return Json(new { redirectTo = redirectUrl });
+#endif
             }
 
             if (selectedList == null)
@@ -79,12 +123,37 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
 
                 return Json(new { tableHtml, paginationHtml });
             }
+            catch (Exception ex) when (ex is FileNotFoundException || ex is ViewRenderingException)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+                string errorMessage = ex switch
+                {
+                    FileNotFoundException => "Partial view file was not found during rendering.",
+                    ViewRenderingException => "An error occurred while rendering the partial view.",
+                    _ => "An unexpected rendering error occurred."
+                };
+
+                _logger.LogError(ex, "RequestId: {RequestId}", requestId);
+#if DEBUG
+                throw;
+#else
+                return Json(new { redirectTo = redirectUrl });
+#endif
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, $"RenderViewAsync error: {ex.Message}");
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+
+                _logger.LogError(ex, "Unexpected error rendering partial views. RequestId: {RequestId}", requestId);
+#if DEBUG
+                throw;
+#else
+                return Json(new { redirectTo = redirectUrl });
+#endif
             }
         }
-
 
         #region Optional methods
         // GET: Catalogs/CollinderCatalogs/Details/5
@@ -98,14 +167,31 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
                 return NotFound();
             }
 
-            var collinderCatalog = await _context.CollinderCatalog
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (collinderCatalog == null)
+            try
             {
-                return NotFound();
-            }
+                var collinderCatalog = await _context.CollinderCatalog.FirstOrDefaultAsync(m => m.Id == id);
+                if (collinderCatalog == null)
+                {
+                    return NotFound();
+                }
 
-            return View(collinderCatalog);
+                return View(collinderCatalog);
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                _logger.LogError(ex, "Error retrieving details for CollinderCatalog by ID {Id}. RequestId: {RequestId}", id, requestId);
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
         }
 
         // GET: Catalogs/CollinderCatalogs/Create
@@ -129,9 +215,39 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(collinderCatalog);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(collinderCatalog);
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogError(ex, "Database update error during creation of CollinderCatalog: {@Collinder}", collinderCatalog);
+                    ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+                }
+                catch (Exception ex)
+                {
+                    var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                    _logger.LogError(
+                        ex,
+                        "Unexpected error during creation of CollinderCatalog: {@Collinder}. RequestId: {RequestId}",
+                        collinderCatalog,
+                        requestId
+                    );
+
+                    TempData["RequestId"] = requestId;
+                    TempData["ErrorMessage"] = ex.Message;
+                    TempData["StackTrace"] = ex.ToString();
+                    TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                    throw;
+#else
+                    return StatusCode(500);
+#endif
+                }
             }
             return View(collinderCatalog);
         }
@@ -152,6 +268,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             {
                 return NotFound();
             }
+
             return View(collinderCatalog);
         }
 
@@ -176,21 +293,62 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
                 {
                     _context.Update(collinderCatalog);
                     await _context.SaveChangesAsync();
-                    // TODO: Clear cache
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException dbUpConcEx)
                 {
                     if (!CollinderCatalogExists(collinderCatalog.Id))
-                    {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+
+                    var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                    TempData["RequestId"] = requestId;
+                    TempData["ErrorMessage"] = dbUpConcEx.Message;
+                    TempData["StackTrace"] = dbUpConcEx.ToString();
+                    TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                    _logger.LogError(
+                        dbUpConcEx,
+                        "Concurrency error occurred during editing CollinderCatalog: {@Collinder}. RequestId: {RequestId}",
+                        collinderCatalog,
+                        requestId
+                    );
+                    TempData["IsLogged"] = true;
+#if DEBUG
+                    throw;
+#else
+                    return RedirectToAction("Error", "Error");
+#endif
                 }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogError(ex, "Database update error during editing CollinderCatalog: {@Collinder}", collinderCatalog);
+                    ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+                }
+                catch (Exception ex)
+                {
+                    var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                    TempData["RequestId"] = requestId;
+                    TempData["ErrorMessage"] = ex.Message;
+                    TempData["StackTrace"] = ex.ToString();
+                    TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                    _logger.LogError(
+                        ex,
+                        "Unexpected error during editing CollinderCatalog: {@Collinder}. RequestId: {RequestId}",
+                        collinderCatalog,
+                        requestId
+                    );
+#if DEBUG
+                    throw;
+#else
+                    return StatusCode(500);
+#endif
+                }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(collinderCatalog);
         }
 
@@ -223,15 +381,60 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var collinderCatalog = await _context.CollinderCatalog.FindAsync(id);
-            if (collinderCatalog != null)
+            try
             {
-                _context.CollinderCatalog.Remove(collinderCatalog);
-            }
+                var collinderCatalog = await _context.CollinderCatalog.FindAsync(id);
+                if (collinderCatalog != null)
+                {
+                    _context.CollinderCatalog.Remove(collinderCatalog);
+                    await _context.SaveChangesAsync();
+                }
 
-            await _context.SaveChangesAsync();
-            // TODO: Clear cache
-            return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    ex, 
+                    "Database update error during deletion of CollinderCatalog by ID {Id}. RequestId: {RequestId}", 
+                    id, 
+                    requestId
+                    
+                );
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    ex, 
+                    "Unexpected error during deletion of CollinderCatalog ID by {Id}. RequestId: {RequestId}", 
+                    id, 
+                    requestId
+                );
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
         }
         #endregion
 

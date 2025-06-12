@@ -1,13 +1,8 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Configuration.Services;
 using Astronomic_Catalogs.Models.Services;
-using Astronomic_Catalogs.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System.Net;
-using System.Net.Http;
 using System.Text.Json;
 
 namespace Astronomic_Catalogs.Infrastructure;
@@ -72,27 +67,28 @@ public class UserLoggingMiddleware(
         {
             context.Response.StatusCode = 429;
             await context.Response.WriteAsync("Too Many Requests");
+            _logger.LogInformation("Blocked user '{UserName}' from IP {IpAddress} attempted to access a restricted resource.", log.UserName, log.IpAddress);
+
             return;
         }
 
+        await _next(context);
+        log.StatusCode = context.Response.StatusCode;
+        
         try
         {
-            await _next(context);
-            log.StatusCode = context.Response.StatusCode;
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                dbContext.UserLogs.Add(log);
+                await dbContext.SaveChangesAsync();
+            }
         }
-        catch (Exception ex)
+        catch (Exception dbEx)
         {
-            log.StatusCode = 500;
-            log.ErrorMessage = ex.Message;
-            throw;
+            _logger.LogError(dbEx, "Error while saving user log.");
         }
 
-        using (var scope = _serviceScopeFactory.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            dbContext.UserLogs.Add(log);
-            await dbContext.SaveChangesAsync();
-        }
     }
 
 
@@ -152,7 +148,7 @@ public class UserLoggingMiddleware(
             return jsonProperty.ValueKind switch
             {
                 JsonValueKind.String => jsonProperty.GetString() ?? defaultValue,
-                JsonValueKind.Number => jsonProperty.GetRawText(), // Зберігаємо число у вигляді рядка
+                JsonValueKind.Number => jsonProperty.GetRawText(),
                 JsonValueKind.True => "true",
                 JsonValueKind.False => "false",
                 _ => defaultValue
@@ -168,9 +164,11 @@ public class UserLoggingMiddleware(
         using (var scope = _serviceScopeFactory.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
             var recentRequests = await dbContext.UserLogs
                 .Where(ul => ul.IpAddress == log.IpAddress && ul.RequestTimeUtc > DateTime.UtcNow.AddMinutes(-log.TimeWindowMinutes))
                 .CountAsync();
+
             int maxRequests = await dbContext.UserLogs
                 .Where(ul => ul.IpAddress == log.IpAddress)
                 .OrderBy(ul => ul.RequestTimeUtc)

@@ -142,7 +142,6 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
     // 1. Collect form data into JSON
     const json = serializeForm(form, pageNumber);
 
-
     try {
         // 2. Show spinner
         console.log(`Adding spinnerHTML.`);
@@ -166,13 +165,20 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
 
         // 4. Check for success
         if (!response.ok) 
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP error! status: ${response.status}`);        
 
         // 5. Receive partial HTML
         const data = await response.json();
         console.log("Fetched data:", data);
 
-        // 6. Insert it into the DOM
+        // 6. Check if redirect is needed
+        if (data.redirectTo) {
+            console.log("Redirecting to:", data.redirectTo);
+            window.location.href = data.redirectTo;
+            return; // Exit function to prevent further execution
+        }
+
+        // 7. Insert received HTML into the DOM
         if (tableHeader && data.tableHtml) {
             tableHeader.innerHTML = data.tableHtml;
         } else {
@@ -187,6 +193,26 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
 
     } catch (error) {
         console.error('Error submitting form or updating partial:', error);
+
+        try {
+            const errorMessage = "An unexpected error occurred on the server. The server did not return a response. Please try again later or contact support.";
+            const encodedMessage = encodeURIComponent(errorMessage);
+
+            const errorUrl = `/Error/Exception?errorMessage=${encodedMessage}`;
+            window.location.href = errorUrl;
+        }
+        catch (error) {
+            const container = document.body;
+            container.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 40px; text-align: center;">
+                    <h1 style="color: #d9534f;">Oops! Something went wrong.</h1>
+                    <p style="font-size: 18px;">An unexpected error occurred on the server.<br>
+                    The server did not return a response.<br>
+                    Please try again later or contact support.</p>
+                    <button onclick="location.reload()">Try Again</button>
+                </div>
+            `;
+        }
     } finally {
         const spinnerTr = document.getElementById("spinnerTr");
         if (spinnerTr) {
@@ -206,22 +232,18 @@ function updateCatalogData(catalog: string, pageButton: HTMLElement) {
         pageNumber = pageButton.textContent?.trim() || '1';
 
     if (catalog === 'NGCICOpendatasofts') {
-        console.log("catalog === 'NGCICOpendatasofts' 1111"); //////////////////////////////////////////////////////////////////////
         submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable', pageNumber);
     }
 
     if (catalog === 'CollinderCatalogs') {
-        console.log("catalog === 'CollinderCatalogs' 2222"); //////////////////////////////////////////////////////////////////////
         submitFormAndUpdatePartial(form, '/Catalogs/CollinderCatalogs/Index', '#sizeFilterTable', pageNumber);
     }
 
     if (catalog === 'PlanetsCatalog') {
-        console.log("catalog === 'PlanetsCatalog' 3333"); //////////////////////////////////////////////////////////////////////
         submitFormAndUpdatePartial(form, '/Planetology/PlanetsCatalog/Index', '#sizeFilterTable', pageNumber);
     }
 
     if (catalog === 'PlanetarySystem') {
-        console.log("catalog === 'PlanetarySystem 4444'"); //////////////////////////////////////////////////////////////////////
         submitFormAndUpdatePartial(form, '/Planetology/PlanetarySystem/Index', '#sizeFilterTable', pageNumber);
     }
 }

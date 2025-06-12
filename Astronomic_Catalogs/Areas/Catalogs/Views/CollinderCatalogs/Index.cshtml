@@ -23,7 +23,15 @@
             <h1>@ViewData["Title"] catalog</h1>
         </div>
         <div class="col-auto ms-auto">
-            <button type="button" class="btn btn-success btn-lg d-inline-block hideFilters">Hide filters</button>
+            <div class="d-flex flex-wrap align-items-center">
+                @if (User.IsInRole("OwnerAdministratorPower"))
+                {
+                    <p class="me-4">
+                        <a asp-action="Create">Create New</a>
+                    </p>
+                }
+                <button type="button" class="btn btn-success btn-lg d-inline-block hideFilters">Hide filters</button>
+            </div>
         </div>
     </div>
 

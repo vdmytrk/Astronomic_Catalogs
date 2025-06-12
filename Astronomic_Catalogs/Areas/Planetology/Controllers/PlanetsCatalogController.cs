@@ -1,10 +1,14 @@
 ﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Entities;
+using Astronomic_Catalogs.Exceptions;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Diagnostics;
 
 namespace Astronomic_Catalogs.Areas.Planetology.Controllers;
 
@@ -15,36 +19,100 @@ public class PlanetsCatalogController : Controller
     private readonly IExcelImport _excelImportService;
     private readonly IImportCancellationService _importCancellationService;
     private readonly IPlanetFilterService _filterService;
+    private readonly ILogger<PlanetsCatalogController> _logger;
+    private readonly IExceptionRedirectUrlService _exRedirectService;
 
     public PlanetsCatalogController(
         ApplicationDbContext context,
         IExcelImport excelImport_OpenXml,
         IImportCancellationService importCancellationService,
-        IPlanetFilterService filterService
+        IPlanetFilterService filterService,
+        ILogger<PlanetsCatalogController> logger,
+        IExceptionRedirectUrlService exRedirectService
         )
     {
         _context = context;
         _excelImportService = excelImport_OpenXml;
         _importCancellationService = importCancellationService;
         _filterService = filterService;
+        _logger = logger;
+        _exRedirectService = exRedirectService;
     }
 
     // GET: Planetology/PlanetsCatalog
     public async Task<IActionResult> Index()
     {
-        var (plLetters, telescopes, discoveryMethods) = await _filterService.GetCatalogStatsAsync();
+        List<SelectListItem> plLetters;
+        List<SelectListItem> telescopes;
+        List<SelectListItem> discoveryMethods;
+
+        try
+        {
+            (plLetters, telescopes, discoveryMethods) = await _filterService.GetCatalogStatsAsync();
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            string messageTemplate = $"An unexpected error occurred during data retrieval in PlanetsCatalogController.";
+            _logger.LogError(ex, "{`} RequestId: {RequestId}", messageTemplate, requestId);
+
+            var message = ex.Data.Contains("ErrorMessage")
+                ? ex.Data["ErrorMessage"]?.ToString()
+                : string.IsNullOrEmpty(ex.Message)
+                    ? $"{messageTemplate} RequestId : {requestId}"
+                    : ex.Message;
+
+            TempData["RequestId"] = requestId;
+            TempData["IsLogged"] = true;
+            TempData["ErrorMessage"] = message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+            throw;
+#else
+            return RedirectToAction("Error", "Error");
+#endif
+        }
+
         ViewBag.RowOnPageCatalog = "30";
         ViewBag.PlanetNames = plLetters;
         ViewBag.TelescopNames = telescopes;
         ViewBag.DiscoveryMethod = discoveryMethods;
 
-        // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
-        var result = await _filterService.GetFilteredDataAsync(new() { ["pageNumber"] = 1, ["rowOnPage"] = 30 });
-        ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
+        List<NASAExoplanetCatalog>? result = new();
+
+        try
+        {
+            // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
+            result = await _filterService.GetFilteredDataAsync(new() { ["pageNumber"] = 1, ["rowOnPage"] = 30 });
+            ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            string messageTemplate = $"An unexpected error occurred during data retrieval AmountRowsResult in PlanetsCatalogController.";
+            _logger.LogError(ex, "{Message}. RequestId: {RequestId}", messageTemplate, requestId);
+
+            var message = ex.Data.Contains("ErrorMessage")
+                ? ex.Data["ErrorMessage"]?.ToString()
+                : string.IsNullOrEmpty(ex.Message)
+                    ? $"{messageTemplate} RequestId : {requestId}"
+                    : ex.Message;
+
+            TempData["RequestId"] = requestId;
+            TempData["IsLogged"] = true;
+            TempData["ErrorMessage"] = message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+            throw;
+#else
+            return RedirectToAction("Error", "Error");
+#endif
+        }
 
         return View(result);
     }
-
 
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
@@ -52,8 +120,7 @@ public class PlanetsCatalogController : Controller
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "30";
         int? pageNumber = parameters.GetInt("PageNumberVaulue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
-
-        List<NASAExoplanetCatalog>? selectedList;
+        List<NASAExoplanetCatalog>? selectedList = new();
 
         try
         {
@@ -61,7 +128,13 @@ public class PlanetsCatalogController : Controller
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error fetching filtered data: {ex.Message}");
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+#if DEBUG
+            throw;
+#else
+            return Json(new { redirectTo = redirectUrl });
+#endif
         }
 
         if (selectedList == null)
@@ -80,12 +153,37 @@ public class PlanetsCatalogController : Controller
 
             return Json(new { tableHtml, paginationHtml });
         }
+        catch (Exception ex) when (ex is FileNotFoundException || ex is ViewRenderingException)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+            string errorMessage = ex switch
+            {
+                FileNotFoundException => "Partial view file was not found during rendering.",
+                ViewRenderingException => "An error occurred while rendering the partial view.",
+                _ => "An unexpected rendering error occurred."
+            };
+
+            _logger.LogError(ex, "RequestId: {RequestId}", requestId);
+#if DEBUG
+            throw;
+#else
+            return Json(new { redirectTo = redirectUrl });
+#endif
+        }
         catch (Exception ex)
         {
-            return StatusCode(500, $"RenderViewAsync error: {ex.Message}");
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+
+            _logger.LogError(ex, "Unexpected error rendering partial views. RequestId: {RequestId}", requestId);
+#if DEBUG
+            throw;
+#else
+            return Json(new { redirectTo = redirectUrl });
+#endif
         }
     }
-
 
     // GET: Planetology/PlanetsCatalog/Details/5
     public async Task<IActionResult> Details(int? id)
@@ -95,14 +193,31 @@ public class PlanetsCatalogController : Controller
             return NotFound();
         }
 
-        var nASAExoplanetCatalog = await _context.PlanetsCatalog
-            .FirstOrDefaultAsync(m => m.RowId == id);
-        if (nASAExoplanetCatalog == null)
+        try
         {
-            return NotFound();
-        }
+            var nASAExoplanetCatalog = await _context.PlanetsCatalog.FirstOrDefaultAsync(m => m.RowId == id);
+            if (nASAExoplanetCatalog == null)
+            {
+                return NotFound();
+            }
 
-        return View(nASAExoplanetCatalog);
+            return View(nASAExoplanetCatalog);
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            _logger.LogError(ex, "Error retrieving details for PlanetsCatalog by ID {Id}. RequestId: {RequestId}", id, requestId);
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                throw;
+#else
+            return StatusCode(500);
+#endif
+        }
     }
 
     #region Optional methods
@@ -146,10 +261,40 @@ public class PlanetsCatalogController : Controller
     {
         if (ModelState.IsValid)
         {
-            _context.Add(nASAExoplanetCatalog);
-            await _context.SaveChangesAsync();
-            // TODO: Clear cache
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _context.Add(nASAExoplanetCatalog);
+                await _context.SaveChangesAsync();
+
+                // TODO: Clear cache
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error during creation of NASAExoplanetCatalog: {@NASAExoplanetCatalog}", nASAExoplanetCatalog);
+                ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                _logger.LogError(
+                    ex,
+                    "Unexpected error during creation of NASAExoplanetCatalog: {@NASAExoplanetCatalog}. RequestId: {RequestId}",
+                    nASAExoplanetCatalog,
+                    requestId
+                );
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                    throw;
+#else
+                return StatusCode(500);
+#endif
+            }
         }
         return View(nASAExoplanetCatalog);
     }
@@ -215,17 +360,58 @@ public class PlanetsCatalogController : Controller
                 await _context.SaveChangesAsync();
                 // TODO: Clear cache
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException dbUpConcEx)
             {
                 if (!NASAExoplanetCatalogExists(nASAExoplanetCatalog.RowId))
-                {
                     return NotFound();
-                }
-                else
-                {
+
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = dbUpConcEx.Message;
+                TempData["StackTrace"] = dbUpConcEx.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    dbUpConcEx,
+                    "Concurrency error occurred during editing NASAExoplanetCatalog: {@NASAExoplanetCatalog}. RequestId: {RequestId}",
+                    nASAExoplanetCatalog,
+                    requestId
+                );
+                TempData["IsLogged"] = true;
+#if DEBUG
                     throw;
-                }
+#else
+                return RedirectToAction("Error", "Error");
+#endif
             }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error during editing NASAExoplanetCatalog: {@NASAExoplanetCatalog}", nASAExoplanetCatalog);
+                ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    ex,
+                    "Unexpected error during editing CollinderCatalog: {@Collinder}. RequestId: {RequestId}",
+                    nASAExoplanetCatalog,
+                    requestId
+                );
+#if DEBUG
+                    throw;
+#else
+                return StatusCode(500);
+#endif
+            }
+
             return RedirectToAction(nameof(Index));
         }
         return View(nASAExoplanetCatalog);
@@ -254,15 +440,61 @@ public class PlanetsCatalogController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var nASAExoplanetCatalog = await _context.PlanetsCatalog.FindAsync(id);
-        if (nASAExoplanetCatalog != null)
+        try
         {
-            _context.PlanetsCatalog.Remove(nASAExoplanetCatalog);
-        }
+            var nASAExoplanetCatalog = await _context.PlanetsCatalog.FindAsync(id);
+            if (nASAExoplanetCatalog != null)
+            {
+                _context.PlanetsCatalog.Remove(nASAExoplanetCatalog);
+            }
 
-        await _context.SaveChangesAsync();
-        // TODO: Clear cache
-        return RedirectToAction(nameof(Index));
+            await _context.SaveChangesAsync();
+            // TODO: Clear cache
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DbUpdateException ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+
+            _logger.LogError(
+                ex,
+                "Database update error during deletion of PlanetsCatalog by ID {Id}. RequestId: {RequestId}",
+                id,
+                requestId
+
+            );
+#if DEBUG
+                throw;
+#else
+            return StatusCode(500);
+#endif
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+
+            _logger.LogError(
+                ex,
+                "Unexpected error during deletion of PlanetsCatalog ID by {Id}. RequestId: {RequestId}",
+                id,
+                requestId
+            );
+#if DEBUG
+                throw;
+#else
+            return StatusCode(500);
+#endif
+        }
     }
 
     private bool NASAExoplanetCatalogExists(int id)

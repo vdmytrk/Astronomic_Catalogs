@@ -37,9 +37,7 @@ function progresParHendler() {
 }
 
 function startImport(btn: HTMLElement): void {
-    const TestVariable = 1;
     if (btn) {
-        const TestVariable = 1;
         btn.addEventListener("click", () => {
             if (isImportInProgress) return;
             isImportInProgress = true;
@@ -74,9 +72,7 @@ function startImport(btn: HTMLElement): void {
 }
 
 function stopImport(btn: HTMLElement): void {
-    const TestVariable = 1;
     if (btn) {
-        const TestVariable = 1;
         btn.addEventListener("click", () => {
             // To stop .fetch from startImport() to free up user resources
             if (abortController) {

@@ -4,6 +4,7 @@ using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text.Json;
@@ -14,11 +15,13 @@ public class CollinderFilterService : ICollinderFilterService
 {
     private readonly ApplicationDbContext _context;
     private readonly ICacheService _cache;
+    private readonly ILogger<CollinderFilterService> _logger;
 
-    public CollinderFilterService(ApplicationDbContext context, ICacheService cache)
+    public CollinderFilterService(ApplicationDbContext context, ICacheService cache, ILogger<CollinderFilterService> logger)
     {
         _context = context;
         _cache = cache;
+        _logger = logger;
     }
 
     public async Task<List<CollinderCatalog>?> GetFilteredDataAsync(Dictionary<string, object> parameters)
@@ -62,10 +65,12 @@ public class CollinderFilterService : ICollinderFilterService
 
         string cacheKey = parameters.ToCacheKey("CollinderData");
 
-        return await _cache.GetOrAddAsync(cacheKey, async () =>
+        try
         {
-            var result = await _context.CollinderCatalog
-                .FromSqlInterpolated($@"
+            return await _cache.GetOrAddAsync(cacheKey, async () =>
+            {
+                var result = await _context.CollinderCatalog
+                    .FromSqlInterpolated($@"
                 EXEC GetFilteredCollinderData 
                     @NameOtherCat = {nameOtherCat},
                     @Constellations = {constellationsJson},
@@ -89,21 +94,29 @@ public class CollinderFilterService : ICollinderFilterService
                     @PageNumber = {pageNumber},
                     @RowOnPage = {rowOnPage}
                 ")
-                .AsNoTracking()
-                .ToListAsync();
+                    .AsNoTracking()
+                    .ToListAsync();
 
-            return result;
-        });
+                return result;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception occurred in List<CollinderCatalog> GetFilteredDataAsync.");
+            throw;
+        }
     }
 
     public async Task<(int count, List<CollinderCatalog> rawData, List<ConstellationDto> constellations)> GetCollinderCatalogDataAsync()
     {
-        using var conn = _context.Database.GetDbConnection();
+        try
+        {
+            using var conn = _context.Database.GetDbConnection();
 
-        if (conn.State != ConnectionState.Open)
-            await conn.OpenAsync();
+            if (conn.State != ConnectionState.Open)
+                await conn.OpenAsync();
 
-        var sql = @"
+            var sql = @"
                 SELECT COUNT(*) FROM CollinderCatalog;
                 SELECT TOP 50 
                     Id, 
@@ -136,14 +149,38 @@ public class CollinderFilterService : ICollinderFilterService
                 FROM Constellation;
             ";
 
-        using var multi = await conn.QueryMultipleAsync(sql);
+            using var multi = await conn.QueryMultipleAsync(sql);
 
-        int count = await multi.ReadFirstAsync<int>();
-        var rawData = (await multi.ReadAsync<CollinderCatalog>()).ToList();
-        var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
+            int count = await multi.ReadFirstAsync<int>();
+            var rawData = (await multi.ReadAsync<CollinderCatalog>()).ToList();
+            var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
 
-        return (count, rawData, constellations);
+            return (count, rawData, constellations);
+        }
+        catch (Exception sqlEx) when (sqlEx is SqlException || sqlEx is InvalidOperationException)
+        {
+            string message = sqlEx switch
+            {
+                SqlException => "SQL exception in GetCollinderCatalogDataAsync.",
+                InvalidOperationException => "Invalid operation in GetCollinderCatalogDataAsync. Possibly wrong DB state or context misuse.",
+                _ => "An unexpected rendering error occurred."
+            };
+            _logger.LogError(sqlEx, message);
+            sqlEx.Data["ErrorMessage"] = message;
+            sqlEx.Data["IsLogged"] = true;
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            string message = "Unexpected exception in GetCollinderCatalogDataAsync";
+            _logger.LogError(ex, message);
+            ex.Data["ErrorMessage"] = message;
+            ex.Data["IsLogged"] = true;
+
+            throw;
+        }
     }
 
-}
+} 
 

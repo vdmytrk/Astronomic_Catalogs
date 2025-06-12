@@ -1,4 +1,6 @@
 ﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.DTO;
+using Astronomic_Catalogs.Exceptions;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Astronomic_Catalogs.Services.Interfaces;
@@ -8,6 +10,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers;
 
@@ -16,20 +19,61 @@ public class NGCICOpendatasoftsController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly INGCICFilterService _filterService;
+    private readonly ILogger<NGCICOpendatasoftsController> _logger;
     private readonly IMapper _mapper;
+    private readonly IExceptionRedirectUrlService _exRedirectService;
 
-    public NGCICOpendatasoftsController(ApplicationDbContext context, INGCICFilterService filterService, IMapper mapper)
+    public NGCICOpendatasoftsController(
+        ApplicationDbContext context,
+        INGCICFilterService filterService,
+        IMapper mapper,
+        ILogger<NGCICOpendatasoftsController> logger,
+        IExceptionRedirectUrlService exceptionRedirectService)
     {
         _context = context;
         _filterService = filterService;
         _mapper = mapper;
+        _logger = logger;
+        _exRedirectService = exceptionRedirectService;
     }
 
     // GET: Catalogs/NGCICOpendatasofts
     public async Task<IActionResult> Index()
     {
-        var (countNGCTask, countNGCE_Task, constellations, catalogItems) = await _filterService.GetNGCICOpendatasoftDataAsync();
-        var catalogViewModels = _mapper.Map<List<NGCICViewModel>>(catalogItems); 
+        int countNGCTask;
+        int countNGCE_Task;
+        List<ConstellationDto>? constellations;
+        List<NGCICOpendatasoft>? catalogItems;
+        List<NGCICViewModel> catalogViewModels;
+
+        try
+        {
+            (countNGCTask, countNGCE_Task, constellations, catalogItems) = await _filterService.GetNGCICOpendatasoftDataAsync();
+            catalogViewModels = _mapper.Map<List<NGCICViewModel>>(catalogItems);
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            string messageTemplate = $"An unexpected error occurred during data retrieval AmountRowsResult in NGCICOpendatasoftsController.";
+            _logger.LogError(ex, "{Message}. RequestId: {RequestId}", messageTemplate, requestId);
+
+            var message = ex.Data.Contains("ErrorMessage")
+                ? ex.Data["ErrorMessage"]?.ToString()
+                : string.IsNullOrEmpty(ex.Message)
+                    ? $"{messageTemplate} RequestId : {requestId}"
+                    : ex.Message;
+
+            TempData["RequestId"] = requestId;
+            TempData["IsLogged"] = true;
+            TempData["ErrorMessage"] = message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+            throw;
+#else
+            return RedirectToAction("Error", "Error");
+#endif
+        }
 
         ViewBag.RowOnPageCatalog = "50";
         ViewBag.AmountRowsResult = countNGCTask + countNGCE_Task;
@@ -38,14 +82,12 @@ public class NGCICOpendatasoftsController : Controller
         return View(catalogViewModels);
     }
 
-
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
         int? pageNumber = parameters.GetInt("PageNumberVaulue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
-
         List<NGCICOpendatasoft>? selectedList;
 
         try
@@ -54,7 +96,13 @@ public class NGCICOpendatasoftsController : Controller
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error fetching filtered data: {ex.Message}");
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+#if DEBUG
+            throw;
+#else
+                return Json(new { redirectTo = redirectUrl });
+#endif
         }
 
         if (selectedList == null)
@@ -74,9 +122,35 @@ public class NGCICOpendatasoftsController : Controller
 
             return Json(new { tableHtml, paginationHtml });
         }
+        catch (Exception ex) when (ex is FileNotFoundException || ex is ViewRenderingException)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+            string errorMessage = ex switch
+            {
+                FileNotFoundException => "Partial view file was not found during rendering.",
+                ViewRenderingException => "An error occurred while rendering the partial view.",
+                _ => "An unexpected rendering error occurred."
+            };
+
+            _logger.LogError(ex, "RequestId: {RequestId}", requestId);
+#if DEBUG
+            throw;
+#else
+            return Json(new { redirectTo = redirectUrl });
+#endif
+        }
         catch (Exception ex)
         {
-            return StatusCode(500, $"RenderViewAsync error: {ex.Message}");
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+
+            _logger.LogError(ex, "Unexpected error rendering partial views. RequestId: {RequestId}", requestId);
+#if DEBUG
+            throw;
+#else
+            return Json(new { redirectTo = redirectUrl });
+#endif
         }
     }
 
@@ -92,11 +166,29 @@ public class NGCICOpendatasoftsController : Controller
             return NotFound();
         }
 
-        var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
-        if (entity == null) return NotFound();
+        try
+        {
+            var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
+            if (entity == null) return NotFound();
 
-        var viewModel = _mapper.Map<NGCICViewModel>(entity);
-        return View(viewModel);
+            var viewModel = _mapper.Map<NGCICViewModel>(entity);
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            _logger.LogError(ex, "Error retrieving details for NGCICOpendatasofts by ID {Id}. RequestId: {RequestId}", id, requestId);
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+            throw;
+#else
+            return StatusCode(500);
+#endif
+        }
     }
 
     // GET: Catalogs/NGCICOpendatasofts/Create
@@ -121,11 +213,43 @@ public class NGCICOpendatasoftsController : Controller
     {
         if (ModelState.IsValid)
         {
-            var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
-            _context.Add(entity);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
+                _context.Add(entity);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error during creation of NGCICOpendatasoft: {@NGCICOpendatasoft}", viewModel);
+                ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                _logger.LogError(
+                    ex,
+                    "Unexpected error during creation of NGCICOpendatasoft: {@NGCICOpendatasoft}. RequestId: {RequestId}",
+                    viewModel,
+                    requestId
+                );
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
+
         }
+
         return View(viewModel);
     }
 
@@ -167,11 +291,58 @@ public class NGCICOpendatasoftsController : Controller
                 _context.Update(entity);
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException dbUpConcEx)
             {
-                if (!NGCICOpendatasoftExists(viewModel.Id)) return NotFound();
-                else throw;
+                if (!NGCICOpendatasoftExists(viewModel.Id))
+                    return NotFound();
+
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = dbUpConcEx.Message;
+                TempData["StackTrace"] = dbUpConcEx.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    dbUpConcEx,
+                    "Concurrency error occurred during editing NGCICOpendatasoft: {@NGCICOpendatasoft}. RequestId: {RequestId}",
+                    viewModel,
+                    requestId
+                );
+                TempData["IsLogged"] = true;
+#if DEBUG
+                throw;
+#else
+                    return RedirectToAction("Error", "Error");
+#endif
             }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error during editing NGCICOpendatasoft: {@NGCICOpendatasoft}", viewModel);
+                ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    ex,
+                    "Unexpected error during editing NGCICOpendatasoft: {@NGCICOpendatasoft}. RequestId: {RequestId}",
+                    viewModel,
+                    requestId
+                );
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
+
             return RedirectToAction(nameof(Index));
         }
         return View(viewModel);
@@ -203,14 +374,60 @@ public class NGCICOpendatasoftsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var nGCICOpendatasoft = await _context.NGCIC_Catalog.FindAsync(id);
-        if (nGCICOpendatasoft != null)
+        try
         {
-            _context.NGCIC_Catalog.Remove(nGCICOpendatasoft);
-        }
+            var nGCICOpendatasoft = await _context.NGCIC_Catalog.FindAsync(id);
+            if (nGCICOpendatasoft != null)
+            {
+                _context.NGCIC_Catalog.Remove(nGCICOpendatasoft);
+            }
 
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DbUpdateException ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+
+            _logger.LogError(
+                ex,
+                "Database update error during deletion of NGCICOpendatasofts by ID {Id}. RequestId: {RequestId}",
+                id,
+                requestId
+
+            );
+#if DEBUG
+            throw;
+#else
+            return StatusCode(500);
+#endif
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+
+            _logger.LogError(
+                ex, 
+                "Unexpected error during deletion of NGCICOpendatasofts ID by {Id}. RequestId: {RequestId}", 
+                id, 
+                requestId
+            );
+#if DEBUG
+            throw;
+#else
+            return StatusCode(500);
+#endif
+        }
     }
     #endregion
 

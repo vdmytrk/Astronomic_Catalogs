@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Astronomic_Catalogs.Exceptions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Astronomic_Catalogs.Utils;
 
@@ -9,6 +11,11 @@ static class ControllerExtensions
 {
     public static async Task<string> RenderViewAsync(this Controller controller, string viewName, object? model, bool partial = false)
     {
+        var logger = controller.HttpContext.RequestServices.GetService<ILoggerFactory>()?
+            .CreateLogger(controller.GetType());
+        var requestId = Activity.Current?.Id ?? controller.HttpContext.TraceIdentifier;
+
+
         if (string.IsNullOrEmpty(viewName))
             viewName = controller.ControllerContext.ActionDescriptor.ActionName;
 
@@ -21,6 +28,10 @@ static class ControllerExtensions
 
         if (!viewResult.Success)
         {
+
+            logger?.LogError("View '{ViewName}' not found. RequestId: {RequestId}. Searched locations:\n{Locations}",
+                viewName, requestId, string.Join("\n", viewResult.SearchedLocations));
+
             throw new FileNotFoundException($"View '{viewName}' not found. Searched locations:\n" +
                 string.Join("\n", viewResult.SearchedLocations));
         }
@@ -41,7 +52,15 @@ static class ControllerExtensions
             controller.ViewData["Layout"] = null; // Disable layout to prevent a partial view from wrapping.
         }
 
-        await viewResult.View.RenderAsync(viewContext);
-        return writer.GetStringBuilder().ToString();
+        try
+        {
+            await viewResult.View.RenderAsync(viewContext);
+            return writer.GetStringBuilder().ToString();
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Rendering error for view '{ViewName}'", viewName);
+            throw new ViewRenderingException($"Failed to render view '{viewName}'", ex);
+        }
     }
 }

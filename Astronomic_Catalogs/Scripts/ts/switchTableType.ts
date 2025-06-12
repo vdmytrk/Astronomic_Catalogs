@@ -74,19 +74,35 @@ async function submitFormAndUpdatePartialSwitchTable(form: HTMLElement, url: str
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(json),
         });
-        //const response = await fetch(url);
 
         // 4. Check for success
         if (!response.ok)
             throw new Error(`HTTP error! Failed to load table. Status: ${response.status}`);
 
-        // 5. Receive partial HTML
-        const html = await response.text();
+        // 5. Check if JSON or HTML and receive data
+        let data: any;
+        let isJson = false;
 
-        // 6. Insert it into the DOM
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+            isJson = true;
+        } else {
+            data = await response.text(); // HTML
+        }
+        console.log("Fetched data:", data);
+
+        // 6. Check if redirect is needed
+        if (data.redirectTo) {
+            console.log("Redirecting to:", data.redirectTo);
+            window.location.href = data.redirectTo;
+            return; // Exit function to prevent further execution
+        }
+
+        // 7. Insert received HTML into the DOM
         container.innerHTML = showGrouped
-            ? `<div id="planetsSystemTableContainer" class="hideShowColumnTable p-3">${html}</div>`
-            : `<div id="planetsInGroupsSystemTableContainer" class="p-3">${html}</div>`;
+            ? `<div id="planetsSystemTableContainer" class="hideShowColumnTable p-3">${data}</div>`
+            : `<div id="planetsInGroupsSystemTableContainer" class="p-3">${data}</div>`;
 
     } catch (error) {
         container.innerHTML = "<div class='text-danger p-3'>Error loading data</div>";

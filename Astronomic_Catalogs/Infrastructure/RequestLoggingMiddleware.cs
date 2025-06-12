@@ -7,11 +7,10 @@ namespace Astronomic_Catalogs.Infrastructure;
 /// <summary>
 /// This middleware logs REQUESTS to the resource.
 /// </summary>
-public class RequestLoggingMiddleware (RequestDelegate next, ILogger<RequestLoggingMiddleware> logger, PublicIpService publicIpService)
+public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
 {
     private readonly RequestDelegate _next = next;
     private readonly ILogger<RequestLoggingMiddleware> _logger = logger;
-    private readonly PublicIpService _publicIpService = publicIpService;
 
     public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
     {
@@ -26,23 +25,22 @@ public class RequestLoggingMiddleware (RequestDelegate next, ILogger<RequestLogg
             Referer = context.Request.Headers["Referer"].ToString()
         };
 
+        await _next(context);
+        log.StatusCode = context.Response.StatusCode;
+
         try
         {
-            await _next(context);
-            log.StatusCode = context.Response.StatusCode;
+            using var scope = serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            dbContext.RequestLogs.Add(log);
+            await dbContext.SaveChangesAsync();
         }
-        catch (Exception ex)
+        catch (Exception dbEx)
         {
-            log.StatusCode = 500;
-            log.ErrorMessage = ex.Message;
-            _logger.LogError(ex, "Error while saving RequestLog to the database.");
+            _logger.LogError(dbEx, "Error while saving request log.");
         }
 
-        using var scope = serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-        dbContext.RequestLogs.Add(log);
-        await dbContext.SaveChangesAsync();
     }
+
 }
 

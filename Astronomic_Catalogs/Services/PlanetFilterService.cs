@@ -16,11 +16,13 @@ public class PlanetFilterService : IPlanetFilterService
 {
     private readonly ApplicationDbContext _context;
     private readonly ICacheService _cache;
+    private readonly ILogger<PlanetFilterService> _logger;
 
-    public PlanetFilterService(ApplicationDbContext context, ICacheService cache)
+    public PlanetFilterService(ApplicationDbContext context, ICacheService cache, ILogger<PlanetFilterService> logger)
     {
         _context = context;
         _cache = cache;
+        _logger = logger;
     }
 
     public async Task<List<NASAExoplanetCatalog>?> GetFilteredDataAsync(Dictionary<string, object> parameters)
@@ -54,10 +56,12 @@ public class PlanetFilterService : IPlanetFilterService
 
         string cacheKey = parameters.ToCacheKey("Planet");
 
-        return await _cache.GetOrAddAsync(cacheKey, async () =>
+        try
         {
-            var result = await _context.PlanetsCatalog
-            .FromSqlInterpolated($@"
+            return await _cache.GetOrAddAsync(cacheKey, async () =>
+            {
+                var result = await _context.PlanetsCatalog
+                .FromSqlInterpolated($@"
                 EXEC GetFilteredPlanetsData
                     @PlanetWithSize = {planetWithSize},
                     @PlanetType = {planetType},
@@ -74,38 +78,69 @@ public class PlanetFilterService : IPlanetFilterService
                     @PageNumber = {pageNumber},
                     @RowOnPage = {rowOnPage}
                 ")
-            .AsNoTracking()
-            .ToListAsync();
+                .AsNoTracking()
+                .ToListAsync();
 
-            return result;
-        });
+                return result;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception occurred in List<NASAExoplanetCatalog> GetFilteredDataAsync.");
+            throw;
+        }
     }
-
 
     public async Task<(List<SelectListItem> plLetters, List<SelectListItem> telescopes, List<SelectListItem> discoveryMethods)> GetCatalogStatsAsync()
     {
-        using var conn = new SqlConnection(_context.Database.GetConnectionString());
+        try
+        {
+            using var conn = new SqlConnection(_context.Database.GetConnectionString());
 
-        if (conn.State != ConnectionState.Open)
-            await conn.OpenAsync();
+            if (conn.State != ConnectionState.Open)
+                await conn.OpenAsync();
 
-        var sql = @"
-            SELECT DISTINCT Pl_letter AS PlLetter  FROM NASAExoplanetCatalog WHERE Pl_letter IS NOT NULL;
-            SELECT DISTINCT Disc_telescope AS DiscTelescope FROM NASAExoplanetCatalog WHERE Disc_telescope IS NOT NULL;
-            SELECT DISTINCT DiscoveryMethod FROM NASAExoplanetCatalog WHERE DiscoveryMethod IS NOT NULL;
-        ";
+            var sql = @"
+                SELECT DISTINCT Pl_letter AS PlLetter  FROM NASAExoplanetCatalog WHERE Pl_letter IS NOT NULL;
+                SELECT DISTINCT Disc_telescope AS DiscTelescope FROM NASAExoplanetCatalog WHERE Disc_telescope IS NOT NULL;
+                SELECT DISTINCT DiscoveryMethod FROM NASAExoplanetCatalog WHERE DiscoveryMethod IS NOT NULL;
+            ";
 
-        using var multi = await conn.QueryMultipleAsync(sql);
+            using var multi = await conn.QueryMultipleAsync(sql);
 
-        var plLetterRaw = (await multi.ReadAsync<string>()).ToList();
-        var telescopesRaw = (await multi.ReadAsync<string>()).ToList();
-        var discoveryMethodsRaw = (await multi.ReadAsync<string>()).ToList();
-        
-        List<SelectListItem> plLetters = SelectListUtils.FromStrings(plLetterRaw);
-        List<SelectListItem> telescopes = SelectListUtils.FromStrings(telescopesRaw);
-        List<SelectListItem> discoveryMethods = SelectListUtils.FromStrings(discoveryMethodsRaw);
+            var plLetterRaw = (await multi.ReadAsync<string>()).ToList();
+            var telescopesRaw = (await multi.ReadAsync<string>()).ToList();
+            var discoveryMethodsRaw = (await multi.ReadAsync<string>()).ToList();
 
-        return (plLetters, telescopes, discoveryMethods);
+            List<SelectListItem> plLetters = SelectListUtils.FromStrings(plLetterRaw);
+            List<SelectListItem> telescopes = SelectListUtils.FromStrings(telescopesRaw);
+            List<SelectListItem> discoveryMethods = SelectListUtils.FromStrings(discoveryMethodsRaw);
+
+            return (plLetters, telescopes, discoveryMethods);
+        }
+        catch (Exception sqlEx) when (sqlEx is SqlException || sqlEx is InvalidOperationException)
+        {
+            string message = sqlEx switch
+            {
+                SqlException => "SQL exception in GetCatalogStatsAsync.",
+                InvalidOperationException => "Invalid operation in GetCatalogStatsAsync. Possibly wrong DB state or context misuse.",
+                _ => "An unexpected rendering error occurred."
+            };
+            _logger.LogError(sqlEx, message);
+            sqlEx.Data["ErrorMessage"] = message;
+            sqlEx.Data["IsLogged"] = true;
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            string message = "Unexpected exception in GetCatalogStatsAsync";
+            _logger.LogError(ex, message);
+            ex.Data["ErrorMessage"] = message;
+            ex.Data["IsLogged"] = true;
+
+            throw;
+        }
     }
 
 
