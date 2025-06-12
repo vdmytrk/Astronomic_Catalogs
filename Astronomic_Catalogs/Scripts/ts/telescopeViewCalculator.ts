@@ -57,15 +57,20 @@ function calculateTelescopeView(): void {
     }
 
     // Calculations
+    const moonDistanceKm = 384400;
+
     const focuserDiameterMM = focuserDiameterInches * 25.399;
-    const effectiveFocalLength = focalLengthTelescope * barlowLens;
-    const magnification = (effectiveFocalLength / focalLengthEyepiece) * barlowLens;
+    const focalLengthTelescopeBL  = focalLengthTelescope * barlowLens;
+    const magnification = (focalLengthTelescopeBL / focalLengthEyepiece);
     const exitPupil = aperture / magnification;
 
-    const focalRatioE = effectiveFocalLength / aperture;
+    const focalRatioBL = focalLengthTelescopeBL  / aperture;
     const focalRatio = focalLengthTelescope / aperture;
-    const resolvingPower = 116 / aperture; // Dawes limit (where 116 is a constant factor in angular seconds)
+    const resolvingPowerArcSec = 116 / aperture; // Dawes limit (where 116 is a constant factor in angular seconds)
 
+    //===========================================================================================================================
+    // limitingStellarMagnitude
+    //===========================================================================================================================
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     const limitingStellarMagnitude = 2 + 5 * Math.log10(aperture);
     // Ця формула найчастіше використовується в астрономії аматорського рівня.
@@ -76,6 +81,10 @@ function calculateTelescopeView(): void {
     //    Число 7.5 вказує на теоретичний максимум зоряної величини для більш чутливих інструментів.
     //    Ця формула враховує не тільки розмір апертури, а й більш складні фактори, наприклад, втрати світла в оптиці.
 
+
+    //===========================================================================================================================
+    // fieldOfView
+    //===========================================================================================================================
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //const maximumFieldOfView = fieldViewE / magnification;
     // Ця формула використовує безпосередні параметри окуляра та збільшення.
@@ -83,8 +92,8 @@ function calculateTelescopeView(): void {
     // Ця формула враховує діаметр фокусера та фокусну відстань телескопа, а також перетворює радіани в градуси.
 
 
-    //const fieldOfViewE = Math.min(fieldViewEyepiece / magnification, maximumFieldOfView);
     const fieldOfViewE = fieldViewEyepiece / magnification;
+    const fieldOfView = Math.min(fieldOfViewE, maximumFieldOfView);
 
     let formatDegreesToDMS = (decimalDegrees: number): string => {
         const degrees = Math.floor(decimalDegrees);
@@ -95,22 +104,25 @@ function calculateTelescopeView(): void {
         return `${degrees}° ${minutes}' ${seconds}"`;
     }
     const maximumFieldOfViewFormatted = formatDegreesToDMS(maximumFieldOfView);
-    const maximumFieldOfViewFormattedE = formatDegreesToDMS(fieldOfViewE);
+    const maximumFieldOfViewFormattedE = formatDegreesToDMS(fieldOfView);
 
     let formatDegreesToMinutesOnly = (decimalDegrees: number): string => {
         const totalMinutes = decimalDegrees * 60;
         return `${totalMinutes.toFixed(2)}`;
     };
     const maximumFieldOfViewInMinutes = formatDegreesToMinutesOnly(maximumFieldOfView);
-    const maximumFieldOfViewInMinutesE = formatDegreesToMinutesOnly(fieldOfViewE);
+    const maximumFieldOfViewInMinutesE = formatDegreesToMinutesOnly(fieldOfView);
 
 
+    //===========================================================================================================================
+    // minMoonCrater
+    //===========================================================================================================================
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //const minMoonCrater = 200 / aperture;
     // Ця формула використовує простий емпіричний підхід для аматорських спостережень.
-    //    Число 200 є емпіричним значенням, яке використовується для аматорських телескопів з апертурою в сантиметрах. Воно 
+    //    Число 200 є емпіричним значенням, яке використовується для аматорських телескопів з апертурою в сантиметрах. Воно
     //    базується на роздільній здатності оптичної системи та середній дистанції до Місяця.
-    const minMoonCrater = (3474 / (aperture * 2));
+    //const minMoonCrater = (3474 / (aperture * 2));
     // Ця формула більш точна, оскільки враховує реальний діаметр Місяця
     //    Число 3474 — це діаметр Місяця в кілометрах.
     //const minMoonCrater = 3423 / magnification;
@@ -121,30 +133,35 @@ function calculateTelescopeView(): void {
     //      3474 км — діаметр Місяця.
     //      384400 км — середня відстань від Землі до Місяця.
     //      206265 — кількість кутових секунд в одному радіані.
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const minMoonCraterWithMagnific = 3423 / magnification  *  resolvingPower;
-    // Ця формула пов’язана з безпосереднім збільшенням телескопа та враховує окуляр.
+    // Calculation of the smallest crater on the Moon that the telescope can resolve, in kilometers.
+    const minMoonCrater = 2 * Math.PI * moonDistanceKm * (resolvingPowerArcSec / 3600) / 360;
     ///////////////
     ///// Висновок:
-    // Формула з числом 3474 найбільш точна, оскільки вона ґрунтується на реальному діаметрі Місяця та оптичній роздільній 
+    // Остання формула та формула з числом 3474 найбільш точні, оскільки вони ґрунтується на реальному діаметрі Місяця та оптичній роздільній 
     // здатності телескопа. Інші формули дають лише наближені значення.
 
-    const minMoonCraterWithMagnificatoin = Math.min(minMoonCrater, minMoonCraterWithMagnific);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Мінімальний розмір кратера, який людське око зможе побачити при цьому збільшенні
+    // (поправка на людське сприйняття, розмір повинен "потрапити" в 1 arcmin)
+    // Для цієї формули важливо щоб minMoonCrater розраховувася так: 2 * Math.PI * moonDistanceKm * (resolvingPowerArcSec / 3600) / 360;
+    const minMoonCraterWithMagnificatoin  = minMoonCrater * (60 / magnification);
+
+    const minCraterPerceived = Math.max(minMoonCrater, minMoonCraterWithMagnificatoin);
+    //===========================================================================================================================
 
     setOutputText(".magnification", magnification.toFixed(1) + "×");
-    setOutputText(".fieldView", maximumFieldOfViewFormattedE + "   (" + fieldOfViewE.toFixed(2) + "° | " + maximumFieldOfViewInMinutesE + "\")");
+    setOutputText(".fieldView", maximumFieldOfViewFormattedE + "   (" + fieldOfView.toFixed(2) + "° | " + maximumFieldOfViewInMinutesE + "\")");
     setOutputText(".exitPupil", exitPupil.toFixed(1) + " mm");
 
-    setOutputText(".focalRatioE", "f/" + focalRatioE.toFixed(1));
+    setOutputText(".focalRatioE", "f/" + focalRatioBL.toFixed(1));
     setOutputText(".focalRatio", "f/" + focalRatio.toFixed(2));
-    setOutputText(".resolvingPower", resolvingPower.toFixed(3) + " arcsec");
+    setOutputText(".resolvingPower", resolvingPowerArcSec .toFixed(3) + " arcsec");
     setOutputText(".limitingStellarMagnitude", limitingStellarMagnitude.toFixed(1));
     setOutputText(".maximumFieldOfView", maximumFieldOfViewFormatted + "   (" + maximumFieldOfView.toFixed(3) + "° | " + maximumFieldOfViewInMinutes + "\")");
     setOutputText(".minimumMoonCrater", minMoonCrater.toFixed(1) + " km"); 
-    setOutputText(".minimumMoonCraterWithEyepiece", minMoonCraterWithMagnificatoin.toFixed(1) + " km"); 
+    setOutputText(".minimumMoonCraterWithEyepiece", minCraterPerceived.toFixed(1) + " km"); 
 
-    // Typical magnifications (D/5, D/3, D/2, ...)
     const updateTypicalMagnification = (
         magn: number,
         valueSelector: string,
@@ -158,6 +175,7 @@ function calculateTelescopeView(): void {
         setOutputText(eyepieceSelector, "× (with the eyepiece: " + eyepieceFocalLength.toFixed(0) + "mm )");
     };
 
+    // Typical magnifications (D/5, D/3, D/2, ...)
     const magnifications = [
         { ratio:   aperture / 5, val: ".typicalMagnificationsD5value" , ep: ".eyepieceSizeD5" },
         { ratio:   aperture / 3, val: ".typicalMagnificationsD3value" , ep: ".eyepieceSizeD3" },

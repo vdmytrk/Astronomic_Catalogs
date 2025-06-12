@@ -58,7 +58,7 @@
                     <div class="telescopeCharacteristicsContent">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <h6 class="me-1">Barlow lens:</h6>
+                                <h6 class="me-1">Focuser diameter:</h6>
                             </div>
                             <div class="col-md-6">
                                 @Html.DropDownList("focuserDiameter", new SelectList(focuserDiameter, "Value", "Text", "1.5"), new { @class = "text-FocuserDiameter", id = "", data_default = "0" })
@@ -176,7 +176,7 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-7">
-                                        <h6 class="me-2">Maximum field of view (without reducer):</h6>
+                                        <h6 class="me-2">Maximum field of view (without a Barlow lens):</h6>
                                     </div>
                                     <div class="col-md-auto">
                                         <span class="maximumFieldOfView"></span>
