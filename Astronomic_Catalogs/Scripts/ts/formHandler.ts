@@ -200,7 +200,7 @@ function getPartialViewName(data, checkbox?: HTMLInputElement): FormData {
     const isVisualization = sessionStorage.getItem("isSysVisualization") === "true"; 
     if (isVisualization) {
         console.log(`  >>> IS VISUALIZATION: ${isVisualization}`);
-        data["PartialViewName"] = "_PlanetarySystemTableInGroups";
+        data["PartialViewName"] = "_PlanetarySystemVisualizationBase";
     } else if (checkbox) {
         console.log(`  >>> IS VISUALIZATION: ${isVisualization}`);
         data["PartialViewName"] = checkbox.checked ? "_PlanetarySystemTable" : "_PlanetarySystemTableInGroups";
@@ -233,7 +233,7 @@ async function submitFormAndUpdatePartial(
             ...(parameters ?? {}) // If `parameters` is undefined — create an empty object.
         };
 
-        fallbackParams["PartialViewName"] = "_PlanetarySystemTableInGroups";
+        fallbackParams["PartialViewName"] = "_PlanetarySystemVisualizationBase";
         fallbackParams["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
         json = fallbackParams;
     }

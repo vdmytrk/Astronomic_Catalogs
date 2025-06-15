@@ -115,9 +115,11 @@ function handleHabitableZoneDependency(): void {
     const updateTerrestrialCheckboxState = () => {
         if (habitableZoneCheckbox.checked) {
             terrestrialCheckbox.disabled = false;
+            terrestrialCheckbox.classList.remove('disabled-opacity');
         } else {
             terrestrialCheckbox.disabled = true;
             terrestrialCheckbox.checked = false;
+            terrestrialCheckbox.classList.add('disabled-opacity');
         }
     };
 
