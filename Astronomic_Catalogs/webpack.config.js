@@ -17,6 +17,7 @@ module.exports = {
         telescopeViewCalculator: "./Scripts/ts/telescopeViewCalculator.ts",
         calendarHandler: "./Scripts/ts/calendarHandler.ts",
         switchTableType: "./Scripts/ts/switchTableType.ts",
+        planetarySystemVisualization: "./Scripts/ts/planetarySystemVisualization.ts",
     },
     output: {
         filename: "[name].min.js",

@@ -49,6 +49,7 @@
 		<TypeScriptCompile Remove="Scripts\ts\formHandler.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\mainCO.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\metrics.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\planetarySystemVisualization.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\progresImportBar.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\scriptTSC.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\switchTableType.ts" />

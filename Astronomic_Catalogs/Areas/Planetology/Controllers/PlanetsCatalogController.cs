@@ -117,6 +117,9 @@ public class PlanetsCatalogController : Controller
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
+        if (parameters is null)
+            throw new ArgumentNullException("Not given value into the parameters parameter.");
+
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "30";
         int? pageNumber = parameters.GetInt("PageNumberVaulue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;

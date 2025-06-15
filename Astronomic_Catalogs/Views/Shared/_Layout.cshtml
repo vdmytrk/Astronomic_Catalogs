@@ -103,7 +103,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/scriptTS.min.js" asp-append-version="true"></script>
-    <script src="~/js/development.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     @await RenderSectionAsync("ScriptsAstroTableFilters", required: false)
     @await RenderSectionAsync("ScriptsFormHandler", required: false)
@@ -112,5 +111,6 @@
     @await RenderSectionAsync("ScriptsPlanetarySystem", required: false)
     @await RenderSectionAsync("ScriptsCalendarHandler", required: false)
     @await RenderSectionAsync("ScriptsProgresImportBar", required: false)
+    @await RenderSectionAsync("Development", required: false)
 </body>
 </html>

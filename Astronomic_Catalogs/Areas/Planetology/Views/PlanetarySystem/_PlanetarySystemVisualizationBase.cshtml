@@ -1,0 +1,9 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Entities.PlanetarySystem>
+
+<h1>TEST</h1>
+
+@foreach (var system in Model)
+{
+    await Html.RenderPartialAsync("_PlanetarySystemVisualization", system);
+}
+

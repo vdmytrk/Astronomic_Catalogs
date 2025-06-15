@@ -32,16 +32,41 @@ function setupShowTextBlockToggles(): void {
     });
 }
 
-function setupShowFiltersToggles(): void {
+export function setupShowFiltersToggles(): void {
     document.addEventListener("click", (e) => {
+        console.log("FUNCTION: setupShowFiltersToggles");
         const target = e.target as HTMLElement;
-        if (target.classList.contains("hideFilters")) {
-            const filtersBlock = document.querySelector(".allTopMenuFilters") as HTMLElement | null;
-            if (!filtersBlock) return;
+        const isVisualization = sessionStorage.getItem("isSysVisualization") === "true";
+        const filtersBlock = document.querySelector(".allTopMenuFilters") as HTMLElement | null;
+        const filtersBtn = document.querySelector(".hideFilters") as HTMLElement | null;
 
+        if (!filtersBlock || !filtersBtn) return;
+
+        const toggleFilters = () => {
             const isCollapsed = filtersBlock.classList.toggle("collapsed");
-            target.textContent = isCollapsed ? "Show filters" : "Hide filters";
+            if (filtersBtn) {
+                filtersBtn.textContent = isCollapsed ? "Show filters" : "Hide filters";
+            }
         };
+
+        const toggleVisualization = () => {
+            console.log(`🔁 setupShowFiltersToggles: isVisualization = ${isVisualization}`);
+            filtersBtn.classList.toggle("d-none", !isVisualization);
+            filtersBlock.classList.toggle("collapsed", !isVisualization);
+
+            const isCollapsed = filtersBlock.classList.contains("collapsed");
+            console.log(`isCollapsed = ${isCollapsed}`);
+
+            target.textContent = isCollapsed
+                ? "HIDE PLANETARY SYSTEMS VISUALIZATION"
+                : "SHOW PLANETARY SYSTEMS VISUALIZATION";
+        };
+
+        if (target.classList.contains("hideFilters")) {
+            toggleFilters();
+        } else if (target.classList.contains("platetarySystemVisualization")) {
+            toggleVisualization();
+        }
     });
 }
 

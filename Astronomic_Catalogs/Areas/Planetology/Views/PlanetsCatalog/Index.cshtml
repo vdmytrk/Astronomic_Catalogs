@@ -91,13 +91,13 @@
             <div class="row mt-0">
                 <div class="fieldsCheckBoks">
                     <h5 class="pHeader mt-2">Table columns:</h5>
-                    <span>Other catalogs columns: @Html.CheckBox("OtherCatalogsColumns", false, new { @class = "chb-OtherCatalogsColumns", onclick = "toggleCheckbox(this, 'OtherCatalogsColumns')" }) <span class="borderBlock pe-2">|</span></span>
-                    <span>System columns: @Html.CheckBox("SystemColumns", false, new { @class = "chb-SystemColumns", onclick = "toggleCheckbox(this, 'SystemColumns')" })                              <span class="borderBlock pe-2">|</span></span>
-                    <span>Discovery data columns: @Html.CheckBox("DiscoveryDataColumns", false, new { @class = "chb-DiscoveryDataColumns", onclick = "toggleCheckbox(this, 'DiscoveryDataColumns')" }) <span class="borderBlock pe-2">|</span></span>
-                    <span>Article columns: @Html.CheckBox("ArticleColumns", false, new { @class = "chb-ArticleColumns", onclick = "toggleCheckbox(this, 'ArticleColumns')" })                          <span class="borderBlock pe-2">|</span></span>
-                    <span>Planet columns: @Html.CheckBox("PlanetColumns", true, new { @class = "chb-PlanetColumns", onclick = "toggleCheckbox(this, 'PlanetColumns')" })                               <span class="borderBlock pe-2">|</span></span>
-                    <span>Star columns: @Html.CheckBox("StarColumns", false, new { @class = "chb-StarColumns", onclick = "toggleCheckbox(this, 'StarColumns')" })                                      <span class="borderBlock pe-2">|</span></span>
-                    <span>Coordinates columns: @Html.CheckBox("CoordinatesColumns", false, new { @class = "chb-CoordinatesColumns", onclick = "toggleCheckbox(this, 'CoordinatesColumns')" })          </span>
+                    <span>Other catalogs columns: @Html.CheckBox("OtherCatalogsColumns", false, new { @class = "check-box chb-OtherCatalogsColumns", onclick = "toggleCheckbox(this, 'OtherCatalogsColumns')" }) <span class="borderBlock pe-2">|</span></span>
+                    <span>System columns: @Html.CheckBox("SystemColumns", false, new { @class = "check-box chb-SystemColumns", onclick = "toggleCheckbox(this, 'SystemColumns')" })                              <span class="borderBlock pe-2">|</span></span>
+                    <span>Discovery data columns: @Html.CheckBox("DiscoveryDataColumns", false, new { @class = "check-box chb-DiscoveryDataColumns", onclick = "toggleCheckbox(this, 'DiscoveryDataColumns')" }) <span class="borderBlock pe-2">|</span></span>
+                    <span>Article columns: @Html.CheckBox("ArticleColumns", false, new { @class = "check-box chb-ArticleColumns", onclick = "toggleCheckbox(this, 'ArticleColumns')" })                          <span class="borderBlock pe-2">|</span></span>
+                    <span>Planet columns: @Html.CheckBox("PlanetColumns", true, new { @class = "check-box chb-PlanetColumns", onclick = "toggleCheckbox(this, 'PlanetColumns')" })                               <span class="borderBlock pe-2">|</span></span>
+                    <span>Star columns: @Html.CheckBox("StarColumns", false, new { @class = "check-box chb-StarColumns", onclick = "toggleCheckbox(this, 'StarColumns')" })                                      <span class="borderBlock pe-2">|</span></span>
+                    <span>Coordinates columns: @Html.CheckBox("CoordinatesColumns", false, new { @class = "check-box chb-CoordinatesColumns", onclick = "toggleCheckbox(this, 'CoordinatesColumns')" })          </span>
                 </div>
                 <div class="marginButton">
                     <button type="button" class="btn btn-primary setDefaultValueForAllFieldsCheckBox">
@@ -133,7 +133,7 @@
                                                     <span class="label">Show only planets with a defined size:</span>
                                                     <span class="label">
                                                         <span>
-                                                            @Html.CheckBox("PlanetWithSize", false, new { @class = "chb-PlanetWithSize ms-2", onclick = "toggleCheckbox(this, 'PlanetWithSize')" })
+                                                            @Html.CheckBox("PlanetWithSize", false, new { @class = "check-box chb-PlanetWithSize ms-2", onclick = "toggleCheckbox(this, 'PlanetWithSize')" })
                                                         </span>
                                                     </span>
                                                 </div>
@@ -287,7 +287,7 @@
                                                         <span class="habitableZoneAllPalanetText">Planets in habitable zone:</span>
                                                     </div>
                                                     <div class="col">
-                                                        <span>@Html.CheckBox("HabitableZonePlanets", false, new { @class = "chb-habitableZonePlanets ms-2" })</span>
+                                                        <span>@Html.CheckBox("HabitableZonePlanets", false, new { @class = "check-box chb-habitableZonePlanets ms-2" })</span>
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -295,7 +295,7 @@
                                                         <span class="habitableZoneTerrestrialPalanetText">Terrestrial planets:</span>
                                                     </div>
                                                     <div class="col">
-                                                        <span>@Html.CheckBox("TerrestrialHabitableZonePlanets", false, new { @class = "chb-terrestrialHabitableZonePlanets ms-2" }) </span>
+                                                        <span>@Html.CheckBox("TerrestrialHabitableZonePlanets", false, new { @class = "check-box chb-terrestrialHabitableZonePlanets ms-2" }) </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -317,7 +317,10 @@
                         <div class="col-6">
                             <div class="d-flex flex-wrap align-items-center">
                                 <h6 class="pe-2">Number of elements on the page:</h6>
-                                @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50" }, "30"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30" })
+                                @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30", "50" }, "30"),
+                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30", @class = "form-select RowOnPageCatal" })
                             </div>
                         </div>
                         <div class="col-6">

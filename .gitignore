@@ -392,6 +392,8 @@ Astronomic_Catalogs/wwwroot/less/themes.css
 Astronomic_Catalogs/wwwroot/less/themes.less
 Astronomic_Catalogs/wwwroot/less/site.css
 Astronomic_Catalogs/wwwroot/less/site.less
+Astronomic_Catalogs/wwwroot/less/planetarySystemVisualization.css
+Astronomic_Catalogs/wwwroot/less/planetarySystemVisualization.less
 
 # js + typescript
 Astronomic_Catalogs/wwwroot/js/*.js.map

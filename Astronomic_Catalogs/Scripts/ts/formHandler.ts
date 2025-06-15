@@ -1,33 +1,104 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
+sessionStorage.getItem("isSysVisualization") === "true";
+
 if (!(window as any).__formHandlerInitialized) {
     (window as any).__formHandlerInitialized = true;
 
     document.addEventListener("DOMContentLoaded", () => {
+        sessionStorage.setItem("isSysVisualization", String(false));
         astronomicCatalogFormHandler();
     });
 }
 
 function astronomicCatalogFormHandler() {
-
-    console.log('astronomicCatalogFormHandler initialized');
+    console.log('FUNCTION: astronomicCatalogFormHandler initialized');
 
     document.addEventListener("click", (e: MouseEvent) => {
         const target = e.target as HTMLElement;
-        const paginationCell = target.classList.contains("paginationCell");
-        const filterBtn = target.classList.contains("applyFiltersBtn");
+        if (!target) return;
 
-        if (paginationCell || filterBtn) {
-            const controller = target.getAttribute("data-controller");
-            if (controller) {
-                const pageButton = paginationCell ? target : null;
-                updateCatalogData(controller, pageButton);
+        console.log("############");
+        console.log("FUNCTION: astronomicCatalogFormHandler - CLICK AT:");
+        console.log(new Date().toLocaleString());
+
+        const plSysVisualizationBtn = target.closest(".platetarySystemVisualization") as HTMLElement;
+        const filterBtn = target.classList.contains("applyFiltersBtn");
+        let controller = target.getAttribute("data-controller");
+        const isVisualization = sessionStorage.getItem("isSysVisualization") === "true"; // Current value
+        console.log("🔁 isSysVisualization (before toggle):", isVisualization); 
+
+        const paginationCell = target.classList.contains("paginationCell");
+        const currentPageElement = document.querySelector(".paginationBodyBlock .currentPage") as HTMLElement | null;
+        const pageButton = paginationCell ? target : currentPageElement;
+
+        if (filterBtn || (paginationCell && !isVisualization)) {
+            console.log(" >>>  filterBtn || (paginationCell && !isSysVisualization)");
+            updateCatalogData(controller, pageButton);
+        }
+        else if (plSysVisualizationBtn || (paginationCell && isVisualization)) {
+            console.log(" >>>  plSysVisualizationBtn || (paginationCell && isSysVisualization)");
+
+            let newIsVisualization: boolean;
+            if (!paginationCell)
+                newIsVisualization = toggleSysVisualization();
+            console.log(`🔁 Toggle: isSysVisualization = ${newIsVisualization}`); // New value
+
+            let dataParams: string;
+            let parameters: FormData;
+            if (newIsVisualization) {
+                controller = controller + "_Visualization";
+                dataParams = target.getAttribute("data-parameters");
+                console.log("data-parameters =", dataParams);
+                parameters = parametersInitialization(dataParams);
+                console.log(`Controller: ${controller}`);
+
+                updateCatalogData(controller, pageButton, parameters);
+            } else {
+                console.log(`Controller: ${controller}`);
+                updateCatalogData(controller, pageButton, parameters);
             }
+        }
+
+        if (paginationCell) {
+            console.log(" >>>  paginationCell  IS TRUE");
         }
     });
 }
 
+function toggleSysVisualization(): boolean {
+    const current = sessionStorage.getItem("isSysVisualization") === "true";
+    const next = !current;
+    sessionStorage.setItem("isSysVisualization", String(next));
 
+    return next;
+}
+
+interface FormData {
+    [key: string]: string | string[];
+}
+
+function parametersInitialization(dataParams: string | null): FormData | null {
+    let parameters = {};
+
+    if (dataParams && dataParams === "null") // First load of the _PlanetarySystemVisualizationBase page.
+    {
+        console.log(`⚠️ First load of the _PlanetarySystemVisualizationBase page'`);
+        const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement | null;
+        if (!form) return;
+        parameters = serializeForm(form, "0");
+    }
+    else {
+        try {
+            parameters = JSON.parse(dataParams) as FormData;
+            console.log(`✅ dataParams is valid.`);
+        } catch (err) {
+            console.error("⛔ Invalid JSON in data-parameters:", err);
+        }
+    }
+
+    return parameters;
+}
 
 function getCountChecked_fieldsCheckBoks_Checkbox(): number {
     const container = document.querySelector(".fieldsCheckBoks");
@@ -52,10 +123,6 @@ export function createSpinnerHTML(): string {
     `;
 
     return spinnerHTML;
-}
-
-interface FormData {
-    [key: string]: string | string[];
 }
 
 export function serializeForm(rootElement: HTMLElement, pageNumber: string): FormData {
@@ -112,35 +179,64 @@ export function serializeForm(rootElement: HTMLElement, pageNumber: string): For
         }
     }
 
-    data["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
+    const isVisualization = sessionStorage.getItem("isSysVisualization") === "true"; 
+    if (isVisualization) {
+        data = getPartialViewName(data, null);
+    } else {
+        const checkbox = document.querySelector("label.switchTableType input[type='checkbox']") as HTMLInputElement;
+        if (checkbox)
+            data = getPartialViewName(data, checkbox);
+    }
 
-    const checkbox = document.querySelector("label.switchTableType input[type='checkbox']") as HTMLInputElement;
-    if (checkbox)
-        data = getPartialViewName(data, checkbox);
+    data["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
 
     console.log("serializeForm (after): ", data);
     return data;
 }
 
-function getPartialViewName(data, checkbox: HTMLInputElement): FormData {
+function getPartialViewName(data, checkbox?: HTMLInputElement): FormData {
     console.log("FUNCTION: getPartialViewName");
 
-    const showGrouped = checkbox.checked;
-    const partialViewName = showGrouped ? "_PlanetarySystemTable" : "_PlanetarySystemTableInGroups";
-
-    data["PartialViewName"] = partialViewName;
-
+    const isVisualization = sessionStorage.getItem("isSysVisualization") === "true"; 
+    if (isVisualization) {
+        console.log(`  >>> IS VISUALIZATION: ${isVisualization}`);
+        data["PartialViewName"] = "_PlanetarySystemTableInGroups";
+    } else if (checkbox) {
+        console.log(`  >>> IS VISUALIZATION: ${isVisualization}`);
+        data["PartialViewName"] = checkbox.checked ? "_PlanetarySystemTable" : "_PlanetarySystemTableInGroups";
+    }
+    console.log(`PartialViewName: ${data["PartialViewName"]}`);
     return data;
 }
 
-async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partialSelector: string, pageNumber: string = '1') {
+async function submitFormAndUpdatePartial(
+    form: HTMLElement | null,
+    url: string,
+    partialSelector: string,
+    pageNumber: string = '1',
+    parameters?: FormData)
+{
     console.log(`FUNCTOIN: submitFormAndUpdatePartial(form: ${form}, url: ${url}, partialSelector: ${partialSelector}, pageNumber: ${pageNumber}!!!`);
     const tableHeader = document.querySelector(partialSelector);
     const paginationBodyBlock = document.getElementById("paginationBodyBlockContainer");
+    const plSysVisualizationBtn = document.querySelector(".platetarySystemVisualization") as HTMLElement;
     let tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement | null;
+    let json: FormData;
 
-    // 1. Collect form data into JSON
-    const json = serializeForm(form, pageNumber);
+    // 1. Collect input data into JSON
+    if (form) {
+        console.log("  >>>  FORM IS NOT NULL");
+        json = serializeForm(form, pageNumber);
+    } else {
+        console.log("  >>>  FORM IS NULL");
+        const fallbackParams: FormData = {
+            ...(parameters ?? {}) // If `parameters` is undefined — create an empty object.
+        };
+
+        fallbackParams["PartialViewName"] = "_PlanetarySystemTableInGroups";
+        fallbackParams["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
+        json = fallbackParams;
+    }
 
     try {
         // 2. Show spinner
@@ -156,6 +252,8 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
             tableBody.insertAdjacentHTML('afterbegin', createSpinnerHTML());
         }
 
+        console.log(`JSON argument: ${JSON.stringify(json)}`);
+
         // 3. Send request
         const response = await fetch(url, {
             method: 'POST',
@@ -164,8 +262,10 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
         });
 
         // 4. Check for success
-        if (!response.ok) 
-            throw new Error(`HTTP error! status: ${response.status}`);        
+        if (!response.ok) {
+            console.log(`4. Check for success. response.ok = ${response.ok}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         // 5. Receive partial HTML
         const data = await response.json();
@@ -181,15 +281,18 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
         // 7. Insert received HTML into the DOM
         if (tableHeader && data.tableHtml) {
             tableHeader.innerHTML = data.tableHtml;
+
+            if (plSysVisualizationBtn) {
+                plSysVisualizationBtn.setAttribute("data-parameters", JSON.stringify(json));
+            }
         } else {
             console.error(`Partial container with selector "${partialSelector}" not found.`);
         }
 
-        if (paginationBodyBlock && data.paginationHtml) {
+        if (paginationBodyBlock)
             paginationBodyBlock.innerHTML = data.paginationHtml;
-        } else {
+        else
             console.error(`Partial container with selector "paginationBodyBlockContainer" not found.`);
-        }
 
     } catch (error) {
         console.error('Error submitting form or updating partial:', error);
@@ -221,29 +324,41 @@ async function submitFormAndUpdatePartial(form: HTMLElement, url: string, partia
     }
 }
 
-function updateCatalogData(catalog: string, pageButton: HTMLElement) {
+function updateCatalogData(catalog: string, pageButton: HTMLElement | null, parameters?: FormData) {
     const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement;
-    if (!form) return;
-    console.log(form);
+    if (!form && !parameters) return;
 
-    let pageNumber = '1';
+    const pageNumber = pageButton?.textContent?.trim() || '1';
 
-    if (pageButton)
-        pageNumber = pageButton.textContent?.trim() || '1';
+    console.log(`updateCatalogData(form = ${form}, pageNumber = ${pageNumber}): `);
 
     if (catalog === 'NGCICOpendatasofts') {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        console.log("  >>> catalog === 'NGCICOpendatasofts'");
         submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable', pageNumber);
     }
 
     if (catalog === 'CollinderCatalogs') {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        console.log("  >>> catalog === 'CollinderCatalogs'");
         submitFormAndUpdatePartial(form, '/Catalogs/CollinderCatalogs/Index', '#sizeFilterTable', pageNumber);
     }
 
     if (catalog === 'PlanetsCatalog') {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        console.log("  >>> catalog === 'PlanetsCatalog'");
         submitFormAndUpdatePartial(form, '/Planetology/PlanetsCatalog/Index', '#sizeFilterTable', pageNumber);
     }
 
     if (catalog === 'PlanetarySystem') {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        console.log("  >>> catalog === 'PlanetarySystem'");
         submitFormAndUpdatePartial(form, '/Planetology/PlanetarySystem/Index', '#sizeFilterTable', pageNumber);
+    }
+
+    if (catalog === 'PlanetarySystem_Visualization') {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        console.log("  >>> catalog === 'PlanetarySystem_Visualization'");
+        submitFormAndUpdatePartial(null, '/Planetology/PlanetarySystem/PlanetarySystemVisualization', '#sizeFilterTable', pageNumber, parameters);
     }
 }

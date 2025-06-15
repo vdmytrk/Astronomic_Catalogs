@@ -1,0 +1,5 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Entities.PlanetarySystem>
+
+<div class="planetary-system-container" data-system='@Html.Raw(Json.Serialize(Model))'>
+    <svg class="planetary-system-svg"></svg>
+</div>

@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function initialize(): void {
     console.log("FUNCTION: switchTable");
     const checkbox = document.querySelector("label.switchTableType input[type='checkbox']") as HTMLInputElement;
-
     if (!checkbox) return;
 
     checkbox.addEventListener("change", async () => {

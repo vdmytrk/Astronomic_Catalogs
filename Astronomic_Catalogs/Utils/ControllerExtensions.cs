@@ -59,8 +59,8 @@ static class ControllerExtensions
         }
         catch (Exception ex)
         {
-            logger?.LogError(ex, "Rendering error for view '{ViewName}'", viewName);
-            throw new ViewRenderingException($"Failed to render view '{viewName}'", ex);
+            logger?.LogError(ex, "Rendering error for view '{ViewName}' RequestId: {RequestId}", viewName, requestId);
+            throw new ViewRenderingException($"Failed to render view '{viewName}'. INNER ERROR: {ex.Message} RequestId: {requestId}", ex);
         }
     }
 }

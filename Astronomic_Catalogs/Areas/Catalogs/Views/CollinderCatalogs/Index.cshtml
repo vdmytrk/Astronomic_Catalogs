@@ -96,17 +96,17 @@
         <div class="allTopMenuFilters restrictedBlock">
             <div class="fieldsCheckBoks">
                 <h5 class="pHeader mt-4 p-2">Table columns:</h5>
-                <span>   Constellation: @Html.CheckBox("Constellation", true, new { @class = "chb-Constellation", onclick = "toggleCheckbox(this, 'Constellation')" })                           <span class="borderBlock pe-2">|</span></span>
-                <span>   Right Ascension: @Html.CheckBox("RightAscension", true, new { @class = "chb-RightAscension", onclick = "toggleCheckbox(this, 'RightAscension')" })                      <span class="borderBlock pe-2">|</span></span>
-                <span>   Declination: @Html.CheckBox("Declination", true, new { @class = "chb-Declination", onclick = "toggleCheckbox(this, 'Declination')" })                                   <span class="borderBlock pe-2">|</span></span>
-                <span>   AppMag: @Html.CheckBox("AppMag", true, new { @class = "chb-AppMag", onclick = "toggleCheckbox(this, 'AppMag')" })                                                       <span class="borderBlock pe-2">|</span></span>
-                <span>   AppMag Flag: @Html.CheckBox("AppMagFlag", true, new { @class = "chb-AppMagFlag", onclick = "toggleCheckbox(this, 'AppMagFlag')" })                                      <span class="borderBlock pe-2">|</span></span>
-                <span>   Count Stars: @Html.CheckBox("CountStars", true, new { @class = "chb-CountStars", onclick = "toggleCheckbox(this, 'CountStars')" })                                      <span class="borderBlock pe-2">|</span></span>
-                <span>   CountStars to finding: @Html.CheckBox("CountStarsToFinding", true, new { @class = "chb-CountStarsToFinding", onclick = "toggleCheckbox(this, 'CountStarsToFinding')" }) <span class="borderBlock pe-2">|</span></span>
-                <span>   Ang Diameter: @Html.CheckBox("AngDiameter", true, new { @class = "chb-AngDiameter", onclick = "toggleCheckbox(this, 'AngDiameter')" })                                  <span class="borderBlock pe-2">|</span></span>
-                <span>   AngDiameterNew: @Html.CheckBox("AngDiameterNew", true, new { @class = "chb-AngDiameterNew", onclick = "toggleCheckbox(this, 'AngDiameterNew')" })                       <span class="borderBlock pe-2">|</span></span>
-                <span>   Class: @Html.CheckBox("Class", true, new { @class = "chb-Class", onclick = "toggleCheckbox(this, 'Class')" })                                                           <span class="borderBlock pe-2">|</span></span>
-                <span>   Comment: @Html.CheckBox("Comment", true, new { @class = "chb-Comment", onclick = "toggleCheckbox(this, 'Comment')" })                                                   </span>
+                <span>   Constellation: @Html.CheckBox("Constellation", true, new { @class = "check-box chb-Constellation", onclick = "toggleCheckbox(this, 'Constellation')" })                           <span class="borderBlock pe-2">|</span></span>
+                <span>   Right Ascension: @Html.CheckBox("RightAscension", true, new { @class = "check-box chb-RightAscension", onclick = "toggleCheckbox(this, 'RightAscension')" })                      <span class="borderBlock pe-2">|</span></span>
+                <span>   Declination: @Html.CheckBox("Declination", true, new { @class = "check-box chb-Declination", onclick = "toggleCheckbox(this, 'Declination')" })                                   <span class="borderBlock pe-2">|</span></span>
+                <span>   AppMag: @Html.CheckBox("AppMag", true, new { @class = "check-box chb-AppMag", onclick = "toggleCheckbox(this, 'AppMag')" })                                                       <span class="borderBlock pe-2">|</span></span>
+                <span>   AppMag Flag: @Html.CheckBox("AppMagFlag", true, new { @class = "check-box chb-AppMagFlag", onclick = "toggleCheckbox(this, 'AppMagFlag')" })                                      <span class="borderBlock pe-2">|</span></span>
+                <span>   Count Stars: @Html.CheckBox("CountStars", true, new { @class = "check-box chb-CountStars", onclick = "toggleCheckbox(this, 'CountStars')" })                                      <span class="borderBlock pe-2">|</span></span>
+                <span>   CountStars to finding: @Html.CheckBox("CountStarsToFinding", true, new { @class = "check-box chb-CountStarsToFinding", onclick = "toggleCheckbox(this, 'CountStarsToFinding')" }) <span class="borderBlock pe-2">|</span></span>
+                <span>   Ang Diameter: @Html.CheckBox("AngDiameter", true, new { @class = "check-box chb-AngDiameter", onclick = "toggleCheckbox(this, 'AngDiameter')" })                                  <span class="borderBlock pe-2">|</span></span>
+                <span>   AngDiameterNew: @Html.CheckBox("AngDiameterNew", true, new { @class = "check-box chb-AngDiameterNew", onclick = "toggleCheckbox(this, 'AngDiameterNew')" })                       <span class="borderBlock pe-2">|</span></span>
+                <span>   Class: @Html.CheckBox("Class", true, new { @class = "check-box chb-Class", onclick = "toggleCheckbox(this, 'Class')" })                                                           <span class="borderBlock pe-2">|</span></span>
+                <span>   Comment: @Html.CheckBox("Comment", true, new { @class = "check-box chb-Comment", onclick = "toggleCheckbox(this, 'Comment')" })                                                   </span>
             </div>
             <div class="marginButton">
                 <button type="button" class="btn btn-primary selectAllFieldsCheckBox">
@@ -347,14 +347,14 @@
                 <div class="m-0">
                     <h5 class="pHeader mt-4 p-2">Objects class:</h5>
                     <div class="responsiveColumnsContainer">
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("μNorm", false, new { @class = "type-Norm" })    μ Norm</span> — Resembles the cluster μ Normae (NGC 6169), but with uncertainty.</p>
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Chain", false, new { @class = "type-Chain" })   Chain</span> — Stars are arranged in a chain-like or linear formation.</p>
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Glob", false, new { @class = "type-Glob" })     Glob</span> — The cluster resembles a globular cluster in appearance.</p>
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Neb", false, new { @class = "type-Neb" })       Neb</span> — The cluster appears nebulous or is embedded in a nebula.</p>
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Neb?", false, new { @class = "type-Neb?" })     Neb?</span> — Possibly associated with a nebula, but this is uncertain.</p>
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("nl", false, new { @class = "type-nl" })         nl</span> — No classification listed (stands for “none listed”).</p>
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Plei", false, new { @class = "type-Plei" })     Plei</span> — Resembles the Pleiades (M45): bright, compact, and well-defined.</p>
-                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Praes", false, new { @class = "type-Praes" })   Praes</span> —  Resembles the Beehive Cluster (Praesepe, M44): more spread out and loose.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("μNorm", false, new { @class = "check-box type-Norm" })    μ Norm</span> — Resembles the cluster μ Normae (NGC 6169), but with uncertainty.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Chain", false, new { @class = "check-box type-Chain" })   Chain</span> — Stars are arranged in a chain-like or linear formation.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Glob", false, new { @class = "check-box type-Glob" })     Glob</span> — The cluster resembles a globular cluster in appearance.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Neb", false, new { @class = "check-box type-Neb" })       Neb</span> — The cluster appears nebulous or is embedded in a nebula.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Neb?", false, new { @class = "check-box type-Neb?" })     Neb?</span> — Possibly associated with a nebula, but this is uncertain.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("nl", false, new { @class = "check-box type-nl" })         nl</span> — No classification listed (stands for “none listed”).</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Plei", false, new { @class = "check-box type-Plei" })     Plei</span> — Resembles the Pleiades (M45): bright, compact, and well-defined.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Praes", false, new { @class = "check-box type-Praes" })   Praes</span> —  Resembles the Beehive Cluster (Praesepe, M44): more spread out and loose.</p>
                     </div>
                 </div>
 
@@ -364,7 +364,10 @@
                         <div class="col-6">
                             <div class="d-flex flex-wrap align-items-center">
                                 <h6 class="pe-2">Number of elements on the page:</h6>
-                                @Html.DropDownList("RowOnPageCatalog", new SelectList(new string[] { "10", "20", "30", "50", "100", "All" }, "50"), new { @id = "RowOnPageCatalog", @required = "true", @data_default = "50" })
+                                @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30", "50", "100", "All" }, "50"),
+                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "50", @class = "form-select RowOnPageCatal" })
                             </div>
                         </div>
                         <div class="col-6">

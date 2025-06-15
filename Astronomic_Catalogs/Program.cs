@@ -3,6 +3,7 @@ using Astronomic_Catalogs.Authorization;
 using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.Interfaces;
+using Astronomic_Catalogs.Infrastructure.LogingIfrastructure;
 using Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
 using Astronomic_Catalogs.Models.Services;
 using Astronomic_Catalogs.Services;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using NLog;
 using NLog.Web;
 using System.Globalization;
@@ -34,7 +36,9 @@ public class Program
         AddServices(builder);
         AddDatabaseServices(builder);
         AddIdentityServices(builder, configuration);
+#if !DEBUG // ALSO SEE UseRateLimiter SETTINGS
         ConfigureRateLimiting(builder);
+#endif
 
         builder.Services.AddHttpClient();
         builder.Services.AddControllersWithViews();
@@ -69,6 +73,12 @@ public class Program
 
     private static void AddServices(WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton(new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.None
+        });
+
         builder.Services.AddTransient<PublicIpService>();
         builder.Services.AddSingleton<IImportCancellationService, ImportCancellationService>();
         builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
@@ -449,7 +459,9 @@ public class Program
         app.UseStaticFiles();
         app.UseAuthentication();
         app.UseAuthorization();
+#if !DEBUG // ALSO SEE ConfigureRateLimiting SETTINGS
         app.UseRateLimiter();
+#endif
         app.UseMiddleware<UserLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<UserAccessMiddleware>();
