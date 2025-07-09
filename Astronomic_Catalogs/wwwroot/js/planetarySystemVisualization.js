@@ -646,7 +646,6 @@ function temperatureToColor(tempK) {
 }
 function renderHabitablZone(system, planetGroup, systemHeight) {
     const borderThickness = 0.1 * remInPixels; // Якщо видалиш і будеш використовувати однойменну глобальну змінну - перестане працюваати
-    console.log(`  📐📐📐 system.habitablZone: ${system.habitablZone}`);
     if (system.habitablZone && (system.stLum != 0.00 || system.hostname == "Sun")) {
         const hzCenter = +system.habitablZone;
         // Межі HZ на основі пропорцій для Сонця
