@@ -106,11 +106,22 @@ function resetUI(): void {
     isImportInProgress = false;
     abortController = null;
 
-    fetch('/Planetology/PlanetsCatalog/GetPlanetsTable')
-        .then(response => response.text())
-        .then(html => {
+    fetch('/Planetology/PlanetsCatalog/Index', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            PageNumberVaulue: 1,
+            RowOnPageCatalog: 30
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
             const tableContainer = document.getElementById('planetsTableContainer') as HTMLElement;
-            tableContainer.innerHTML = html;
+            if (data.tableHtml) {
+                tableContainer.innerHTML = data.tableHtml;
+            }
         })
         .catch(error => console.error('Error updating table:', error));
 }

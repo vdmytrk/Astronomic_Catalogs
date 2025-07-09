@@ -714,11 +714,7 @@ function temperatureToColor(tempK: number): string {
 function renderHabitablZone(system: any, planetGroup: any, systemHeight: number) {
     const borderThickness = 0.1 * remInPixels; // Якщо видалиш і будеш використовувати однойменну глобальну змінну - перестане працюваати
 
-
-    const format = (v: number) => (v.toFixed(2) === "0.00" ? "?" : v.toFixed(2));
-    const stLum = format(system.stLum);
-
-    if (system.habitablZone && system.stLum != 0.00) {
+    if (system.habitablZone && (system.stLum != 0.00 || system.hostname == "Sun")) {
         const hzCenter = +system.habitablZone;
 
         // Межі HZ на основі пропорцій для Сонця
@@ -1236,7 +1232,7 @@ const solarSystem = {
     stMass: 1.0,
     stMet: 0.0122,
     stMetratio: "[Fe/H]",
-    stLum: 0.00,
+    stLum: 0,
     stAge: 4.6,
     syDist: 0,
     stLumSunAbsol: 1.0,
@@ -1402,7 +1398,7 @@ function applyGridLabelLayout(planetGroup: d3.Selection<SVGGElement, unknown, nu
             //console.log(`  ⚠️⚠️⚠ PLANET: ${system.exoplanets?.[i].plLetter}`);
             //console.log(`  🧪 starRadiusPx(${starRadiusPx}) > newX(${newX})`);
             //console.log(`  🧪 newX - bbox.width / 2(${bbox.width / 2}) = ${newX - bbox.width / 2} < ${starRadiusPx * 2} = starRadiusPx * 2`);
-            planetDescColor = starRadiusPx > newX || newX - bbox.width / 2 < starRadiusPx * 1.5 ? "#2C2C2C" : planetDescColor;
+            planetDescColor = starRadiusPx > newX || newX - bbox.width / 2 < starRadiusPx * 1.4 ? "#2C2C2C" : planetDescColor;
         }
 
         // Зміщення текстів

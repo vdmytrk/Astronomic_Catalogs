@@ -478,6 +478,7 @@ public class DatabaseInitializer
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_Cursor.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_While.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/Recreate_NASAPlanetarySystems_Tables.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/DataBugFixes.sql");
     }
 
     private async Task ExecuteInsertDataSqlByStoredProcedureAsync()

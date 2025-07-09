@@ -520,7 +520,7 @@ public class PlanetsCatalogController : Controller
         }
         catch (OperationCanceledException)
         {
-            return StatusCode(499); // Non-standard "Client Closed Request"
+            return StatusCode(499); 
         }
     }
 

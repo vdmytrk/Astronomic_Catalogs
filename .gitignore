@@ -379,6 +379,8 @@ Astronomic_Catalogs/wwwroot/Excel
 # SQL
 Astronomic_Catalogs/Database Scripts/Tables/RequestLog.sql
 Astronomic_Catalogs/Database Scripts/Tables/UsertLog.sql
+Astronomic_Catalogs/Database Scripts/Functions and procedures/DataBugFixes.sql
+
 
 # C#
 *_extended.cs

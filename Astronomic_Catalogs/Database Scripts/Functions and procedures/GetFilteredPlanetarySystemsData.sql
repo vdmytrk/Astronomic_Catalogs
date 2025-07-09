@@ -26,7 +26,7 @@ BEGIN
 	BEGIN TRY
 		-- Parameter validation
 
-		DECLARE @InvalidPattern  NVARCHAR(100) = '%[^A-Za-z0-9 \-_,.]%'; 
+		DECLARE @InvalidPattern  NVARCHAR(100) = '%[^A-Za-z0-9 \-_,.''`]%'; 
 
 		BEGIN
 			IF @PlanetType IS NOT NULL AND @PlanetType != '[]' 

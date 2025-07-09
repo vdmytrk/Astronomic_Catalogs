@@ -100,19 +100,23 @@ BEGIN
 			P.Pl_massj,
 			P.LatestDate,
 			CASE  
-				WHEN P.Pl_orbsmax BETWEEN 
-					CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(S.St_lum AS decimal(18,10)) / 2.0) * 0.75 AS decimal(18,10)) 
-					AND 
-					CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(S.St_lum AS decimal(18,10)) / 2.0) * 1.77 AS decimal(18,10)) 
+				WHEN S.St_lum != 0 
+						AND P.Pl_orbsmax BETWEEN HZ.HZ_Inner AND HZ.HZ_Outer					 
 				THEN 1
 				ELSE 0
 			END AS InHabitablZone
 		FROM NASAExoplanetCatalogUniquePlanets P
 		INNER JOIN NASAPlanetarySystemsStars S ON P.Hostname = S.Hostname
-		WHERE P.Hostname IN (
-			SELECT DISTINCT Hostname
-			FROM NASAExoplanetCatalogUniquePlanets
-			WHERE Pl_rade IS NOT NULL OR Pl_radj IS NOT NULL
+		CROSS APPLY (
+			SELECT
+				CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(S.St_lum AS decimal(18,10)) / 2.0) * 0.75 AS decimal(18,10)) AS HZ_Inner,
+				CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(S.St_lum AS decimal(18,10)) / 2.0) * 1.77 AS decimal(18,10)) AS HZ_Outer
+		) AS HZ
+		WHERE EXISTS (
+			SELECT 1
+			FROM NASAExoplanetCatalogUniquePlanets X
+			WHERE X.Hostname = P.Hostname
+				AND (X.Pl_rade IS NOT NULL OR X.Pl_radj IS NOT NULL)
 		);	
 		
         IF @StartedTran = 1 AND XACT_STATE() = 1
