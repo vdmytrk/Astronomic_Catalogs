@@ -1,0 +1,30 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Server Error";
+}
+
+<div class="container mt-5 p-3">
+    <h1 class="text-danger">500 - Internal Server Error</h1>
+    <p>An unexpected error occurred.</p>
+
+    @if (Model.ShowRequestId)
+    {
+        <p class="text-muted mt-4">
+            <small>
+                Please provide this <strong>Request ID</strong> to support if needed: <code>@Model.RequestId</code>
+            </small>
+        </p>
+    }
+
+    <h4>Error Details</h4>
+    <p>@Html.Raw(Model.ErrorMessage)</p>
+
+    @if (Model.IsDevelopment)
+    {
+        <pre>@Html.Raw(Model.StackTrace)</pre>
+        <p>@Html.Raw(Model.Path)</p>
+        <p>@Html.Raw(Model.Source)</p>
+    }
+
+    <a href="/" class="btn btn-primary mt-5">Go to Home</a>
+</div>

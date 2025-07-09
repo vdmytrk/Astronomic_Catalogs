@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-
-namespace Astronomic_Catalogs.Models;
+﻿namespace Astronomic_Catalogs.Models;
 
 public class NGCICOpendatasoft
 {
@@ -9,12 +6,14 @@ public class NGCICOpendatasoft
     public string? NGC_IC { get; set; }
     public int? Name { get; set; }
     public string? SubObject { get; set; }
-    public string? Messier { get; set; }
+    public int? Messier { get; set; }
     public string? Name_UK { get; set; }
     public string? Comment { get; set; }
     public string? OtherNames { get; set; }
     public string? NGC { get; set; }
     public string? IC { get; set; }
+    public string? LimitAngDiameter { get; set; }
+    public double? AngDiameter { get; set; }
     public string? ObjectTypeAbrev { get; set; }
     public string? ObjectType { get; set; }
     public string? ObjectTypeFull { get; set; }
@@ -63,6 +62,6 @@ public class NGCICOpendatasoft
     public string? Image { get; set; }
 
 
-    public int? PageNumber { get; set; }
-    public int? PageCount { get; set; }
+    public int? RowOnPage { get; set; }
+    public string? SourceTable { get; set; }
 }

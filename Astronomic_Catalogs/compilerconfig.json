@@ -10,5 +10,9 @@
   {
     "outputFile": "wwwroot/less/site.css",
     "inputFile": "wwwroot/less/site.less"
+  },
+  {
+    "outputFile": "wwwroot/less/planetarySystemVisualization.css",
+    "inputFile": "wwwroot/less/planetarySystemVisualization.less"
   }
 ]

@@ -26,13 +26,13 @@ namespace Astronomic_Catalogs.Areas.Identity.Pages.Account
         private readonly UserManager<AspNetUser> _userManager;
         private readonly ICustomEmailSender _sender;
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<DatabaseInitializer> _logger;
+        private readonly ILogger<RegisterConfirmationModel> _logger;
 
         public RegisterConfirmationModel(
             ApplicationDbContext context, 
             UserManager<AspNetUser> userManager,
             ICustomEmailSender sender, 
-            ILogger<DatabaseInitializer> logger)
+            ILogger<RegisterConfirmationModel> logger)
         {
             _userManager = userManager;
             _sender = sender;

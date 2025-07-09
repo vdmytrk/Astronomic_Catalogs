@@ -10,8 +10,11 @@
     "sourceMap": true,
     "target": "ES6",
     "types": [ "node", "jquery" ],
-    "typeRoots": [ "node_modules/@types" ]
-
+    "typeRoots": [ "node_modules/@types" ],
+    "baseUrl": ".",
+    "paths": {
+      "@modules/*": [ "wwwroot/js/*" ]
+    }
   },
   "exclude": [
     "node_modules",

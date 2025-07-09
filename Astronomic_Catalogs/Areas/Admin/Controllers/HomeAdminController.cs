@@ -1,15 +1,11 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Infrastructure.Interfaces;
-using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using NLog;
 using System.Data;
-using System.Diagnostics;
 
 namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 
@@ -20,12 +16,12 @@ namespace Astronomic_Catalogs.Areas.Admin.Controllers;
 public class HomeAdminController : Controller
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<DatabaseInitializer> _logger;
+    private readonly ILogger<HomeAdminController> _logger;
     private string connectionString = null!;
 
     public HomeAdminController(
         ApplicationDbContext context,
-        ILogger<DatabaseInitializer> logger,
+        ILogger<HomeAdminController> logger,
         IConnectionStringProvider connectionStringProvider)
     {
         _logger = logger;
@@ -77,12 +73,6 @@ public class HomeAdminController : Controller
 
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 
     public async Task<string> GetDateFromProcedureADOAsync()

@@ -9,15 +9,17 @@ public class NLogApplicationCodeConfiguration : IEntityTypeConfiguration<NLogApp
     {
         builder.ToTable("NLogApplicationCode");
 
-        builder.HasKey(e => e.Id).HasName("PK_NLog");
+        builder.HasKey(e => e.Id).HasName("PK_NLogApplicationCode");
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd();
 
         builder.Property(e => e.CreatedOn)
+            .HasColumnType("datetime2(7)")
             .HasDefaultValueSql("GETUTCDATE()")
             .IsRequired();
 
         builder.Property(e => e.Logged)
+            .HasColumnType("datetime2(7)")
             .IsRequired();
 
         builder.Property(e => e.Level)

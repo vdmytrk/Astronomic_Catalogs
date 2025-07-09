@@ -3,10 +3,10 @@ using System.Net.Http;
 
 namespace Astronomic_Catalogs.Services;
 
-public class PublicIpService (HttpClient httpClient, ILogger<UserLoggingMiddleware> logger)
+public class PublicIpService (HttpClient httpClient, ILogger<PublicIpService> logger)
 {
     private readonly HttpClient _httpClient = httpClient;
-    private readonly ILogger<UserLoggingMiddleware> _logger = logger;
+    private readonly ILogger<PublicIpService> _logger = logger;
     public string PublicIp { get; set; } = string.Empty;
 
     public async Task GetPublicIpAsync(HttpContext context, string ip)

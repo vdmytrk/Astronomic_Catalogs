@@ -1,0 +1,141 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Models.NASAExoplanetCatalog>
+@using Astronomic_Catalogs.Helpers
+
+<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-2 table-toFixRows-1 table-fixed-headers table-set-size astroCatalogTable setColumnWidth">
+    <thead>
+        <tr class="tr-oun-style">
+            <th class="RowId">@Html.DisplayNameFor(model => model.RowId)</th>
+            <th class="PlName">@Html.DisplayNameFor(model => model.PlName)</th>
+            <th class="Hostname">@Html.DisplayNameFor(model => model.Hostname)</th>
+            <th class="PlLetter">@Html.DisplayNameFor(model => model.PlLetter)</th>
+            <th hidden class="OtherCatalogsColumns HdName">@Html.DisplayNameFor(model => model.HdName)</th>
+            <th hidden class="OtherCatalogsColumns HipName">@Html.DisplayNameFor(model => model.HipName)</th>
+            <th hidden class="OtherCatalogsColumns TicId">@Html.DisplayNameFor(model => model.TicId)</th>
+            <th hidden class="OtherCatalogsColumns GaiaId">@Html.DisplayNameFor(model => model.GaiaId)</th>
+            <th hidden class="SystemColumns DefaultFlag">@Html.DisplayNameFor(model => model.DefaultFlag)</th>
+            <th hidden class="SystemColumns SySnum">@Html.DisplayNameFor(model => model.SySnum)</th>
+            <th hidden class="SystemColumns SyPnum">@Html.DisplayNameFor(model => model.SyPnum)</th>
+            <th hidden class="SystemColumns SyMnum">@Html.DisplayNameFor(model => model.SyMnum)</th>
+            <th hidden class="SystemColumns CbFlag">@Html.DisplayNameFor(model => model.CbFlag)</th>
+            <th hidden class="DiscoveryDataColumns DiscoveryMethod">@Html.DisplayNameFor(model => model.DiscoveryMethod)</th>
+            <th hidden class="DiscoveryDataColumns DiscYear">@Html.DisplayNameFor(model => model.DiscYear)</th>
+            <th hidden class="DiscoveryDataColumns DiscRefName">@Html.DisplayNameFor(model => model.DiscRefName)</th>
+            <th hidden class="DiscoveryDataColumns DiscPubDate">@Html.DisplayNameFor(model => model.DiscPubDate)</th>
+            <th hidden class="DiscoveryDataColumns DiscLocale">@Html.DisplayNameFor(model => model.DiscLocale)</th>
+            <th hidden class="DiscoveryDataColumns DiscFacility">@Html.DisplayNameFor(model => model.DiscFacility)</th>
+            <th hidden class="DiscoveryDataColumns DiscTelescope">@Html.DisplayNameFor(model => model.DiscTelescope)</th>
+            <th hidden class="DiscoveryDataColumns DiscInstrument">@Html.DisplayNameFor(model => model.DiscInstrument)</th>
+            <th hidden class="DiscoveryDataColumns RvFlag">@Html.DisplayNameFor(model => model.RvFlag)</th>
+            <th hidden class="DiscoveryDataColumns PulFlag">@Html.DisplayNameFor(model => model.PulFlag)</th>
+            <th hidden class="DiscoveryDataColumns PtvFlag">@Html.DisplayNameFor(model => model.PtvFlag)</th>
+            <th hidden class="DiscoveryDataColumns TranFlag">@Html.DisplayNameFor(model => model.TranFlag)</th>
+            <th hidden class="DiscoveryDataColumns AstFlag">@Html.DisplayNameFor(model => model.AstFlag)</th>
+            <th hidden class="DiscoveryDataColumns ObmFlag">@Html.DisplayNameFor(model => model.ObmFlag)</th>
+            <th hidden class="DiscoveryDataColumns MicroFlag">@Html.DisplayNameFor(model => model.MicroFlag)</th>
+            <th hidden class="DiscoveryDataColumns EtvFlag">@Html.DisplayNameFor(model => model.EtvFlag)</th>
+            <th hidden class="DiscoveryDataColumns ImaFlag">@Html.DisplayNameFor(model => model.ImaFlag)</th>
+            <th hidden class="DiscoveryDataColumns DkinFlag">@Html.DisplayNameFor(model => model.DkinFlag)</th>
+            <th hidden class="ArticleColumns SolType">@Html.DisplayNameFor(model => model.SolType)</th>
+            <th hidden class="ArticleColumns PlControvFlag">@Html.DisplayNameFor(model => model.PlControvFlag)</th>
+            <th hidden class="ArticleColumns PlRefName">@Html.DisplayNameFor(model => model.PlRefName)</th>
+            <th class="PlanetColumns PlOrbPer">@Html.DisplayNameFor(model => model.PlOrbPer)</th>
+            <th class="PlanetColumns PlOrbSmax">@Html.DisplayNameFor(model => model.PlOrbSmax)</th>
+            <th class="PlanetColumns PlRade">@Html.DisplayNameFor(model => model.PlRade)</th>
+            <th class="PlanetColumns PlRadJ">@Html.DisplayNameFor(model => model.PlRadJ)</th>
+            <th class="PlanetColumns PlMasse">@Html.DisplayNameFor(model => model.PlMasse)</th>
+            <th class="PlanetColumns PlMassJ">@Html.DisplayNameFor(model => model.PlMassJ)</th>
+            <th class="PlanetColumns PlMsiniE">@Html.DisplayNameFor(model => model.PlMsiniE)</th>
+            <th class="PlanetColumns PlMsiniJ">@Html.DisplayNameFor(model => model.PlMsiniJ)</th>
+            <th class="PlanetColumns PlCMasse">@Html.DisplayNameFor(model => model.PlCMasse)</th>
+            <th class="PlanetColumns PlCMassJ">@Html.DisplayNameFor(model => model.PlCMassJ)</th>
+            <th class="PlanetColumns PlBmasse">@Html.DisplayNameFor(model => model.PlBmasse)</th>
+            <th class="PlanetColumns PlBmassJ">@Html.DisplayNameFor(model => model.PlBmassJ)</th>
+            <th class="PlanetColumns PlBmassProv">@Html.DisplayNameFor(model => model.PlBmassProv)</th>
+            <th class="PlanetColumns PlDens">@Html.DisplayNameFor(model => model.PlDens)</th>
+            <th class="PlanetColumns PlOrbEccen">@Html.DisplayNameFor(model => model.PlOrbEccen)</th>
+            <th class="PlanetColumns PlInsol">@Html.DisplayNameFor(model => model.PlInsol)</th>
+            <th class="PlanetColumns PlEqt">@Html.DisplayNameFor(model => model.PlEqt)</th>
+            <th class="PlanetColumns PlOrbincl">@Html.DisplayNameFor(model => model.PlOrbincl)</th>
+            <th class="PlanetColumns PlTranmid">@Html.DisplayNameFor(model => model.PlTranmid)</th>
+            <th class="PlanetColumns PlTsystemref">@Html.DisplayNameFor(model => model.PlTsystemref)</th>
+            <th class="PlanetColumns TtvFlag">@Html.DisplayNameFor(model => model.TtvFlag)</th>
+            <th class="PlanetColumns PlImppar">@Html.DisplayNameFor(model => model.PlImppar)</th>
+            <th class="PlanetColumns PlTrandep">@Html.DisplayNameFor(model => model.PlTrandep)</th>
+            <th class="PlanetColumns PlTrandur">@Html.DisplayNameFor(model => model.PlTrandur)</th>
+            <th class="PlanetColumns PlRatdor">@Html.DisplayNameFor(model => model.PlRatdor)</th>
+            <th class="PlanetColumns PlRatror">@Html.DisplayNameFor(model => model.PlRatror)</th>
+            <th class="PlanetColumns PlOccdep">@Html.DisplayNameFor(model => model.PlOccdep)</th>
+            <th class="PlanetColumns PlOrbtper">@Html.DisplayNameFor(model => model.PlOrbtper)</th>
+            <th class="PlanetColumns PlOrblper">@Html.DisplayNameFor(model => model.PlOrblper)</th>
+            <th hidden class="SystemColumns PlRvamp">@Html.DisplayNameFor(model => model.PlRvamp)</th>
+            <th hidden class="SystemColumns PlProjobliq">@Html.DisplayNameFor(model => model.PlProjobliq)</th>
+            <th hidden class="SystemColumns PlTrueobliq">@Html.DisplayNameFor(model => model.PlTrueobliq)</th>
+            <th hidden class="SystemColumns StRefname">@Html.DisplayNameFor(model => model.StRefname)</th>
+            <th hidden class="StarColumns StSpectype">@Html.DisplayNameFor(model => model.StSpectype)</th>
+            <th hidden class="StarColumns StTeff">@Html.DisplayNameFor(model => model.StTeff)</th>
+            <th hidden class="StarColumns StRad">@Html.DisplayNameFor(model => model.StRad)</th>
+            <th hidden class="StarColumns StMass">@Html.DisplayNameFor(model => model.StMass)</th>
+            <th hidden class="StarColumns StMet">@Html.DisplayNameFor(model => model.StMet)</th>
+            <th hidden class="StarColumns StMetratio">@Html.DisplayNameFor(model => model.StMetratio)</th>
+            <th hidden class="StarColumns StLum">@Html.DisplayNameFor(model => model.StLum)</th>
+            <th hidden class="StarColumns StLogg">@Html.DisplayNameFor(model => model.StLogg)</th>
+            <th hidden class="StarColumns StAge">@Html.DisplayNameFor(model => model.StAge)</th>
+            <th hidden class="StarColumns StDens">@Html.DisplayNameFor(model => model.StDens)</th>
+            <th hidden class="StarColumns StVsin">@Html.DisplayNameFor(model => model.StVsin)</th>
+            <th hidden class="StarColumns StRotp">@Html.DisplayNameFor(model => model.StRotp)</th>
+            <th hidden class="StarColumns StRadv">@Html.DisplayNameFor(model => model.StRadv)</th>
+            <th hidden class="SystemColumns SyRefName">@Html.DisplayNameFor(model => model.SyRefName)</th>
+            <th hidden class="CoordinatesColumns Rastr">@Html.DisplayNameFor(model => model.Rastr)</th>
+            <th hidden class="CoordinatesColumns Ra">@Html.DisplayNameFor(model => model.Ra)</th>
+            <th hidden class="CoordinatesColumns Decstr">@Html.DisplayNameFor(model => model.Decstr)</th>
+            <th hidden class="CoordinatesColumns Dec">@Html.DisplayNameFor(model => model.Dec)</th>
+            <th hidden class="CoordinatesColumns Glat">@Html.DisplayNameFor(model => model.Glat)</th>
+            <th hidden class="CoordinatesColumns Glon">@Html.DisplayNameFor(model => model.Glon)</th>
+            <th hidden class="CoordinatesColumns Elat">@Html.DisplayNameFor(model => model.Elat)</th>
+            <th hidden class="CoordinatesColumns Elon">@Html.DisplayNameFor(model => model.Elon)</th>
+            <th hidden class="CoordinatesColumns SyPm">@Html.DisplayNameFor(model => model.SyPm)</th>
+            <th hidden class="CoordinatesColumns SyPmRa">@Html.DisplayNameFor(model => model.SyPmRa)</th>
+            <th hidden class="CoordinatesColumns SyPmDec">@Html.DisplayNameFor(model => model.SyPmDec)</th>
+            <th hidden class="SystemColumns SyDist">@Html.DisplayNameFor(model => model.SyDist)</th>
+            <th hidden class="SystemColumns SyPlx">@Html.DisplayNameFor(model => model.SyPlx)</th>
+            <th hidden class="SystemColumns SyBmag">@Html.DisplayNameFor(model => model.SyBmag)</th>
+            <th hidden class="SystemColumns SyVmag">@Html.DisplayNameFor(model => model.SyVmag)</th>
+            <th hidden class="SystemColumns SyJmag">@Html.DisplayNameFor(model => model.SyJmag)</th>
+            <th hidden class="SystemColumns SyHmag">@Html.DisplayNameFor(model => model.SyHmag)</th>
+            <th hidden class="SystemColumns SyKmag">@Html.DisplayNameFor(model => model.SyKmag)</th>
+            <th hidden class="SystemColumns SyUmag">@Html.DisplayNameFor(model => model.SyUmag)</th>
+            <th hidden class="SystemColumns SyGmag">@Html.DisplayNameFor(model => model.SyGmag)</th>
+            <th hidden class="SystemColumns SyRmag">@Html.DisplayNameFor(model => model.SyRmag)</th>
+            <th hidden class="SystemColumns SyImag">@Html.DisplayNameFor(model => model.SyImag)</th>
+            <th hidden class="SystemColumns SyZmag">@Html.DisplayNameFor(model => model.SyZmag)</th>
+            <th hidden class="SystemColumns SyW1mag">@Html.DisplayNameFor(model => model.SyW1mag)</th>
+            <th hidden class="SystemColumns SyW2mag">@Html.DisplayNameFor(model => model.SyW2mag)</th>
+            <th hidden class="SystemColumns SyW3mag">@Html.DisplayNameFor(model => model.SyW3mag)</th>
+            <th hidden class="SystemColumns SyW4mag">@Html.DisplayNameFor(model => model.SyW4mag)</th>
+            <th hidden class="SystemColumns SyGaiaMag">@Html.DisplayNameFor(model => model.SyGaiaMag)</th>
+            <th hidden class="SystemColumns SyIcmag">@Html.DisplayNameFor(model => model.SyIcmag)</th>
+            <th hidden class="SystemColumns SyTmag">@Html.DisplayNameFor(model => model.SyTmag)</th>
+            <th hidden class="SystemColumns SyKepmag">@Html.DisplayNameFor(model => model.SyKepmag)</th>
+            <th hidden class="ArticleColumns Rowupdate">@Html.DisplayNameFor(model => model.Rowupdate)</th>
+            <th hidden class="ArticleColumns PlPubdate">@Html.DisplayNameFor(model => model.PlPubdate)</th>
+            <th hidden class="ArticleColumns Releasedate">@Html.DisplayNameFor(model => model.Releasedate)</th>
+            <th hidden class="ArticleColumns PlNnotes">@Html.DisplayNameFor(model => model.PlNnotes)</th>
+            <th hidden class="ArticleColumns StNphot">@Html.DisplayNameFor(model => model.StNphot)</th>
+            <th hidden class="ArticleColumns StNrvc">@Html.DisplayNameFor(model => model.StNrvc)</th>
+            <th hidden class="ArticleColumns StNspec">@Html.DisplayNameFor(model => model.StNspec)</th>
+            <th hidden class="ArticleColumns PlNespec">@Html.DisplayNameFor(model => model.PlNespec)</th>
+            <th hidden class="ArticleColumns PlNtranspec">@Html.DisplayNameFor(model => model.PlNtranspec)</th>
+            <th hidden class="ArticleColumns PlNdispec">@Html.DisplayNameFor(model => model.PlNdispec)</th>
+            <th class="Actions">Actions</th>
+            @if (User.IsInRole("OwnerAdministratorPower"))
+            {
+                <th class="AdminActions">Admin actions</th>
+            }
+        </tr>
+    </thead>
+    <tbody id="catalogTableBody">
+        @{
+            await Html.RenderPartialAsync("_PlanetsTableBody", Model);
+        }
+    </tbody>
+</table>

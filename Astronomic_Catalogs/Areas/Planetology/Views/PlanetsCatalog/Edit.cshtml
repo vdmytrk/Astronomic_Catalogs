@@ -1,0 +1,1464 @@
+﻿@model Astronomic_Catalogs.Models.NASAExoplanetCatalog
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>NASAExoplanetCatalog</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="RowId" />
+            <div class="form-group">
+                <label asp-for="PlName" class="control-label"></label>
+                <input asp-for="PlName" class="form-control" />
+                <span asp-validation-for="PlName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Hostname" class="control-label"></label>
+                <input asp-for="Hostname" class="form-control" />
+                <span asp-validation-for="Hostname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlLetter" class="control-label"></label>
+                <input asp-for="PlLetter" class="form-control" />
+                <span asp-validation-for="PlLetter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HdName" class="control-label"></label>
+                <input asp-for="HdName" class="form-control" />
+                <span asp-validation-for="HdName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HipName" class="control-label"></label>
+                <input asp-for="HipName" class="form-control" />
+                <span asp-validation-for="HipName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TicId" class="control-label"></label>
+                <input asp-for="TicId" class="form-control" />
+                <span asp-validation-for="TicId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GaiaId" class="control-label"></label>
+                <input asp-for="GaiaId" class="form-control" />
+                <span asp-validation-for="GaiaId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DefaultFlag" class="control-label"></label>
+                <input asp-for="DefaultFlag" class="form-control" />
+                <span asp-validation-for="DefaultFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SySnum" class="control-label"></label>
+                <input asp-for="SySnum" class="form-control" />
+                <span asp-validation-for="SySnum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPnum" class="control-label"></label>
+                <input asp-for="SyPnum" class="form-control" />
+                <span asp-validation-for="SyPnum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyMnum" class="control-label"></label>
+                <input asp-for="SyMnum" class="form-control" />
+                <span asp-validation-for="SyMnum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CbFlag" class="control-label"></label>
+                <input asp-for="CbFlag" class="form-control" />
+                <span asp-validation-for="CbFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscoveryMethod" class="control-label"></label>
+                <input asp-for="DiscoveryMethod" class="form-control" />
+                <span asp-validation-for="DiscoveryMethod" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscYear" class="control-label"></label>
+                <input asp-for="DiscYear" class="form-control" />
+                <span asp-validation-for="DiscYear" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscRefName" class="control-label"></label>
+                <input asp-for="DiscRefName" class="form-control" />
+                <span asp-validation-for="DiscRefName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscPubDate" class="control-label"></label>
+                <input asp-for="DiscPubDate" class="form-control" />
+                <span asp-validation-for="DiscPubDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscLocale" class="control-label"></label>
+                <input asp-for="DiscLocale" class="form-control" />
+                <span asp-validation-for="DiscLocale" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscFacility" class="control-label"></label>
+                <input asp-for="DiscFacility" class="form-control" />
+                <span asp-validation-for="DiscFacility" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscTelescope" class="control-label"></label>
+                <input asp-for="DiscTelescope" class="form-control" />
+                <span asp-validation-for="DiscTelescope" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiscInstrument" class="control-label"></label>
+                <input asp-for="DiscInstrument" class="form-control" />
+                <span asp-validation-for="DiscInstrument" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RvFlag" class="control-label"></label>
+                <input asp-for="RvFlag" class="form-control" />
+                <span asp-validation-for="RvFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PulFlag" class="control-label"></label>
+                <input asp-for="PulFlag" class="form-control" />
+                <span asp-validation-for="PulFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PtvFlag" class="control-label"></label>
+                <input asp-for="PtvFlag" class="form-control" />
+                <span asp-validation-for="PtvFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TranFlag" class="control-label"></label>
+                <input asp-for="TranFlag" class="form-control" />
+                <span asp-validation-for="TranFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AstFlag" class="control-label"></label>
+                <input asp-for="AstFlag" class="form-control" />
+                <span asp-validation-for="AstFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ObmFlag" class="control-label"></label>
+                <input asp-for="ObmFlag" class="form-control" />
+                <span asp-validation-for="ObmFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MicroFlag" class="control-label"></label>
+                <input asp-for="MicroFlag" class="form-control" />
+                <span asp-validation-for="MicroFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EtvFlag" class="control-label"></label>
+                <input asp-for="EtvFlag" class="form-control" />
+                <span asp-validation-for="EtvFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImaFlag" class="control-label"></label>
+                <input asp-for="ImaFlag" class="form-control" />
+                <span asp-validation-for="ImaFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DkinFlag" class="control-label"></label>
+                <input asp-for="DkinFlag" class="form-control" />
+                <span asp-validation-for="DkinFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SolType" class="control-label"></label>
+                <input asp-for="SolType" class="form-control" />
+                <span asp-validation-for="SolType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlControvFlag" class="control-label"></label>
+                <input asp-for="PlControvFlag" class="form-control" />
+                <span asp-validation-for="PlControvFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRefName" class="control-label"></label>
+                <input asp-for="PlRefName" class="form-control" />
+                <span asp-validation-for="PlRefName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbPer" class="control-label"></label>
+                <input asp-for="PlOrbPer" class="form-control" />
+                <span asp-validation-for="PlOrbPer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbPerErr1" class="control-label"></label>
+                <input asp-for="PlOrbPerErr1" class="form-control" />
+                <span asp-validation-for="PlOrbPerErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbPerErr2" class="control-label"></label>
+                <input asp-for="PlOrbPerErr2" class="form-control" />
+                <span asp-validation-for="PlOrbPerErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbPerLim" class="control-label"></label>
+                <input asp-for="PlOrbPerLim" class="form-control" />
+                <span asp-validation-for="PlOrbPerLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbSmax" class="control-label"></label>
+                <input asp-for="PlOrbSmax" class="form-control" />
+                <span asp-validation-for="PlOrbSmax" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbSmaxErr1" class="control-label"></label>
+                <input asp-for="PlOrbSmaxErr1" class="form-control" />
+                <span asp-validation-for="PlOrbSmaxErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbSmaxErr2" class="control-label"></label>
+                <input asp-for="PlOrbSmaxErr2" class="form-control" />
+                <span asp-validation-for="PlOrbSmaxErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbSmaxLim" class="control-label"></label>
+                <input asp-for="PlOrbSmaxLim" class="form-control" />
+                <span asp-validation-for="PlOrbSmaxLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRade" class="control-label"></label>
+                <input asp-for="PlRade" class="form-control" />
+                <span asp-validation-for="PlRade" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRadeErr1" class="control-label"></label>
+                <input asp-for="PlRadeErr1" class="form-control" />
+                <span asp-validation-for="PlRadeErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRadeErr2" class="control-label"></label>
+                <input asp-for="PlRadeErr2" class="form-control" />
+                <span asp-validation-for="PlRadeErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRadeLim" class="control-label"></label>
+                <input asp-for="PlRadeLim" class="form-control" />
+                <span asp-validation-for="PlRadeLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRadJ" class="control-label"></label>
+                <input asp-for="PlRadJ" class="form-control" />
+                <span asp-validation-for="PlRadJ" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRadJErr1" class="control-label"></label>
+                <input asp-for="PlRadJErr1" class="form-control" />
+                <span asp-validation-for="PlRadJErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRadJErr2" class="control-label"></label>
+                <input asp-for="PlRadJErr2" class="form-control" />
+                <span asp-validation-for="PlRadJErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRadJLim" class="control-label"></label>
+                <input asp-for="PlRadJLim" class="form-control" />
+                <span asp-validation-for="PlRadJLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMasse" class="control-label"></label>
+                <input asp-for="PlMasse" class="form-control" />
+                <span asp-validation-for="PlMasse" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMasseErr1" class="control-label"></label>
+                <input asp-for="PlMasseErr1" class="form-control" />
+                <span asp-validation-for="PlMasseErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMasseErr2" class="control-label"></label>
+                <input asp-for="PlMasseErr2" class="form-control" />
+                <span asp-validation-for="PlMasseErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMasseLim" class="control-label"></label>
+                <input asp-for="PlMasseLim" class="form-control" />
+                <span asp-validation-for="PlMasseLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMassJ" class="control-label"></label>
+                <input asp-for="PlMassJ" class="form-control" />
+                <span asp-validation-for="PlMassJ" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMassJErr1" class="control-label"></label>
+                <input asp-for="PlMassJErr1" class="form-control" />
+                <span asp-validation-for="PlMassJErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMassJErr2" class="control-label"></label>
+                <input asp-for="PlMassJErr2" class="form-control" />
+                <span asp-validation-for="PlMassJErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMassJLim" class="control-label"></label>
+                <input asp-for="PlMassJLim" class="form-control" />
+                <span asp-validation-for="PlMassJLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniE" class="control-label"></label>
+                <input asp-for="PlMsiniE" class="form-control" />
+                <span asp-validation-for="PlMsiniE" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniEErr1" class="control-label"></label>
+                <input asp-for="PlMsiniEErr1" class="form-control" />
+                <span asp-validation-for="PlMsiniEErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniEErr2" class="control-label"></label>
+                <input asp-for="PlMsiniEErr2" class="form-control" />
+                <span asp-validation-for="PlMsiniEErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniELim" class="control-label"></label>
+                <input asp-for="PlMsiniELim" class="form-control" />
+                <span asp-validation-for="PlMsiniELim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniJ" class="control-label"></label>
+                <input asp-for="PlMsiniJ" class="form-control" />
+                <span asp-validation-for="PlMsiniJ" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniJErr1" class="control-label"></label>
+                <input asp-for="PlMsiniJErr1" class="form-control" />
+                <span asp-validation-for="PlMsiniJErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniJErr2" class="control-label"></label>
+                <input asp-for="PlMsiniJErr2" class="form-control" />
+                <span asp-validation-for="PlMsiniJErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlMsiniJLim" class="control-label"></label>
+                <input asp-for="PlMsiniJLim" class="form-control" />
+                <span asp-validation-for="PlMsiniJLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMasse" class="control-label"></label>
+                <input asp-for="PlCMasse" class="form-control" />
+                <span asp-validation-for="PlCMasse" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMasseErr1" class="control-label"></label>
+                <input asp-for="PlCMasseErr1" class="form-control" />
+                <span asp-validation-for="PlCMasseErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMasseErr2" class="control-label"></label>
+                <input asp-for="PlCMasseErr2" class="form-control" />
+                <span asp-validation-for="PlCMasseErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMasseLim" class="control-label"></label>
+                <input asp-for="PlCMasseLim" class="form-control" />
+                <span asp-validation-for="PlCMasseLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMassJ" class="control-label"></label>
+                <input asp-for="PlCMassJ" class="form-control" />
+                <span asp-validation-for="PlCMassJ" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMassJErr1" class="control-label"></label>
+                <input asp-for="PlCMassJErr1" class="form-control" />
+                <span asp-validation-for="PlCMassJErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMassJErr2" class="control-label"></label>
+                <input asp-for="PlCMassJErr2" class="form-control" />
+                <span asp-validation-for="PlCMassJErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlCMassJLim" class="control-label"></label>
+                <input asp-for="PlCMassJLim" class="form-control" />
+                <span asp-validation-for="PlCMassJLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmasse" class="control-label"></label>
+                <input asp-for="PlBmasse" class="form-control" />
+                <span asp-validation-for="PlBmasse" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmasseErr1" class="control-label"></label>
+                <input asp-for="PlBmasseErr1" class="form-control" />
+                <span asp-validation-for="PlBmasseErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmasseErr2" class="control-label"></label>
+                <input asp-for="PlBmasseErr2" class="form-control" />
+                <span asp-validation-for="PlBmasseErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmasseLim" class="control-label"></label>
+                <input asp-for="PlBmasseLim" class="form-control" />
+                <span asp-validation-for="PlBmasseLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmassJ" class="control-label"></label>
+                <input asp-for="PlBmassJ" class="form-control" />
+                <span asp-validation-for="PlBmassJ" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmassJErr1" class="control-label"></label>
+                <input asp-for="PlBmassJErr1" class="form-control" />
+                <span asp-validation-for="PlBmassJErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmassJErr2" class="control-label"></label>
+                <input asp-for="PlBmassJErr2" class="form-control" />
+                <span asp-validation-for="PlBmassJErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmassJLim" class="control-label"></label>
+                <input asp-for="PlBmassJLim" class="form-control" />
+                <span asp-validation-for="PlBmassJLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlBmassProv" class="control-label"></label>
+                <input asp-for="PlBmassProv" class="form-control" />
+                <span asp-validation-for="PlBmassProv" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlDens" class="control-label"></label>
+                <input asp-for="PlDens" class="form-control" />
+                <span asp-validation-for="PlDens" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlDensErr1" class="control-label"></label>
+                <input asp-for="PlDensErr1" class="form-control" />
+                <span asp-validation-for="PlDensErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlDensErr2" class="control-label"></label>
+                <input asp-for="PlDensErr2" class="form-control" />
+                <span asp-validation-for="PlDensErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlDensLim" class="control-label"></label>
+                <input asp-for="PlDensLim" class="form-control" />
+                <span asp-validation-for="PlDensLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbEccen" class="control-label"></label>
+                <input asp-for="PlOrbEccen" class="form-control" />
+                <span asp-validation-for="PlOrbEccen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbEccenErr1" class="control-label"></label>
+                <input asp-for="PlOrbEccenErr1" class="form-control" />
+                <span asp-validation-for="PlOrbEccenErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbEccenErr2" class="control-label"></label>
+                <input asp-for="PlOrbEccenErr2" class="form-control" />
+                <span asp-validation-for="PlOrbEccenErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbeccenLim" class="control-label"></label>
+                <input asp-for="PlOrbeccenLim" class="form-control" />
+                <span asp-validation-for="PlOrbeccenLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlInsol" class="control-label"></label>
+                <input asp-for="PlInsol" class="form-control" />
+                <span asp-validation-for="PlInsol" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlInsolErr1" class="control-label"></label>
+                <input asp-for="PlInsolErr1" class="form-control" />
+                <span asp-validation-for="PlInsolErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlInsolErr2" class="control-label"></label>
+                <input asp-for="PlInsolErr2" class="form-control" />
+                <span asp-validation-for="PlInsolErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlInsolLim" class="control-label"></label>
+                <input asp-for="PlInsolLim" class="form-control" />
+                <span asp-validation-for="PlInsolLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlEqt" class="control-label"></label>
+                <input asp-for="PlEqt" class="form-control" />
+                <span asp-validation-for="PlEqt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlEqtErr1" class="control-label"></label>
+                <input asp-for="PlEqtErr1" class="form-control" />
+                <span asp-validation-for="PlEqtErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlEqtErr2" class="control-label"></label>
+                <input asp-for="PlEqtErr2" class="form-control" />
+                <span asp-validation-for="PlEqtErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlEqtLim" class="control-label"></label>
+                <input asp-for="PlEqtLim" class="form-control" />
+                <span asp-validation-for="PlEqtLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbincl" class="control-label"></label>
+                <input asp-for="PlOrbincl" class="form-control" />
+                <span asp-validation-for="PlOrbincl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbinclErr1" class="control-label"></label>
+                <input asp-for="PlOrbinclErr1" class="form-control" />
+                <span asp-validation-for="PlOrbinclErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbinclErr2" class="control-label"></label>
+                <input asp-for="PlOrbinclErr2" class="form-control" />
+                <span asp-validation-for="PlOrbinclErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbinclLim" class="control-label"></label>
+                <input asp-for="PlOrbinclLim" class="form-control" />
+                <span asp-validation-for="PlOrbinclLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTranmid" class="control-label"></label>
+                <input asp-for="PlTranmid" class="form-control" />
+                <span asp-validation-for="PlTranmid" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTranmidErr1" class="control-label"></label>
+                <input asp-for="PlTranmidErr1" class="form-control" />
+                <span asp-validation-for="PlTranmidErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTranmidErr2" class="control-label"></label>
+                <input asp-for="PlTranmidErr2" class="form-control" />
+                <span asp-validation-for="PlTranmidErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTranmidLim" class="control-label"></label>
+                <input asp-for="PlTranmidLim" class="form-control" />
+                <span asp-validation-for="PlTranmidLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTsystemref" class="control-label"></label>
+                <input asp-for="PlTsystemref" class="form-control" />
+                <span asp-validation-for="PlTsystemref" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TtvFlag" class="control-label"></label>
+                <input asp-for="TtvFlag" class="form-control" />
+                <span asp-validation-for="TtvFlag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlImppar" class="control-label"></label>
+                <input asp-for="PlImppar" class="form-control" />
+                <span asp-validation-for="PlImppar" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlImpparErr1" class="control-label"></label>
+                <input asp-for="PlImpparErr1" class="form-control" />
+                <span asp-validation-for="PlImpparErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlImpparErr2" class="control-label"></label>
+                <input asp-for="PlImpparErr2" class="form-control" />
+                <span asp-validation-for="PlImpparErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlImpparLim" class="control-label"></label>
+                <input asp-for="PlImpparLim" class="form-control" />
+                <span asp-validation-for="PlImpparLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandep" class="control-label"></label>
+                <input asp-for="PlTrandep" class="form-control" />
+                <span asp-validation-for="PlTrandep" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandepErr1" class="control-label"></label>
+                <input asp-for="PlTrandepErr1" class="form-control" />
+                <span asp-validation-for="PlTrandepErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandepErr2" class="control-label"></label>
+                <input asp-for="PlTrandepErr2" class="form-control" />
+                <span asp-validation-for="PlTrandepErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandepLim" class="control-label"></label>
+                <input asp-for="PlTrandepLim" class="form-control" />
+                <span asp-validation-for="PlTrandepLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandur" class="control-label"></label>
+                <input asp-for="PlTrandur" class="form-control" />
+                <span asp-validation-for="PlTrandur" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandurErr1" class="control-label"></label>
+                <input asp-for="PlTrandurErr1" class="form-control" />
+                <span asp-validation-for="PlTrandurErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandurErr2" class="control-label"></label>
+                <input asp-for="PlTrandurErr2" class="form-control" />
+                <span asp-validation-for="PlTrandurErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrandurLim" class="control-label"></label>
+                <input asp-for="PlTrandurLim" class="form-control" />
+                <span asp-validation-for="PlTrandurLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatdor" class="control-label"></label>
+                <input asp-for="PlRatdor" class="form-control" />
+                <span asp-validation-for="PlRatdor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatdorErr1" class="control-label"></label>
+                <input asp-for="PlRatdorErr1" class="form-control" />
+                <span asp-validation-for="PlRatdorErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatdorErr2" class="control-label"></label>
+                <input asp-for="PlRatdorErr2" class="form-control" />
+                <span asp-validation-for="PlRatdorErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatdorLim" class="control-label"></label>
+                <input asp-for="PlRatdorLim" class="form-control" />
+                <span asp-validation-for="PlRatdorLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatror" class="control-label"></label>
+                <input asp-for="PlRatror" class="form-control" />
+                <span asp-validation-for="PlRatror" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatrorErr1" class="control-label"></label>
+                <input asp-for="PlRatrorErr1" class="form-control" />
+                <span asp-validation-for="PlRatrorErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatrorErr2" class="control-label"></label>
+                <input asp-for="PlRatrorErr2" class="form-control" />
+                <span asp-validation-for="PlRatrorErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRatrorLim" class="control-label"></label>
+                <input asp-for="PlRatrorLim" class="form-control" />
+                <span asp-validation-for="PlRatrorLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOccdep" class="control-label"></label>
+                <input asp-for="PlOccdep" class="form-control" />
+                <span asp-validation-for="PlOccdep" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOccdepErr1" class="control-label"></label>
+                <input asp-for="PlOccdepErr1" class="form-control" />
+                <span asp-validation-for="PlOccdepErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOccdepErr2" class="control-label"></label>
+                <input asp-for="PlOccdepErr2" class="form-control" />
+                <span asp-validation-for="PlOccdepErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOccdepLim" class="control-label"></label>
+                <input asp-for="PlOccdepLim" class="form-control" />
+                <span asp-validation-for="PlOccdepLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbtper" class="control-label"></label>
+                <input asp-for="PlOrbtper" class="form-control" />
+                <span asp-validation-for="PlOrbtper" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbtperErr1" class="control-label"></label>
+                <input asp-for="PlOrbtperErr1" class="form-control" />
+                <span asp-validation-for="PlOrbtperErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbtperErr2" class="control-label"></label>
+                <input asp-for="PlOrbtperErr2" class="form-control" />
+                <span asp-validation-for="PlOrbtperErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrbtperLim" class="control-label"></label>
+                <input asp-for="PlOrbtperLim" class="form-control" />
+                <span asp-validation-for="PlOrbtperLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrblper" class="control-label"></label>
+                <input asp-for="PlOrblper" class="form-control" />
+                <span asp-validation-for="PlOrblper" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrblperErr1" class="control-label"></label>
+                <input asp-for="PlOrblperErr1" class="form-control" />
+                <span asp-validation-for="PlOrblperErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrblperErr2" class="control-label"></label>
+                <input asp-for="PlOrblperErr2" class="form-control" />
+                <span asp-validation-for="PlOrblperErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlOrblperLim" class="control-label"></label>
+                <input asp-for="PlOrblperLim" class="form-control" />
+                <span asp-validation-for="PlOrblperLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRvamp" class="control-label"></label>
+                <input asp-for="PlRvamp" class="form-control" />
+                <span asp-validation-for="PlRvamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRvampErr1" class="control-label"></label>
+                <input asp-for="PlRvampErr1" class="form-control" />
+                <span asp-validation-for="PlRvampErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRvampErr2" class="control-label"></label>
+                <input asp-for="PlRvampErr2" class="form-control" />
+                <span asp-validation-for="PlRvampErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlRvampLim" class="control-label"></label>
+                <input asp-for="PlRvampLim" class="form-control" />
+                <span asp-validation-for="PlRvampLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlProjobliq" class="control-label"></label>
+                <input asp-for="PlProjobliq" class="form-control" />
+                <span asp-validation-for="PlProjobliq" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlProjobliqErr1" class="control-label"></label>
+                <input asp-for="PlProjobliqErr1" class="form-control" />
+                <span asp-validation-for="PlProjobliqErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlProjobliqErr2" class="control-label"></label>
+                <input asp-for="PlProjobliqErr2" class="form-control" />
+                <span asp-validation-for="PlProjobliqErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlProjobliqLim" class="control-label"></label>
+                <input asp-for="PlProjobliqLim" class="form-control" />
+                <span asp-validation-for="PlProjobliqLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrueobliq" class="control-label"></label>
+                <input asp-for="PlTrueobliq" class="form-control" />
+                <span asp-validation-for="PlTrueobliq" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrueobliqErr1" class="control-label"></label>
+                <input asp-for="PlTrueobliqErr1" class="form-control" />
+                <span asp-validation-for="PlTrueobliqErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrueobliqErr2" class="control-label"></label>
+                <input asp-for="PlTrueobliqErr2" class="form-control" />
+                <span asp-validation-for="PlTrueobliqErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlTrueobliqLim" class="control-label"></label>
+                <input asp-for="PlTrueobliqLim" class="form-control" />
+                <span asp-validation-for="PlTrueobliqLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRefname" class="control-label"></label>
+                <input asp-for="StRefname" class="form-control" />
+                <span asp-validation-for="StRefname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StSpectype" class="control-label"></label>
+                <input asp-for="StSpectype" class="form-control" />
+                <span asp-validation-for="StSpectype" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StTeff" class="control-label"></label>
+                <input asp-for="StTeff" class="form-control" />
+                <span asp-validation-for="StTeff" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StTeffErr1" class="control-label"></label>
+                <input asp-for="StTeffErr1" class="form-control" />
+                <span asp-validation-for="StTeffErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StTeffErr2" class="control-label"></label>
+                <input asp-for="StTeffErr2" class="form-control" />
+                <span asp-validation-for="StTeffErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StTeffLim" class="control-label"></label>
+                <input asp-for="StTeffLim" class="form-control" />
+                <span asp-validation-for="StTeffLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRad" class="control-label"></label>
+                <input asp-for="StRad" class="form-control" />
+                <span asp-validation-for="StRad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRadErr1" class="control-label"></label>
+                <input asp-for="StRadErr1" class="form-control" />
+                <span asp-validation-for="StRadErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRadErr2" class="control-label"></label>
+                <input asp-for="StRadErr2" class="form-control" />
+                <span asp-validation-for="StRadErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRadLim" class="control-label"></label>
+                <input asp-for="StRadLim" class="form-control" />
+                <span asp-validation-for="StRadLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMass" class="control-label"></label>
+                <input asp-for="StMass" class="form-control" />
+                <span asp-validation-for="StMass" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMassErr1" class="control-label"></label>
+                <input asp-for="StMassErr1" class="form-control" />
+                <span asp-validation-for="StMassErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMassErr2" class="control-label"></label>
+                <input asp-for="StMassErr2" class="form-control" />
+                <span asp-validation-for="StMassErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMassLim" class="control-label"></label>
+                <input asp-for="StMassLim" class="form-control" />
+                <span asp-validation-for="StMassLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMet" class="control-label"></label>
+                <input asp-for="StMet" class="form-control" />
+                <span asp-validation-for="StMet" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMetErr1" class="control-label"></label>
+                <input asp-for="StMetErr1" class="form-control" />
+                <span asp-validation-for="StMetErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMetErr2" class="control-label"></label>
+                <input asp-for="StMetErr2" class="form-control" />
+                <span asp-validation-for="StMetErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMetLim" class="control-label"></label>
+                <input asp-for="StMetLim" class="form-control" />
+                <span asp-validation-for="StMetLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StMetratio" class="control-label"></label>
+                <input asp-for="StMetratio" class="form-control" />
+                <span asp-validation-for="StMetratio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLum" class="control-label"></label>
+                <input asp-for="StLum" class="form-control" />
+                <span asp-validation-for="StLum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLumErr1" class="control-label"></label>
+                <input asp-for="StLumErr1" class="form-control" />
+                <span asp-validation-for="StLumErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLumErr2" class="control-label"></label>
+                <input asp-for="StLumErr2" class="form-control" />
+                <span asp-validation-for="StLumErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLumLim" class="control-label"></label>
+                <input asp-for="StLumLim" class="form-control" />
+                <span asp-validation-for="StLumLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLogg" class="control-label"></label>
+                <input asp-for="StLogg" class="form-control" />
+                <span asp-validation-for="StLogg" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLoggErr1" class="control-label"></label>
+                <input asp-for="StLoggErr1" class="form-control" />
+                <span asp-validation-for="StLoggErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLoggErr2" class="control-label"></label>
+                <input asp-for="StLoggErr2" class="form-control" />
+                <span asp-validation-for="StLoggErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StLoggLim" class="control-label"></label>
+                <input asp-for="StLoggLim" class="form-control" />
+                <span asp-validation-for="StLoggLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StAge" class="control-label"></label>
+                <input asp-for="StAge" class="form-control" />
+                <span asp-validation-for="StAge" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StAgeErr1" class="control-label"></label>
+                <input asp-for="StAgeErr1" class="form-control" />
+                <span asp-validation-for="StAgeErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StAgeErr2" class="control-label"></label>
+                <input asp-for="StAgeErr2" class="form-control" />
+                <span asp-validation-for="StAgeErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StAgeLim" class="control-label"></label>
+                <input asp-for="StAgeLim" class="form-control" />
+                <span asp-validation-for="StAgeLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StDens" class="control-label"></label>
+                <input asp-for="StDens" class="form-control" />
+                <span asp-validation-for="StDens" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StDensErr1" class="control-label"></label>
+                <input asp-for="StDensErr1" class="form-control" />
+                <span asp-validation-for="StDensErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StDensErr2" class="control-label"></label>
+                <input asp-for="StDensErr2" class="form-control" />
+                <span asp-validation-for="StDensErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StDensLim" class="control-label"></label>
+                <input asp-for="StDensLim" class="form-control" />
+                <span asp-validation-for="StDensLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StVsin" class="control-label"></label>
+                <input asp-for="StVsin" class="form-control" />
+                <span asp-validation-for="StVsin" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StVsinErr1" class="control-label"></label>
+                <input asp-for="StVsinErr1" class="form-control" />
+                <span asp-validation-for="StVsinErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StVsinErr2" class="control-label"></label>
+                <input asp-for="StVsinErr2" class="form-control" />
+                <span asp-validation-for="StVsinErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StVsinLim" class="control-label"></label>
+                <input asp-for="StVsinLim" class="form-control" />
+                <span asp-validation-for="StVsinLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRotp" class="control-label"></label>
+                <input asp-for="StRotp" class="form-control" />
+                <span asp-validation-for="StRotp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRotpErr1" class="control-label"></label>
+                <input asp-for="StRotpErr1" class="form-control" />
+                <span asp-validation-for="StRotpErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRotpErr2" class="control-label"></label>
+                <input asp-for="StRotpErr2" class="form-control" />
+                <span asp-validation-for="StRotpErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRotpLim" class="control-label"></label>
+                <input asp-for="StRotpLim" class="form-control" />
+                <span asp-validation-for="StRotpLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRadv" class="control-label"></label>
+                <input asp-for="StRadv" class="form-control" />
+                <span asp-validation-for="StRadv" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRadvErr1" class="control-label"></label>
+                <input asp-for="StRadvErr1" class="form-control" />
+                <span asp-validation-for="StRadvErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRadvErr2" class="control-label"></label>
+                <input asp-for="StRadvErr2" class="form-control" />
+                <span asp-validation-for="StRadvErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StRadvLim" class="control-label"></label>
+                <input asp-for="StRadvLim" class="form-control" />
+                <span asp-validation-for="StRadvLim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyRefName" class="control-label"></label>
+                <input asp-for="SyRefName" class="form-control" />
+                <span asp-validation-for="SyRefName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rastr" class="control-label"></label>
+                <input asp-for="Rastr" class="form-control" />
+                <span asp-validation-for="Rastr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Ra" class="control-label"></label>
+                <input asp-for="Ra" class="form-control" />
+                <span asp-validation-for="Ra" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Decstr" class="control-label"></label>
+                <input asp-for="Decstr" class="form-control" />
+                <span asp-validation-for="Decstr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dec" class="control-label"></label>
+                <input asp-for="Dec" class="form-control" />
+                <span asp-validation-for="Dec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Glat" class="control-label"></label>
+                <input asp-for="Glat" class="form-control" />
+                <span asp-validation-for="Glat" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Glon" class="control-label"></label>
+                <input asp-for="Glon" class="form-control" />
+                <span asp-validation-for="Glon" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Elat" class="control-label"></label>
+                <input asp-for="Elat" class="form-control" />
+                <span asp-validation-for="Elat" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Elon" class="control-label"></label>
+                <input asp-for="Elon" class="form-control" />
+                <span asp-validation-for="Elon" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPm" class="control-label"></label>
+                <input asp-for="SyPm" class="form-control" />
+                <span asp-validation-for="SyPm" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmErr1" class="control-label"></label>
+                <input asp-for="SyPmErr1" class="form-control" />
+                <span asp-validation-for="SyPmErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmErr2" class="control-label"></label>
+                <input asp-for="SyPmErr2" class="form-control" />
+                <span asp-validation-for="SyPmErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmRa" class="control-label"></label>
+                <input asp-for="SyPmRa" class="form-control" />
+                <span asp-validation-for="SyPmRa" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmRaErr1" class="control-label"></label>
+                <input asp-for="SyPmRaErr1" class="form-control" />
+                <span asp-validation-for="SyPmRaErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmRaErr2" class="control-label"></label>
+                <input asp-for="SyPmRaErr2" class="form-control" />
+                <span asp-validation-for="SyPmRaErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmDec" class="control-label"></label>
+                <input asp-for="SyPmDec" class="form-control" />
+                <span asp-validation-for="SyPmDec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmDecErr1" class="control-label"></label>
+                <input asp-for="SyPmDecErr1" class="form-control" />
+                <span asp-validation-for="SyPmDecErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPmDecErr2" class="control-label"></label>
+                <input asp-for="SyPmDecErr2" class="form-control" />
+                <span asp-validation-for="SyPmDecErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyDist" class="control-label"></label>
+                <input asp-for="SyDist" class="form-control" />
+                <span asp-validation-for="SyDist" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyDistErr1" class="control-label"></label>
+                <input asp-for="SyDistErr1" class="form-control" />
+                <span asp-validation-for="SyDistErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyDistErr2" class="control-label"></label>
+                <input asp-for="SyDistErr2" class="form-control" />
+                <span asp-validation-for="SyDistErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPlx" class="control-label"></label>
+                <input asp-for="SyPlx" class="form-control" />
+                <span asp-validation-for="SyPlx" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPlxErr1" class="control-label"></label>
+                <input asp-for="SyPlxErr1" class="form-control" />
+                <span asp-validation-for="SyPlxErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyPlxErr2" class="control-label"></label>
+                <input asp-for="SyPlxErr2" class="form-control" />
+                <span asp-validation-for="SyPlxErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyBmag" class="control-label"></label>
+                <input asp-for="SyBmag" class="form-control" />
+                <span asp-validation-for="SyBmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyBmagErr1" class="control-label"></label>
+                <input asp-for="SyBmagErr1" class="form-control" />
+                <span asp-validation-for="SyBmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyBmagErr2" class="control-label"></label>
+                <input asp-for="SyBmagErr2" class="form-control" />
+                <span asp-validation-for="SyBmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyVmag" class="control-label"></label>
+                <input asp-for="SyVmag" class="form-control" />
+                <span asp-validation-for="SyVmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyVmagErr1" class="control-label"></label>
+                <input asp-for="SyVmagErr1" class="form-control" />
+                <span asp-validation-for="SyVmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyVmagErr2" class="control-label"></label>
+                <input asp-for="SyVmagErr2" class="form-control" />
+                <span asp-validation-for="SyVmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyJmag" class="control-label"></label>
+                <input asp-for="SyJmag" class="form-control" />
+                <span asp-validation-for="SyJmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyJmagErr1" class="control-label"></label>
+                <input asp-for="SyJmagErr1" class="form-control" />
+                <span asp-validation-for="SyJmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyJmagErr2" class="control-label"></label>
+                <input asp-for="SyJmagErr2" class="form-control" />
+                <span asp-validation-for="SyJmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyHmag" class="control-label"></label>
+                <input asp-for="SyHmag" class="form-control" />
+                <span asp-validation-for="SyHmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyHmagErr1" class="control-label"></label>
+                <input asp-for="SyHmagErr1" class="form-control" />
+                <span asp-validation-for="SyHmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyHmagErr2" class="control-label"></label>
+                <input asp-for="SyHmagErr2" class="form-control" />
+                <span asp-validation-for="SyHmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyKmag" class="control-label"></label>
+                <input asp-for="SyKmag" class="form-control" />
+                <span asp-validation-for="SyKmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyKmagErr1" class="control-label"></label>
+                <input asp-for="SyKmagErr1" class="form-control" />
+                <span asp-validation-for="SyKmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyKmagErr2" class="control-label"></label>
+                <input asp-for="SyKmagErr2" class="form-control" />
+                <span asp-validation-for="SyKmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyUmag" class="control-label"></label>
+                <input asp-for="SyUmag" class="form-control" />
+                <span asp-validation-for="SyUmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyUmagErr1" class="control-label"></label>
+                <input asp-for="SyUmagErr1" class="form-control" />
+                <span asp-validation-for="SyUmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyUmagErr2" class="control-label"></label>
+                <input asp-for="SyUmagErr2" class="form-control" />
+                <span asp-validation-for="SyUmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyGmag" class="control-label"></label>
+                <input asp-for="SyGmag" class="form-control" />
+                <span asp-validation-for="SyGmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyGmagErr1" class="control-label"></label>
+                <input asp-for="SyGmagErr1" class="form-control" />
+                <span asp-validation-for="SyGmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyGmagErr2" class="control-label"></label>
+                <input asp-for="SyGmagErr2" class="form-control" />
+                <span asp-validation-for="SyGmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyRmag" class="control-label"></label>
+                <input asp-for="SyRmag" class="form-control" />
+                <span asp-validation-for="SyRmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyRmagErr1" class="control-label"></label>
+                <input asp-for="SyRmagErr1" class="form-control" />
+                <span asp-validation-for="SyRmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyRmagErr2" class="control-label"></label>
+                <input asp-for="SyRmagErr2" class="form-control" />
+                <span asp-validation-for="SyRmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyImag" class="control-label"></label>
+                <input asp-for="SyImag" class="form-control" />
+                <span asp-validation-for="SyImag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyImagErr1" class="control-label"></label>
+                <input asp-for="SyImagErr1" class="form-control" />
+                <span asp-validation-for="SyImagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyImagErr2" class="control-label"></label>
+                <input asp-for="SyImagErr2" class="form-control" />
+                <span asp-validation-for="SyImagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyZmag" class="control-label"></label>
+                <input asp-for="SyZmag" class="form-control" />
+                <span asp-validation-for="SyZmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyZmagErr1" class="control-label"></label>
+                <input asp-for="SyZmagErr1" class="form-control" />
+                <span asp-validation-for="SyZmagErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyZmagErr2" class="control-label"></label>
+                <input asp-for="SyZmagErr2" class="form-control" />
+                <span asp-validation-for="SyZmagErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW1mag" class="control-label"></label>
+                <input asp-for="SyW1mag" class="form-control" />
+                <span asp-validation-for="SyW1mag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW1magErr1" class="control-label"></label>
+                <input asp-for="SyW1magErr1" class="form-control" />
+                <span asp-validation-for="SyW1magErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW1magErr2" class="control-label"></label>
+                <input asp-for="SyW1magErr2" class="form-control" />
+                <span asp-validation-for="SyW1magErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW2mag" class="control-label"></label>
+                <input asp-for="SyW2mag" class="form-control" />
+                <span asp-validation-for="SyW2mag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW2magErr1" class="control-label"></label>
+                <input asp-for="SyW2magErr1" class="form-control" />
+                <span asp-validation-for="SyW2magErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW2magErr2" class="control-label"></label>
+                <input asp-for="SyW2magErr2" class="form-control" />
+                <span asp-validation-for="SyW2magErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW3mag" class="control-label"></label>
+                <input asp-for="SyW3mag" class="form-control" />
+                <span asp-validation-for="SyW3mag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW3magErr1" class="control-label"></label>
+                <input asp-for="SyW3magErr1" class="form-control" />
+                <span asp-validation-for="SyW3magErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW3magErr2" class="control-label"></label>
+                <input asp-for="SyW3magErr2" class="form-control" />
+                <span asp-validation-for="SyW3magErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW4mag" class="control-label"></label>
+                <input asp-for="SyW4mag" class="form-control" />
+                <span asp-validation-for="SyW4mag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW4magErr1" class="control-label"></label>
+                <input asp-for="SyW4magErr1" class="form-control" />
+                <span asp-validation-for="SyW4magErr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyW4magErr2" class="control-label"></label>
+                <input asp-for="SyW4magErr2" class="form-control" />
+                <span asp-validation-for="SyW4magErr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyGaiaMag" class="control-label"></label>
+                <input asp-for="SyGaiaMag" class="form-control" />
+                <span asp-validation-for="SyGaiaMag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyGaiamagerr1" class="control-label"></label>
+                <input asp-for="SyGaiamagerr1" class="form-control" />
+                <span asp-validation-for="SyGaiamagerr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyGaiamagerr2" class="control-label"></label>
+                <input asp-for="SyGaiamagerr2" class="form-control" />
+                <span asp-validation-for="SyGaiamagerr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyIcmag" class="control-label"></label>
+                <input asp-for="SyIcmag" class="form-control" />
+                <span asp-validation-for="SyIcmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyIcmagerr1" class="control-label"></label>
+                <input asp-for="SyIcmagerr1" class="form-control" />
+                <span asp-validation-for="SyIcmagerr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyIcmagerr2" class="control-label"></label>
+                <input asp-for="SyIcmagerr2" class="form-control" />
+                <span asp-validation-for="SyIcmagerr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyTmag" class="control-label"></label>
+                <input asp-for="SyTmag" class="form-control" />
+                <span asp-validation-for="SyTmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyTmagerr1" class="control-label"></label>
+                <input asp-for="SyTmagerr1" class="form-control" />
+                <span asp-validation-for="SyTmagerr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyTmagerr2" class="control-label"></label>
+                <input asp-for="SyTmagerr2" class="form-control" />
+                <span asp-validation-for="SyTmagerr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyKepmag" class="control-label"></label>
+                <input asp-for="SyKepmag" class="form-control" />
+                <span asp-validation-for="SyKepmag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyKepmagerr1" class="control-label"></label>
+                <input asp-for="SyKepmagerr1" class="form-control" />
+                <span asp-validation-for="SyKepmagerr1" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SyKepmagerr2" class="control-label"></label>
+                <input asp-for="SyKepmagerr2" class="form-control" />
+                <span asp-validation-for="SyKepmagerr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rowupdate" class="control-label"></label>
+                <input asp-for="Rowupdate" class="form-control" />
+                <span asp-validation-for="Rowupdate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlPubdate" class="control-label"></label>
+                <input asp-for="PlPubdate" class="form-control" />
+                <span asp-validation-for="PlPubdate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Releasedate" class="control-label"></label>
+                <input asp-for="Releasedate" class="form-control" />
+                <span asp-validation-for="Releasedate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlNnotes" class="control-label"></label>
+                <input asp-for="PlNnotes" class="form-control" />
+                <span asp-validation-for="PlNnotes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StNphot" class="control-label"></label>
+                <input asp-for="StNphot" class="form-control" />
+                <span asp-validation-for="StNphot" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StNrvc" class="control-label"></label>
+                <input asp-for="StNrvc" class="form-control" />
+                <span asp-validation-for="StNrvc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StNspec" class="control-label"></label>
+                <input asp-for="StNspec" class="form-control" />
+                <span asp-validation-for="StNspec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlNespec" class="control-label"></label>
+                <input asp-for="PlNespec" class="form-control" />
+                <span asp-validation-for="PlNespec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlNtranspec" class="control-label"></label>
+                <input asp-for="PlNtranspec" class="form-control" />
+                <span asp-validation-for="PlNtranspec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlNdispec" class="control-label"></label>
+                <input asp-for="PlNdispec" class="form-control" />
+                <span asp-validation-for="PlNdispec" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary mt-4" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

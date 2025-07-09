@@ -1,4 +1,4 @@
-﻿@model Astronomic_Catalogs.Models.NGCICOpendatasoft
+﻿@model Astronomic_Catalogs.ViewModels.NGCICViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -65,6 +65,18 @@
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.IC)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.LimitAngDiameter)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.LimitAngDiameter)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.AngDiameter)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.AngDiameter)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ObjectTypeAbrev)
@@ -282,23 +294,11 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Image)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PageNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PageNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PageCount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PageCount)
-        </dd>
     </dl>
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <input type="submit" value="Delete" class="btn btn-danger mt-4" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

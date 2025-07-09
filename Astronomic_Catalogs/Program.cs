@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using NLog;
 using NLog.Web;
 using System.Globalization;
@@ -35,12 +36,16 @@ public class Program
         AddServices(builder);
         AddDatabaseServices(builder);
         AddIdentityServices(builder, configuration);
+#if !DEBUG // ALSO SEE UseRateLimiter SETTINGS
         ConfigureRateLimiting(builder);
+#endif
 
         builder.Services.AddHttpClient();
         builder.Services.AddControllersWithViews();
         builder.Services.AddSignalR();
         builder.Services.AddRazorPages();
+        builder.Services.AddAutoMapper(typeof(Program));
+        builder.Services.AddMemoryCache();
 
         var app = builder.Build();
 
@@ -68,6 +73,12 @@ public class Program
 
     private static void AddServices(WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton(new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.None
+        });
+
         builder.Services.AddTransient<PublicIpService>();
         builder.Services.AddSingleton<IImportCancellationService, ImportCancellationService>();
         builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
@@ -75,6 +86,12 @@ public class Program
         builder.Services.AddSingleton<NLogConfigProvider>();
         builder.Services.AddScoped<DatabaseInitializer>();
         builder.Services.AddScoped<IExcelImport, ExcelImportService_OpenXml>();
+        builder.Services.AddScoped<INGCICFilterService, NGCICFilterService>();
+        builder.Services.AddScoped<IPlanetFilterService, PlanetFilterService>();
+        builder.Services.AddScoped<ICollinderFilterService, CollinderFilterService>();
+        builder.Services.AddScoped<ICacheService, StoredPprocedureCacheService>();
+        builder.Services.AddScoped<IPlanetarySystemFilterService, PlanetarySystemFilterService>();
+        builder.Services.AddTransient<IExceptionRedirectUrlService, ExceptionRedirectUrlService>();
     }
 
     private static IConfiguration LoadConfiguration()
@@ -299,7 +316,7 @@ public class Program
                 CreateSlidingWindowLimiter(600, TimeSpan.FromHours(1), 4),
             #endregion
             #region For unregistered useers
-                CreateTokenBucketLimiter(10, 1, TimeSpan.FromSeconds(10), 1),
+                CreateTokenBucketLimiter(15, 1, TimeSpan.FromSeconds(10), 1),
                 CreateTokenBucketLimiter(70, 0, TimeSpan.FromMinutes(10), 1),
                 CreateTokenBucketLimiter(400, 0, TimeSpan.FromHours(1), 1)
             #endregion
@@ -402,6 +419,8 @@ public class Program
 
     private static void ConfigureMiddleware(WebApplication app, WebApplicationBuilder builder)
     {
+        app.UseRouting();
+
         app.Use(async (context, next) =>
         {
             var userAgent = context.Request.Headers["User-Agent"].ToString();
@@ -415,20 +434,34 @@ public class Program
 
         if (app.Environment.IsDevelopment())
         {
+            app.UseDeveloperExceptionPage();
             app.UseMigrationsEndPoint();
         }
         else
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
 
+        app.UseStatusCodePagesWithReExecute("/Error/StatusCode", "?code={0}");
+
+        app.Use(async (context, next) =>
+        {
+            await next();
+
+            if (!context.Response.HasStarted && context.Response.StatusCode >= 400)
+            {
+                context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+            }
+        });
+
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
+#if !DEBUG // ALSO SEE ConfigureRateLimiting SETTINGS
         app.UseRateLimiter();
+#endif
         app.UseMiddleware<UserLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<UserAccessMiddleware>();

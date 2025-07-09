@@ -1,0 +1,42 @@
+﻿@{
+    int rowOnPageCatalog = Convert.ToInt32(ViewBag.RowOnPageCatalog == null ? 50 : ViewBag.RowOnPageCatalog);
+    int amountRowsResult = Convert.ToInt32(ViewBag.AmountRowsResult == null ? 1 : ViewBag.AmountRowsResult);
+    int pageNumber = Convert.ToInt32(ViewBag.PageNumber == null ? 1 : ViewBag.PageNumber);
+    int pageCount = (int)Math.Ceiling((double)amountRowsResult / rowOnPageCatalog);
+    pageNumber = pageNumber > pageCount ? pageCount : pageNumber;
+    string controller = ViewBag.Contorller;
+}
+
+<div class="paginationBodyBlock">
+    @for (var i = 1; i <= pageCount; i++)
+    {
+        @if (i != pageNumber)
+        {
+            <div class="d-inline-block callStyle">
+                <span class="page_@i paginationCell" value="@i" data-controller="@controller">
+                    @i
+                </span>
+                <span class="borderBlock">|</span>
+            </div>
+        }
+        else
+        {
+            @if (rowOnPageCatalog != 500)
+            {
+                <div class="page_@i d-inline-block callStyle" value="@i" data-controller="@controller">
+                    <span class="currentPage">@i</span>
+                    <span class="borderBlock">|</span>
+                </div>
+            }
+            else
+            {
+                <div class="page_@i d-inline-block callStyle" value="@i" data-controller="@controller">
+                    <span class="currentPage">@i</span>
+                    <span class="borderBlock">|</span>
+                    <span>Row in result: @amountRowsResult</span>
+                </div>
+            }
+        }
+    }
+</div>
+

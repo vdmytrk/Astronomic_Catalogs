@@ -4,7 +4,8 @@
     <script>
         (function() {
             if (localStorage.getItem("theme") === "dark") {
-                document.documentElement.classList.add("loading");
+                document.documentElement.style.display = "none";
+                document.documentElement.style.backgroundColor = "#121212";
             };
         })();
     </script>
@@ -16,6 +17,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/less/site.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/less/themes.min.css" asp-append-version="true" />
+    @RenderSection("PlanetarySystemVisualization", required: false)
     <script src="~/lib/signalr/signalr.min.js"></script>
 </head>
 <body>
@@ -34,7 +36,16 @@
                                 Telescopes
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="" asp-action="">Field of View Calculator</a></li>
+                                <li><a class="dropdown-item" asp-area="TelescopeTools" asp-controller="TelescopeViewCalculator" asp-action="Index">Field of View Calculator</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Planetology
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="Planetology" asp-controller="PlanetsCatalog" asp-action="Index">Planets</a></li>
+                                <li><a class="dropdown-item" asp-area="Planetology" asp-controller="PlanetarySystem" asp-action="Index">Planetary systems</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
@@ -42,7 +53,6 @@
                                 Astronomic сatalogs
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-area="Planets" asp-controller="PlanetsCatalog" asp-action="Index">Planets</a></li>
                                 <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="NGCICOpendatasofts" asp-action="Index">NGC/IC Catalogs</a></li>
                                 <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="CollinderCatalogs" asp-action="Index">Collinder Catalog</a></li>
                                 <li><a class="dropdown-item" asp-area="Catalogs" asp-controller="Constellations" asp-action="Index">Constellations</a></li>
@@ -87,9 +97,19 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/theme.min.js" asp-append-version="true"></script>
-    <script src="~/js/main.min.js" asp-append-version="true"></script> 
+    <script src="~/js/scriptTS.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("ScriptsAstroTableFilters", required: false)
+    @await RenderSectionAsync("ScriptsFormHandler", required: false)
+    @await RenderSectionAsync("ScriptsTelescopViewCalculator", required: false)
+    @await RenderSectionAsync("ScriptsPlanetViewCalendar", required: false)
+    @await RenderSectionAsync("ScriptsPlanetarySystem", required: false)
+    @await RenderSectionAsync("ScriptsCalendarHandler", required: false)
+    @await RenderSectionAsync("ScriptsProgresImportBar", required: false)
+    @await RenderSectionAsync("Development", required: false)
 
+    <div id="global-spinner-overlay" style="display: none;">
+        <div id="global-spinner"></div>
+    </div>
 </body>
 </html>

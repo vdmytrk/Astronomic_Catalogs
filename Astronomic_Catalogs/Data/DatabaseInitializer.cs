@@ -1,7 +1,6 @@
 ﻿using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services;
 using Astronomic_Catalogs.Services.Constants;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -174,12 +173,15 @@ public class DatabaseInitializer
     private async Task InitializeDevelopmentAsync(bool isConnectDb)
     {
         if (isConnectDb)
+        {
             await _context.Database.EnsureDeletedAsync();
+        }
 
         if (await CreateDatabaseAsync())
         {
             await ExecuteAllSqlScriptsAsync();
             await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
+            await ExecuteStoredProcedureAsync("Recreate_NASAPlanetarySystems_Tables");
         }
 
     }
@@ -193,6 +195,7 @@ public class DatabaseInitializer
             await ApplyMigrationsAsync();
             await ExecuteAllSqlScriptsAsync();
             await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
+            await ExecuteStoredProcedureAsync("Recreate_NASAPlanetarySystems_Tables");
         }
         else
         {
@@ -201,7 +204,7 @@ public class DatabaseInitializer
     }
 
     /// <summary>
-    /// Truncate table which are not created by script.
+    /// Truncate tables which are not created by script.
     /// </summary>
     public async Task<bool> ClearDatabase()
     {
@@ -252,7 +255,6 @@ public class DatabaseInitializer
     {
         List<string> existingTables = new();
 
-        //using var connection0 = _context.Database.GetDbConnection();
         using var connection = new SqlConnection(_context.Database.GetConnectionString()); // Використовуємо нове з'єднання
         await connection.OpenAsync();
 
@@ -310,7 +312,7 @@ public class DatabaseInitializer
         }
     }
 
-    private async Task ExecuteStoredProcedureAsync(string storedProcedure)
+    public async Task ExecuteStoredProcedureAsync(string storedProcedure)
     {
         try
         {
@@ -334,13 +336,13 @@ public class DatabaseInitializer
         }
     }
 
-    private async Task<bool> ExecuteSqlScriptAsync(string scriptName)
+    public async Task<bool> ExecuteSqlScriptAsync(string scriptName)
     {
         string scriptPath = $"{_scriptsDirectory}/{scriptName}";
 
         if (!File.Exists(scriptPath))
         {
-            _logger.LogError($"Script file {scriptPath} not found. Skipping.");
+            _logger.LogWarning($"Script file {scriptPath} not found. Skipping.");
             return false;
         }
 
@@ -415,6 +417,7 @@ public class DatabaseInitializer
         await ExecuteCreateTableSqlScriptsAsync();
         await ExecuteInsertDataSqlScriptsAsync();
         await ExecuteCreateProcedureFunctionSqlScriptsAsync();
+        await ExecuteInsertDataSqlByStoredProcedureAsync();
     }
 
     /// <summary>
@@ -428,10 +431,11 @@ public class DatabaseInitializer
         await ExecuteSqlScriptAsync($"Tables/NGCWikipedia_TemporarilySource.sql");
         await ExecuteSqlScriptAsync($"Tables/NGCWikipedia_ExtensionTemporarilySource.sql");
         await ExecuteSqlScriptAsync($"Tables/NGCICOpendatasoft_Source.sql");
-        await ExecuteSqlScriptAsync($"Tables/NLogApplicationCode.sql");
         await ExecuteSqlScriptAsync($"Tables/LogProcFunc.sql");
         await ExecuteSqlScriptAsync($"Tables/RequestLog.sql");
         await ExecuteSqlScriptAsync($"Tables/UsertLog.sql");
+        await ExecuteSqlScriptAsync($"Tables/NASAExoplanetCatalogLastUpdate.sql");
+        await ExecuteSqlScriptAsync($"Tables/NASAExoplanetCatalogUniquePlanets.sql");
     }
 
     private async Task ExecuteInsertDataSqlScriptsAsync()
@@ -451,7 +455,6 @@ public class DatabaseInitializer
         await ExecuteSqlScriptIfNeededAsync("Data/Constellation.sql", nameof(initStatus.Is_Constellation_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarily.sql", nameof(initStatus.Is_NGC2000_UKTemporarily_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog_Temporarily.sql", nameof(initStatus.Is_CollinderCatalog_Temporarily_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog.sql", nameof(initStatus.Is_CollinderCatalog_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_TemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_TemporarilySource_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_ExtensionTemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_ExtensionTemporarilySource_Executed), initStatus);
         await ExecuteSqlScriptIfNeededAsync("Data/NGCICOpendatasoft_Source.sql", nameof(initStatus.Is_NGCICOpendatasoft_Source_Executed), initStatus);
@@ -459,13 +462,37 @@ public class DatabaseInitializer
 
     private async Task ExecuteCreateProcedureFunctionSqlScriptsAsync()
     {
-        await ExecuteSqlScriptAsync($"Functions and procedures/Log_NLogAddLogApplicationCode.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/CalculationPlanetarySystemData.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/CreateNewDate.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/FillNASAExoplanetCatalogLastUpdate.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/FillNASAExoplanetCatalogUniquePlanets.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/GetActualDate.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/GetFilteredCollinderData.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/GetFilteredNGCICData.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/GetFilteredPlanetarySystemsData.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/GetFilteredPlanetsData.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/InsertCollinderCatalog.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/InsertNGCICOpendatasoft.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/InsertNGCICOpendatasoft_Extension.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/Log_NLogAddLogApplicationCode.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_Cursor.sql");
         await ExecuteSqlScriptAsync($"Functions and procedures/MigrateNGCICOStoNGCICO_While.sql");
-        await ExecuteSqlScriptAsync($"Functions and procedures/SearchFilteredNGCICData.sql");
-        await ExecuteSqlScriptAsync($"Functions and procedures/GetActualDate.sql");
-        await ExecuteSqlScriptAsync($"Functions and procedures/CreateNewDate.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/Recreate_NASAPlanetarySystems_Tables.sql");
+        await ExecuteSqlScriptAsync($"Functions and procedures/DataBugFixes.sql");
+    }
+
+    private async Task ExecuteInsertDataSqlByStoredProcedureAsync()
+    {
+        var initStatus = await _context.DatabaseInitialization.FirstOrDefaultAsync(x => x.Id == 1);
+
+        if (initStatus == null)
+        {
+            initStatus = new DatabaseInitialization { };
+            _context.DatabaseInitialization.Add(initStatus);
+            await _context.SaveChangesAsync();
+        }
+
+        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog.sql", nameof(initStatus.Is_CollinderCatalog_Executed), initStatus);
     }
     #endregion
 

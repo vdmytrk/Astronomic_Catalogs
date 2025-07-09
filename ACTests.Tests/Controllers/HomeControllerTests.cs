@@ -1,5 +1,4 @@
-﻿using Astronomic_Catalogs.Models;
-using FakeItEasy;
+﻿using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -64,15 +63,4 @@ public class HomeControllerTests
         Assert.That(result, Is.TypeOf<ViewResult>());
     }
 
-    [Test]
-    public void Error_Returns_ViewResult_With_ErrorViewModel()
-    {
-        // Act
-        var result = _controller.Error() as ViewResult;
-
-        // Assert
-        Assert.That(result, Is.Not.Null);
-        Assert.That(result!.Model, Is.InstanceOf<ErrorViewModel>());
-        Assert.That(((ErrorViewModel)result.Model).RequestId, Is.EqualTo("test-trace-id"));
-    }
 }

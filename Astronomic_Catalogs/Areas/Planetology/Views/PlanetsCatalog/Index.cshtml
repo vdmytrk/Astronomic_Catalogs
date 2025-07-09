@@ -1,0 +1,381 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Models.NASAExoplanetCatalog>
+
+@{
+    ViewData["Title"] = "Planets";
+    ViewBag.Contorller = "PlanetsCatalog";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+    var planetType = new List<ExtendedSelectListItem>
+    {
+        new ExtendedSelectListItem { Value = "1", Text = "Dwarf\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "0.04", Value_2 = "0.27" },
+        new ExtendedSelectListItem { Value = "2", Text = "Mars-size\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "0.27", Value_2 = "0.7" },
+        new ExtendedSelectListItem { Value = "3", Text = "Earth-size\u2003\u2003\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "0.7", Value_2 = "1.2" },
+        new ExtendedSelectListItem { Value = "4", Text = "Super-Earth\u2003\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "1.2", Value_2 = "1.9" },
+        new ExtendedSelectListItem { Value = "5", Text = "Sub-Neptune\u2003\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "1.9", Value_2 = "3.1" },
+        new ExtendedSelectListItem { Value = "6", Text = "Neptune-size\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "3.1", Value_2 = "5.1" },
+        new ExtendedSelectListItem { Value = "7", Text = "Sub-Jupiter\u2003\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "5.1", Value_2 = "8.3" },
+        new ExtendedSelectListItem { Value = "8", Text = "Jupiter-size\u2003\u2003\u2003\u2003\u2003\u2003", Value_1 = "8.3", Value_2 = "13.7" },
+        new ExtendedSelectListItem { Value = "9", Text = "Super(hot)-Jupiter", Value_1 = "13.7", Value_2 = "50" }
+    };
+
+    var distanceToStar = Enumerable.Range(0, 100)
+        .Concat(Enumerable.Range(1, 9).Select(i => i * 100))
+        .Concat(Enumerable.Range(1, 20).Select(i => i * 1000))
+        .Select(i => new SelectListItem { Value = i.ToString(), Text = i.ToString() })
+        .ToList();
+
+    var planetNames = ViewBag.PlanetNames as List<SelectListItem> ?? new();
+    planetNames.Insert(0, new SelectListItem { Value = "0", Text = "All planets" });
+
+    var telescopeNames = ViewBag.TelescopNames as List<SelectListItem> ?? new();
+    telescopeNames.Insert(0, new SelectListItem { Value = "0", Text = "All telescopes" });
+
+    var discoveryMethods = ViewBag.DiscoveryMethod as List<SelectListItem> ?? new();
+    discoveryMethods.Insert(0, new SelectListItem { Value = "0", Text = "All methods" });
+}
+
+<div class="catalogPagesHeader p-3">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="mb-3">Exoplanets of NASA catalog</h1>
+        </div>
+        <div class="col-auto ms-auto">
+            <div class="d-flex flex-wrap align-items-center">
+                @if (User.IsInRole("OwnerAdministratorPower"))
+                {
+                    <p class="mx-3 mt-2">
+                        <a asp-action="Create">Create New</a>
+                    </p>
+                    <div class="col mx-3">
+                        <button id="importPlanetDataButton" type="button" class="btn btn-primary">Import planet data</button>
+                    </div>
+                }
+                <div class="mx-3">
+                    <button type="button" class="btn btn-success btn-lg d-inline-block hideFilters">Hide filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-auto ms-auto">
+                @if (User.IsInRole("OwnerAdministratorPower"))
+                {
+                    <div>
+                        @if (TempData["Message"] != null)
+                        {
+                            <div class="alert alert-success">@TempData["Message"]</div>
+                        }
+                    </div>
+                    <div class="row">
+                        <div class="col-auto">
+                            <button id="stopImportingPlanetDataButton" type="button" class="btn btn-primary">Stop importing planet data</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="my-2 mx-2">
+            @if (User.IsInRole("OwnerAdministratorPower"))
+            {
+                <div id="progressContainer" class="progress ms-1 me-3">
+                    <div id="importProgress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar">0%</div>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    <div class="restrictedWrapper">
+        <div class="allTopMenuFilters restrictedBlock">
+            <div class="row mt-0">
+                <div class="fieldsCheckBoks">
+                    <h5 class="pHeader mt-2">Table columns:</h5>
+                    <span>Other catalogs columns: @Html.CheckBox("OtherCatalogsColumns", false, new { @class = "check-box chb-OtherCatalogsColumns", onclick = "toggleCheckbox(this, 'OtherCatalogsColumns')" }) <span class="borderBlock pe-2">|</span></span>
+                    <span>System columns: @Html.CheckBox("SystemColumns", false, new { @class = "check-box chb-SystemColumns", onclick = "toggleCheckbox(this, 'SystemColumns')" })                              <span class="borderBlock pe-2">|</span></span>
+                    <span>Discovery data columns: @Html.CheckBox("DiscoveryDataColumns", false, new { @class = "check-box chb-DiscoveryDataColumns", onclick = "toggleCheckbox(this, 'DiscoveryDataColumns')" }) <span class="borderBlock pe-2">|</span></span>
+                    <span>Article columns: @Html.CheckBox("ArticleColumns", false, new { @class = "check-box chb-ArticleColumns", onclick = "toggleCheckbox(this, 'ArticleColumns')" })                          <span class="borderBlock pe-2">|</span></span>
+                    <span>Planet columns: @Html.CheckBox("PlanetColumns", true, new { @class = "check-box chb-PlanetColumns", onclick = "toggleCheckbox(this, 'PlanetColumns')" })                               <span class="borderBlock pe-2">|</span></span>
+                    <span>Star columns: @Html.CheckBox("StarColumns", false, new { @class = "check-box chb-StarColumns", onclick = "toggleCheckbox(this, 'StarColumns')" })                                      <span class="borderBlock pe-2">|</span></span>
+                    <span>Coordinates columns: @Html.CheckBox("CoordinatesColumns", false, new { @class = "check-box chb-CoordinatesColumns", onclick = "toggleCheckbox(this, 'CoordinatesColumns')" })          </span>
+                </div>
+                <div class="marginButton">
+                    <button type="button" class="btn btn-primary setDefaultValueForAllFieldsCheckBox">
+                        Restore beginning fields
+                    </button>
+                    <button type="button" class="btn btn-primary selectAllFieldsCheckBox">
+                        Show all fields
+                    </button>
+                    <button type="button" class="btn btn-primary deselectAllFieldsCheckBox">
+                        Hide all fields
+                    </button>
+                </div>
+            </div>
+
+            <!---------------------------------------------------------------------->
+            <!-----------------------------    FORM    ----------------------------->
+            <!---------------------------------------------------------------------->
+            <div class="row topMenuFiltersCatalogs">
+                <div class="m-0">
+                    <h5 class="pHeader mt-4">Objects filters:</h5>
+                    <div class="row gx-0 gy-3 m-0">
+                        <div class="col-12 col-xl">
+                            <div class="d-flex flex-wrap gap-3">
+                                <!-- Planet size block -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column align-items-center text-center planetFilterSizeBlock">
+                                        <div class="mt-3 mt-md-3">
+                                            <div class="w-100 text-start">
+                                                <div class="d-flex justify-content-center">
+                                                    <span class="label fw-bold text-start">Planet syze:</span>
+                                                </div>
+                                                <div class="d-flex justify-content-center text-start">
+                                                    <span class="label">Show only planets with a defined size:</span>
+                                                    <span class="label">
+                                                        <span>
+                                                            @Html.CheckBox("PlanetWithSize", false, new { @class = "check-box chb-PlanetWithSize ms-2", onclick = "toggleCheckbox(this, 'PlanetWithSize')" })
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="chooseWhichPlanetSizes">
+                                                <div class="d-flex justify-content-center mt-4">
+                                                    <span class="label fw-bold text-start">Choose which planet sizes to show (all are selected by default):</span>
+                                                </div>
+                                                <select id="planetTypeSelect" name="PlanetType"
+                                                        class="form-select mx-auto"
+                                                        multiple>
+                                                    @foreach (var item in planetType)
+                                                    {
+                                                        <option value="@item.Value">
+                                                            @item.Text — Size from @item.Value_1 to @item.Value_2 radius of Earth
+                                                        </option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Telescope block -->
+                                <div class="flex-grow-1 mt-3 mt-md-3">
+                                    <div class="d-flex flex-column align-items-center text-center telescopFilterSizeBlock">
+                                        <div class="mt-1">
+                                            <div class="d-flex justify-content-center">
+                                                <span class="label fw-bold text-start">Discovered with a telescope:</span>
+                                            </div>
+                                            <select id="exoplanetTelescope" name="Telescope"
+                                                    class="form-select mx-auto"
+                                                    multiple>
+                                                @foreach (var item in telescopeNames)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @********************************************************************************************************@
+                        <div class="col-12 col-xl mt-3 ps-4">
+                            <div class="d-flex flex-wrap gap-3 align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column">
+                                        <!-- Planet name -->
+                                        <div class="mt-3 exoplanetPlanetName">
+                                            <span class="label fw-bold">Planet name:</span>
+                                            <select id="exoplanetPlanetName" name="PlanetName"
+                                                    class="form-select mx-auto"
+                                                    multiple>
+                                                @foreach (var item in planetNames)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <!-- Discovery method -->
+                                        <div class="mt-3 exoplanetDiscoveryMethod">
+                                            <span class="label fw-bold">Discovered with a method:</span>
+                                            <select id="exoplanetDiscoveryMethod" name="DiscoveryMethod"
+                                                    class="form-select mx-auto"
+                                                    multiple>
+                                                @foreach (var item in discoveryMethods)
+                                                {
+                                                    <option value="@item.Value">@item.Text</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                @*----------------------------------------------------------------------------------------------*@
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-column">
+                                        <!-- Planetary system name -->
+                                        <div class="planetarySystemNameBlock mt-3">
+                                            <div class="mt-1">
+                                                <span class="label fw-bold">Planetary system name:</span>
+                                                <div class="filter-fields">
+                                                    @Html.TextBox("Name", "", new { @class = "text-Name w-100" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Distance from planet to star -->
+                                        <div class="discoveredPlenetCountBlock mt-3">
+                                            <div class="label fw-bold">The distance from the planet to its star, AU:</div>
+                                            <div class="filter-fields row">
+                                                <!-- FROM -->
+                                                <div class="col-6">
+                                                    <div class="fw-semibold">from:</div>
+                                                    <div class="row g-1">
+                                                        <div class="col minWidth5rem">
+                                                            <div class="flex-wrap">
+                                                                @Html.DropDownList("DistanceToStarFrom", new SelectList(distanceToStar, "Value", "Text", "0"), new { @class = "form-select", id = "distanceToStarFrom", data_default = "0" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- TO -->
+                                                <div class="col-6">
+                                                    <div class="fw-semibold">to:</div>
+                                                    <div class="row g-1">
+                                                        <div class="col minWidth5rem">
+                                                            <div class="flex-wrap">
+                                                                @Html.DropDownList("DistanceToStarTo", new SelectList(distanceToStar, "Value", "Text", "20000"), new { @class = "form-select", id = "distanceToStarTo", data_default = "20000" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Calendar -->
+                                        <div class="discoveredDateBlock mt-3">
+                                            <div class="label fw-bold">The period during which the planet was discovered:</div>
+                                            <div class="row">
+                                                <!-- FROM -->
+                                                <div class="col-md-6">
+                                                    <div for="dateFrom" class="form-label fw-bold">Date From:</div>
+                                                    <input type="date" id="dateFrom" name="DateFrom"
+                                                           class="form-control"
+                                                           min="1992-01-01"
+                                                           max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                                </div>
+                                                <!-- TO -->
+                                                <div class="col-md-6">
+                                                    <div for="dateTo" class="form-label fw-bold">Date To:</div>
+                                                    <input type="date" id="dateTo" name="DateTo"
+                                                           class="form-control"
+                                                           min="1992-01-01"
+                                                           max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Habitable zone -->
+                                        <div class="habitableZoneBlock mt-3">
+                                            <div class="d-flex mt-3">
+                                                <span class="label fw-bold">Habitable zone:</span>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="row">
+                                                    <div class="col habitableZoneTextColuns">
+                                                        <span class="habitableZoneAllPalanetText">Planets in habitable zone:</span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span>@Html.CheckBox("HabitableZonePlanets", false, new { @class = "check-box chb-habitableZonePlanets ms-2" })</span>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col habitableZoneTextColuns">
+                                                        <span class="habitableZoneTerrestrialPalanetText">Terrestrial planets:</span>
+                                                    </div>
+                                                    <div class="col">
+                                                        <span>@Html.CheckBox("TerrestrialHabitableZonePlanets", false, new { @class = "check-box chb-terrestrialHabitableZonePlanets ms-2" }) </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @********************************************************************************************************@
+                    </div>
+                </div>
+
+
+
+                <div class="mt-0 additionalBlock">
+                    <h5 class="pHeader mt-4">Additional:</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="d-flex flex-wrap align-items-center">
+                                <h6 class="pe-2">Number of elements on the page:</h6>
+                                @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30", "50" }, "30"),
+                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30", @class = "form-select RowOnPageCatal" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-3">Fix the column width: </div>
+                                <label class="switchButton switchButtonDualColor switchButtonFixColumnWidth">
+                                    <input type="checkbox" checked>
+                                    <span class="slider sliderDualColor"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="marginButton">
+                    <button type="button" id="" class="btn btn-danger applyFiltersBtn m-2" data-controller="@ViewBag.Contorller">
+                        APPLY FILTERS
+                    </button>
+                    <button type="button" class="btn btn-primary m-2" onclick="resetAllFilters()">
+                        Reset all filters
+                    </button>
+                </div>
+            </div>
+            <!------------------------------------------------------------------------>
+            <!-----------------------------   END FORM   ----------------------------->
+            <!------------------------------------------------------------------------>
+
+        </div>
+    </div>
+
+
+
+    <div id="paginationBodyBlockContainer">
+        @await Html.PartialAsync("_PaginationLine")
+    </div>
+
+</div>
+
+
+<div id="planetsTableContainer" class="hideShowColumnTable p-3">
+    @await Html.PartialAsync("_PlanetsTableHeaders", Model)
+</div>
+
+<script>
+    window.isAuthenticated = @(isAuthenticated.ToString().ToLower());
+</script>
+
+@section ScriptsAstroTableFilters {
+    <script src="~/js/AstroTableFilters.min.js" asp-append-version="true"></script>
+}
+@section ScriptsCalendarHandler {
+    <script src="~/js/calendarHandler.min.js" asp-append-version="true"></script>
+}
+@section ScriptsProgresImportBar {
+    <script src="~/js/progresImportBar.min.js" asp-append-version="true"></script>
+}
+@section ScriptsFormHandler {
+    <script src="~/js/formHandler.min.js" asp-append-version="true"></script>
+}

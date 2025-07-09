@@ -1,173 +1,380 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Data;
+﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.DTO;
+using Astronomic_Catalogs.Exceptions;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
+using Astronomic_Catalogs.Services.Interfaces;
+using Astronomic_Catalogs.Utils;
+using Astronomic_Catalogs.ViewModels;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
-namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
+namespace Astronomic_Catalogs.Areas.Catalogs.Controllers;
+
+[Area("Catalogs")]
+public class NGCICOpendatasoftsController : Controller
 {
-    [Area("Catalogs")]
-    public class NGCICOpendatasoftsController : Controller
+    private readonly ApplicationDbContext _context;
+    private readonly INGCICFilterService _filterService;
+    private readonly ILogger<NGCICOpendatasoftsController> _logger;
+    private readonly IMapper _mapper;
+    private readonly IExceptionRedirectUrlService _exRedirectService;
+
+    public NGCICOpendatasoftsController(
+        ApplicationDbContext context,
+        INGCICFilterService filterService,
+        IMapper mapper,
+        ILogger<NGCICOpendatasoftsController> logger,
+        IExceptionRedirectUrlService exceptionRedirectService)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+        _filterService = filterService;
+        _mapper = mapper;
+        _logger = logger;
+        _exRedirectService = exceptionRedirectService;
+    }
 
-        public NGCICOpendatasoftsController(ApplicationDbContext context)
+    // GET: Catalogs/NGCICOpendatasofts
+    public async Task<IActionResult> Index()
+    {
+        int countNGCTask;
+        int countNGCE_Task;
+        List<ConstellationDto>? constellations;
+        List<NGCICOpendatasoft>? catalogItems;
+        List<NGCICViewModel> catalogViewModels;
+
+        try
         {
-            _context = context;
+            (countNGCTask, countNGCE_Task, constellations, catalogItems) = await _filterService.GetNGCICOpendatasoftDataAsync();
+            catalogViewModels = _mapper.Map<List<NGCICViewModel>>(catalogItems);
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            string messageTemplate = $"An unexpected error occurred during data retrieval AmountRowsResult in NGCICOpendatasoftsController.";
+            _logger.LogError(ex, "{Message}. RequestId: {RequestId}", messageTemplate, requestId);
+
+            var message = ex.Data.Contains("ErrorMessage")
+                ? ex.Data["ErrorMessage"]?.ToString()
+                : string.IsNullOrEmpty(ex.Message)
+                    ? $"{messageTemplate} RequestId : {requestId}"
+                    : ex.Message;
+
+            TempData["RequestId"] = requestId;
+            TempData["IsLogged"] = true;
+            TempData["ErrorMessage"] = message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+            throw;
+#else
+            return RedirectToAction("Error", "Error");
+#endif
         }
 
-        // GET: Catalogs/NGCICOpendatasofts
-        public async Task<IActionResult> Index()
-        {
-            var result = await _context.NGCIC_Catalog
-                .OrderBy(x => x.NGC_IC)
-                .ThenBy(x => x.Name)
-                .Take(1000) // 100
-                .ToListAsync();
+        ViewBag.RowOnPageCatalog = "50";
+        ViewBag.AmountRowsResult = countNGCTask + countNGCE_Task;
+        ViewBag.Constellations = constellations;
 
-            return View(result);
+        return View(catalogViewModels);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
+    {
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
+        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
+        List<NGCICOpendatasoft>? selectedList;
+
+        try
+        {
+            selectedList = await _filterService.GetFilteredDataAsync(parameters);
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+#if DEBUG
+            throw;
+#else
+                return Json(new { redirectTo = redirectUrl });
+#endif
         }
 
-        // GET: Catalogs/NGCICOpendatasofts/Details/5
-        [Authorize(Roles = RoleNames.Admin)]
-        [Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "UsersAccessClaim")]
-        public async Task<IActionResult> Details(int? id)
+        if (selectedList == null)
+            return NotFound();
+
+        var viewModelList = _mapper.Map<List<NGCICViewModel>>(selectedList);
+        var firstItem = viewModelList.FirstOrDefault();
+
+        // TODO: Use Dapper to return an output parameter
+        ViewBag.AmountRowsResult = firstItem?.RowOnPage ?? 0; // Using the RowOnPage field of the database table to pass a value.
+        ViewBag.Contorller = "NGCICOpendatasofts";
+
+        try
         {
-            if (id == null)
+            var tableHtml = await this.RenderViewAsync("_NGCICTableHeaders", viewModelList, true);
+            var paginationHtml = await this.RenderViewAsync("_PaginationLine", null, true);
+
+            return Json(new { tableHtml, paginationHtml });
+        }
+        catch (Exception ex) when (ex is FileNotFoundException || ex is ViewRenderingException)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
+            string errorMessage = ex switch
             {
-                return NotFound();
-            }
+                FileNotFoundException => "Partial view file was not found during rendering.",
+                ViewRenderingException => "An error occurred while rendering the partial view.",
+                _ => "An unexpected rendering error occurred."
+            };
 
-            var nGCICOpendatasoft = await _context.NGCIC_Catalog
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (nGCICOpendatasoft == null)
-            {
-                return NotFound();
-            }
+            _logger.LogError(ex, "RequestId: {RequestId}", requestId);
+#if DEBUG
+            throw;
+#else
+            return Json(new { redirectTo = redirectUrl });
+#endif
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var redirectUrl = _exRedirectService.BuildRedirectUrl(ex, requestId, HttpContext.Request.Path);
 
-            return View(nGCICOpendatasoft);
+            _logger.LogError(ex, "Unexpected error rendering partial views. RequestId: {RequestId}", requestId);
+#if DEBUG
+            throw;
+#else
+            return Json(new { redirectTo = redirectUrl });
+#endif
+        }
+    }
+
+    #region Optional methods
+    // GET: Catalogs/NGCICOpendatasofts/Details/5
+    [Authorize(Roles = RoleNames.Admin)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "UsersAccessClaim")]
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null)
+        {
+            return NotFound();
         }
 
-        // GET: Catalogs/NGCICOpendatasofts/Create
-        [Authorize(Roles = RoleNames.Admin)]
-        [Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "UsersAccessClaim")]
-        public IActionResult Create()
+        try
         {
-            return View();
-        }
+            var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
+            if (entity == null) return NotFound();
 
-        // POST: Catalogs/NGCICOpendatasofts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = RoleNames.Admin)]
-        [Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "UsersAccessClaim")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NGC_IC,Name,SubObject,Messier,Name_UK,Comment,OtherNames,NGC,IC,ObjectTypeAbrev,ObjectType,ObjectTypeFull,SourceType,RA,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,DEC,Declination,NS,DeclinationD,DeclinationM,DeclinationS,Constellation,MajorAxis,MinorAxis,PositionAngle,AppMag,AppMagFlag,BMag,VMag,JMag,HMag,KMag,SurfaceBrightness,HubbleOnlyGalaxies,CstarUMag,CstarBMag,CstarVMag,CstarNames,CommonNames,NedNotes,OpenngcNotes,Image,PageNumber,PageCount")] NGCICOpendatasoft nGCICOpendatasoft)
+            var viewModel = _mapper.Map<NGCICViewModel>(entity);
+            return View(viewModel);
+        }
+        catch (Exception ex)
         {
-            if (ModelState.IsValid)
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            _logger.LogError(ex, "Error retrieving details for NGCICOpendatasofts by ID {Id}. RequestId: {RequestId}", id, requestId);
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+            throw;
+#else
+            return StatusCode(500);
+#endif
+        }
+    }
+
+    // GET: Catalogs/NGCICOpendatasofts/Create
+    [Authorize(Roles = RoleNames.Admin)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "UsersAccessClaim")]
+    public IActionResult Create()
+    {
+        var model = new NGCICViewModel();
+        return View(model);
+    }
+
+    // POST: Catalogs/NGCICOpendatasofts/Create
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [Authorize(Roles = RoleNames.Admin)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "UsersAccessClaim")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(NGCICViewModel viewModel)
+    {
+        if (ModelState.IsValid)
+        {
+            try
             {
-                _context.Add(nGCICOpendatasoft);
+                var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
+                _context.Add(entity);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(nGCICOpendatasoft);
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error during creation of NGCICOpendatasoft: {@NGCICOpendatasoft}", viewModel);
+                ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                _logger.LogError(
+                    ex,
+                    "Unexpected error during creation of NGCICOpendatasoft: {@NGCICOpendatasoft}. RequestId: {RequestId}",
+                    viewModel,
+                    requestId
+                );
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
+
         }
 
-        // GET: Catalogs/NGCICOpendatasofts/Edit/5
-        [Authorize(Roles = RoleNames.Admin)]
-        [Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "UsersAccessClaim")]
-        public async Task<IActionResult> Edit(int? id)
+        return View(viewModel);
+    }
+
+    // GET: Catalogs/NGCICOpendatasofts/Edit/5
+    [Authorize(Roles = RoleNames.Admin)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "UsersAccessClaim")]
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var nGCICOpendatasoft = await _context.NGCIC_Catalog.FindAsync(id);
-            if (nGCICOpendatasoft == null)
-            {
-                return NotFound();
-            }
-            return View(nGCICOpendatasoft);
+            return NotFound();
         }
 
-        // POST: Catalogs/NGCICOpendatasofts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize(Roles = RoleNames.Admin)]
-        [Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "UsersAccessClaim")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NGC_IC,Name,SubObject,Messier,Name_UK,Comment,OtherNames,NGC,IC,ObjectTypeAbrev,ObjectType,ObjectTypeFull,SourceType,RA,RightAscension,RightAscensionH,RightAscensionM,RightAscensionS,DEC,Declination,NS,DeclinationD,DeclinationM,DeclinationS,Constellation,MajorAxis,MinorAxis,PositionAngle,AppMag,AppMagFlag,BMag,VMag,JMag,HMag,KMag,SurfaceBrightness,HubbleOnlyGalaxies,CstarUMag,CstarBMag,CstarVMag,CstarNames,CommonNames,NedNotes,OpenngcNotes,Image,PageNumber,PageCount")] NGCICOpendatasoft nGCICOpendatasoft)
+        var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
+        if (entity == null) return NotFound();
+
+        var viewModel = _mapper.Map<NGCICViewModel>(entity);
+        return View(viewModel);
+    }
+
+    // POST: Catalogs/NGCICOpendatasofts/Edit/5
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [Authorize(Roles = RoleNames.Admin)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "UsersAccessClaim")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, NGCICViewModel viewModel)
+    {
+        if (id != viewModel.Id) return NotFound();
+
+        if (ModelState.IsValid)
         {
-            if (id != nGCICOpendatasoft.Id)
+            try
             {
-                return NotFound();
+                var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
+                _context.Update(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException dbUpConcEx)
+            {
+                if (!NGCICOpendatasoftExists(viewModel.Id))
+                    return NotFound();
+
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = dbUpConcEx.Message;
+                TempData["StackTrace"] = dbUpConcEx.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    dbUpConcEx,
+                    "Concurrency error occurred during editing NGCICOpendatasoft: {@NGCICOpendatasoft}. RequestId: {RequestId}",
+                    viewModel,
+                    requestId
+                );
+                TempData["IsLogged"] = true;
+#if DEBUG
+                throw;
+#else
+                    return RedirectToAction("Error", "Error");
+#endif
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update error during editing NGCICOpendatasoft: {@NGCICOpendatasoft}", viewModel);
+                ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    ex,
+                    "Unexpected error during editing NGCICOpendatasoft: {@NGCICOpendatasoft}. RequestId: {RequestId}",
+                    viewModel,
+                    requestId
+                );
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(nGCICOpendatasoft);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NGCICOpendatasoftExists(nGCICOpendatasoft.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(nGCICOpendatasoft);
+            return RedirectToAction(nameof(Index));
         }
+        return View(viewModel);
+    }
 
-        // GET: Catalogs/NGCICOpendatasofts/Delete/5
-        [Authorize(Roles = RoleNames.Admin)]
-        [Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "UsersAccessClaim")]
-        public async Task<IActionResult> Delete(int? id)
+    // GET: Catalogs/NGCICOpendatasofts/Delete/5
+    [Authorize(Roles = RoleNames.Admin)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "UsersAccessClaim")]
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var nGCICOpendatasoft = await _context.NGCIC_Catalog
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (nGCICOpendatasoft == null)
-            {
-                return NotFound();
-            }
-
-            return View(nGCICOpendatasoft);
+            return NotFound();
         }
 
-        // POST: Catalogs/NGCICOpendatasofts/Delete/5
-        [Authorize(Roles = RoleNames.Admin)]
-        [Authorize(Policy = "AdminPolicy")]
-        [Authorize(Policy = "UsersAccessClaim")]
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
+        if (entity == null) return NotFound();
+
+        var viewModel = _mapper.Map<NGCICViewModel>(entity);
+        return View(viewModel);
+    }
+
+    // POST: Catalogs/NGCICOpendatasofts/Delete/5
+    [Authorize(Roles = RoleNames.Admin)]
+    [Authorize(Policy = "AdminPolicy")]
+    [Authorize(Policy = "UsersAccessClaim")]
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        try
         {
             var nGCICOpendatasoft = await _context.NGCIC_Catalog.FindAsync(id);
             if (nGCICOpendatasoft != null)
@@ -178,10 +385,55 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        private bool NGCICOpendatasoftExists(int id)
+        catch (DbUpdateException ex)
         {
-            return _context.NGCIC_Catalog.Any(e => e.Id == id);
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+
+            _logger.LogError(
+                ex,
+                "Database update error during deletion of NGCICOpendatasofts by ID {Id}. RequestId: {RequestId}",
+                id,
+                requestId
+
+            );
+#if DEBUG
+            throw;
+#else
+            return StatusCode(500);
+#endif
+        }
+        catch (Exception ex)
+        {
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+            TempData["RequestId"] = requestId;
+            TempData["ErrorMessage"] = ex.Message;
+            TempData["StackTrace"] = ex.ToString();
+            TempData["Path"] = HttpContext.Request.Path.ToString();
+
+            _logger.LogError(
+                ex, 
+                "Unexpected error during deletion of NGCICOpendatasofts ID by {Id}. RequestId: {RequestId}", 
+                id, 
+                requestId
+            );
+#if DEBUG
+            throw;
+#else
+            return StatusCode(500);
+#endif
         }
     }
+    #endregion
+
+    private bool NGCICOpendatasoftExists(int id)
+    {
+        return _context.NGCIC_Catalog.Any(e => e.Id == id);
+    }
+
 }

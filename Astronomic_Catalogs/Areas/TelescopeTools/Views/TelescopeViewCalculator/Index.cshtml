@@ -1,0 +1,382 @@
+﻿@{
+    ViewData["Title"] = "Telescope View Calculator";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+    var focuserDiameter = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "1.25", Text = "1.25"},
+        new SelectListItem { Value = "2", Text = "2"}
+    };
+    var barlowLens = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "1", Text = "Х"},
+        new SelectListItem { Value = "0.7", Text = "0.7x"},
+        new SelectListItem { Value = "2", Text = "2x"},
+        new SelectListItem { Value = "3", Text = "3x"},
+        new SelectListItem { Value = "4", Text = "4x"},
+        new SelectListItem { Value = "5", Text = "5x"}
+    };
+}
+
+<meta name="description" content="The interactive telescope calculator makes it easy to determine the optimal parameters for astronomical observations. It calculates the magnification range achievable with a specific telescope, as well as the field of view when used with different eyepieces. This tool is useful for both beginners and experienced astronomers — it helps select suitable eyepieces for standard magnification levels and guides you in choosing the right telescope based on your needs." />
+<meta name="description" content="Інтерактивний калькулятор для телескопів дозволяє легко визначити оптимальні параметри для спостереження: обчислює діапазон збільшень, яке можна отримати з конкретним телескопом, а також поле зору, що формується в комбінації з різними окулярами. Цей інструмент стане у пригоді як початківцям, так і досвідченим астрономам — він допоможе підібрати відповідні окуляри для досягнення стандартних рівнів збільшення, а також зорієнтує у виборі самого телескопа залежно від ваших потреб." />
+<meta name="keywords" content="telescope calculator, choose a telescope, telescope selection, find a telescope, choose eyepieces, eyepiece selection, telescope magnification, telescope field of view, telescope focal length, exit pupil, apparent magnitude, aperture ratio, resolving power, objective diameter, minimum magnification, maximum magnification" />
+<meta name="keywords" content="калькулятор телескопа, вибрати телескоп, підібрати телескоп, вибір телескопа, вибрати окуляри, підбір окулярів, збільшення телескопа, поле зору телескопа, фокусна відстань телескопа, вихідна зіниця, зоряна величина, світлосила, роздільна здатність, діаметр об'єктива, мінімальне збільшення, максимальне збільшення" />
+<meta name="keywords" content="калькулятор телескопа, выбрать телескоп, подобрать телескоп, выбор телескопа, выбрать окуляры, выбор окуляров, увеличение телескопа, поле зрения телескопа, фокусное расстояние телескопа, выходной зрачок, звездная величина, относительное отверстие, разрешающая способность, диаметр объектива, минимальное увеличение, максимальное увеличение" />
+
+<h1>@ViewData["Title"]</h1>
+
+<div id="telescopeViewCalculator" class="container my-4 px-3">
+    <div class="row justify-content-center">
+        <!-- Input data -->
+        <div class="col-12 col-lg-auto telescopeViewCalculatorInputs">
+            <h3 class="fullWidthHeader mt-5 pHeader text-center">CHARACTERISTICS</h3>
+            <div class="row telescopeCharacteristics">
+                <div class="col-12 col-md-6">
+                    <h4 class="pHeader">Characteristics of telescope</h4>
+                    <div class="telescopeCharacteristicsContent">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="me-1">Aperture:</h6>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBox("Aperture", "", new { @class = "text-Aperture" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="telescopeCharacteristicsContent">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="me-1">Focal length:</h6>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBox("focalLengthT", "", new { @class = "text-FocalLengthT" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="telescopeCharacteristicsContent">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="me-1">Focuser diameter:</h6>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.DropDownList("focuserDiameter", new SelectList(focuserDiameter, "Value", "Text", "1.5"), new { @class = "text-FocuserDiameter", id = "", data_default = "0" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="pHeader">Characteristics of eyepiece</h4>
+                    <div class="telescopeCharacteristicsContent">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="me-1">Eyepiece field of view:</h6>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBox("FieldViewE", "", new { @class = "text-FieldViewE" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="telescopeCharacteristicsContent">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="me-1">Eyepiece focal length:</h6>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBox("focalLengthE", "", new { @class = "text-FocalLengthE" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="telescopeCharacteristicsContent">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="me-1">Barlow lens:</h6>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.DropDownList("BarlowLens", new SelectList(barlowLens, "Value", "Text"), new { @class = "barlowLens", id = "", data_default = "0" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- row -->
+            <div class="ms-auto mt-3 mb-5 ms-4">
+                <button type="button" class="ms-5 btn btn-success btn-lg d-inline-block CalculateTelescopeView">Calculate</button>
+            </div>
+        </div>
+
+        <!-- Output data -->
+        <div class="col-12 col-lg-auto telescopeViewCalculatorOutputs">
+            <h3 class="fullWidthHeader mt-5 pHeader text-center">PARAMETERS</h3>
+            <div class="row">
+                <!-- View provided by the eyepiece -->
+                <div class="col-12 col-xl-auto viewProvidedEyepiece">
+                    <h4 class="pHeader">View provided by the eyepiece and barlow lens:</h4>
+                    <div class="viewProvidedEyepieceContent">
+                        <div class="row mb-3">
+                            <div class="col-md-7">
+                                <h6>Magnification:</h6>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="magnification"></span>
+                            </div>
+                        </div>
+                    @if (User.IsInRole("OwnerAdministratorPower"))
+                    {
+                            <div class="row mb-3">
+                            <div class="col-md-7">
+                                <h6 class="me-2">Focal ratio:</h6>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="focalRatioE"></span>
+                            </div>
+                        </div>
+                    }
+                        <div class="row mb-3">
+                            <div class="col-md-7">
+                                <h6>Field of view:</h6>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="fieldView"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3 crateSizeDescription">
+                            <div class="col-md-7">
+                                <h6 class="me-2">Minimum visible crater size on the Moon:</h6>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="minimumMoonCraterWithEyepiece minWidth5rem"></span>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-7">
+                                <h6>Exit pupil:</h6>
+                            </div>
+                            <div class="col-md-auto">
+                                <span class="exitPupil"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Telescope parameters -->
+                <div class="col-12 col-xl-auto telescopeParameters">
+                    <h4 class="pHeader">Telescope parameters:</h4>
+                    <div class="row">
+                        <!-- Other parameters -->
+                        <div class="col-12 col-xl-7 otherParameters">
+                            <div class="otherParametersContent">
+                                <h5 class="pHeader">Parameters</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Focal ratio:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="focalRatio"></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Maximum field of view (without a Barlow lens):</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="maximumFieldOfView"></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Resolving power:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="resolvingPower"></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3 crateSizeDescription">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Minimum visible crater size on the Moon:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="minimumMoonCrater minWidth5rem "></span>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-7">
+                                        <h6 class="me-2">Limiting stellar magnitude:</h6>
+                                    </div>
+                                    <div class="col-md-auto">
+                                        <span class="limitingStellarMagnitude"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Typical magnifications -->
+                        <div class="col-12 col-xl-auto typicalMagnifications">
+                            <h5 class="pHeader">Typical magnifications</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>Low Power (D/5 and greater):</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="typicalMagnificationsD5value"></span>
+                                    <span class="eyepieceSizeD5"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="magnificationDiscriptionD5">
+                                    <ul>
+                                        <li>Ideal for wide-field observations such as star clusters, the Milky Way, and large nebulae.</li>
+                                        <li>Produces bright, clear images with a wide field of view.</li>
+                                        <li>Best for finding objects and initial surveys of the sky.</li>
+                                        <li>Often used with binoculars or small refractors.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>Moderately Low Power (D/3):</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="typicalMagnificationsD3value"></span>
+                                    <span class="eyepieceSizeD3"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="magnificationDiscriptionD3">
+                                    <ul>
+                                        <li>Good for observing larger deep-sky objects like galaxies and diffuse nebulae.</li>
+                                        <li>Provides a balanced view between field size and image detail.</li>
+                                        <li>Still relatively bright, making it suitable for casual observations.</li>
+                                        <li>Common for exploring extended celestial objects.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>Medium Power (D/2):</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="typicalMagnificationsD2value"></span>
+                                    <span class="eyepieceSizeD2"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="magnificationDiscriptionD2">
+                                    <ul>
+                                        <li>Suitable for detailed views of the moon, planets, and some bright star clusters.</li>
+                                        <li>Retains moderate brightness while increasing image scale.</li>
+                                        <li>Good for resolving some planetary features and lunar craters.</li>
+                                        <li>Often used for general-purpose viewing.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>Moderate-High Power (0.7 * D):</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="typicalMagnifications07Dvalue"></span>
+                                    <span class="eyepieceSize07D"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="magnificationDiscription07D">
+                                    <ul>
+                                        <li>Suitable for more detailed planetary and lunar observation.</li>
+                                        <li>Allows for better resolution of planetary bands and crater details.</li>
+                                        <li>Image brightness decreases, but still practical for well-illuminated objects.</li>
+                                        <li>Ideal for intermediate planetary studies.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>High Power (D):</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="typicalMagnificationsDvalue"></span>
+                                    <span class="eyepieceSizeD"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="magnificationDiscriptionD">
+                                    <ul>
+                                        <li>Used for closer inspection of planets, the moon, and double stars.</li>
+                                        <li>Offers detailed views of planetary features like Saturn’s rings or Jupiter’s cloud belts.</li>
+                                        <li>The image becomes dimmer, and atmospheric seeing conditions become more critical.</li>
+                                        <li>Often the practical limit for average seeing conditions.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>Very High Power (1.4 * D):</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="typicalMagnifications14Dvalue"></span>
+                                    <span class="eyepieceSize14D"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="magnificationDiscription14D">
+                                    <ul>
+                                        <li>Suitable for detailed planetary and lunar studies when atmospheric conditions are stable.</li>
+                                        <li>Useful for splitting tighter double stars.</li>
+                                        <li>The image may start to blur or dim due to turbulence or optical limits.</li>
+                                        <li>Best reserved for exceptional nights with good seeing.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>Maximum Useful Power (2 * D):</h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <span class="typicalMagnifications2Dvalue"></span>
+                                    <span class="eyepieceSize2D"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="magnificationDiscription2D">
+                                    <ul>
+                                        <li>The theoretical upper limit for telescopes, primarily for lunar, planetary, or close double star observations.</li>
+                                        <li>The image can appear soft, dim, or distorted due to atmospheric conditions or optical imperfections.</li>
+                                        <li>Rarely practical except with excellent optics and perfect seeing.</li>
+                                        <li>Best for experienced observers when conditions are ideal.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- row -->
+                </div>
+            </div> <!-- row -->
+        </div>
+    </div> <!-- row -->
+</div> <!-- container -->
+
+<div hidden>
+    <p>Get a link to this calculation.</p>
+</div>
+
+<script>
+    window.isAuthenticated = @(isAuthenticated.ToString().ToLower());
+</script>
+
+@section ScriptsTelescopViewCalculator {
+    <script src="~/js/telescopeViewCalculator.min.js" asp-append-version="true"></script>
+}
+
+
+
+

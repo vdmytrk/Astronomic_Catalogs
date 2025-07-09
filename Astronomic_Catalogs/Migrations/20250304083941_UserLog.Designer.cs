@@ -249,12 +249,12 @@ namespace Astronomic_Catalogs.Migrations
 
                     b.Property<float?>("AngDiameterNew")
                         .HasColumnType("real")
-                        .HasColumnName("Ang_Diameter_NEW");
+                        .HasColumnName("Ang_Diameter_Max");
 
-                    b.Property<string>("AngDiameterOld")
+                    b.Property<string>("AngDiameter")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
-                        .HasColumnName("Ang_Diameter_OLD");
+                        .HasColumnName("Ang_Diameter");
 
                     b.Property<float?>("AppMag")
                         .HasColumnType("real")

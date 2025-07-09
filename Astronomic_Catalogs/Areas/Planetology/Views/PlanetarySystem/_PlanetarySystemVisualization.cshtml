@@ -1,0 +1,6 @@
+﻿@model Astronomic_Catalogs.Entities.PlanetarySystem
+@* <h3>Hostname: @Model.Hostname</h3> *@
+<div class="planetary-system-container">
+    <svg class="planetary-system-data d-none" data-system='@Html.Raw(Json.Serialize(Model))'></svg>
+</div>
+

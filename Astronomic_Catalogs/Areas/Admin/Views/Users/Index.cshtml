@@ -25,7 +25,7 @@
             <th>@Html.DisplayNameFor(model => model.LockoutEnabled)</th>
             <th>AccessFailed</th>
             <th>Roles</th>
-            <th style="max-width: 20em">Claims</th>
+            <th class="widthUsersClaimColum">Claims</th>
             <th>Logins</th>
             <th>Tokens</th>
             <th>Actions</th>
@@ -58,7 +58,7 @@
                         <span class="text-muted">No Roles</span>
                     }
                 </td>
-                <td class="text-wrap" style="max-width: 20em">
+                <td class="text-wrap widthUsersClaimColum">
                     @if (item.UserClaims.Any())
                     {
                         @string.Join(", ", item.UserClaims.Select(uc => $"{uc.ClaimType}: {uc.ClaimValue}"))

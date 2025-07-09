@@ -1,0 +1,187 @@
+﻿@model IEnumerable<Astronomic_Catalogs.ViewModels.NGCICViewModel>
+
+<table id="sizeFilterTable" class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size astroCatalogTable setColumnWidth">
+    <thead id="NGCICOpendatasoftTableHeader">
+        <tr class="tr-oun-style">
+            <th class="Name">
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th class="SubObject">
+                @Html.DisplayNameFor(model => model.SubObject)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Messier">
+                @Html.DisplayNameFor(model => model.Messier)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Name_UK" title="Other unique name (taken from the NGC2000_UK catalog. Analogous to the Othernames field). THESE TWO FIELDS SHOULD BE MERGED EVENTUALLY!!!" hidden>
+                @Html.DisplayNameFor(model => model.Name_UK)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Comment" title="Comment from the NameObject table.">
+                @Html.DisplayNameFor(model => model.Comment)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Other_names" title="Name from other catalogs or historically established. In this case, from the Object field of the NameObject table.">
+                @Html.DisplayNameFor(model => model.OtherNames)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="NGC" hidden>
+                @Html.DisplayNameFor(model => model.NGC)
+            </th>
+            <th class="IC" hidden>
+                @Html.DisplayNameFor(model => model.IC)
+            </th>
+            <th class="LimitAngDiameter" title="This field contains the character &quot;<&quot; if the object's size is an upper limit; otherwise, the field is empty." hidden>
+                @Html.DisplayNameFor(model => model.LimitAngDiameter)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="AngDiameter" title="This field contains the size of the object in arcminutes. It is the angular size measured along the largest dimension. It is taken from the NGC2000_UK catalog.">
+                @Html.DisplayNameFor(model => model.AngDiameter)*
+            </th>
+            <th class="ObjectTypeAbrev">
+                @Html.DisplayNameFor(model => model.ObjectTypeAbrev)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="ObjectType" hidden>
+                @Html.DisplayNameFor(model => model.ObjectType)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="ObjectTypeFull">
+                @Html.DisplayNameFor(model => model.ObjectTypeFull)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="SourceType" title="Object type. See the SourceType table." hidden>
+                @Html.DisplayNameFor(model => model.SourceType)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="RA" title="LII – Galactic longitude of the NGC/IC object – right ascension (analogous to longitude on Earth's surface) of the NGC/IC object on the selected equinox date. Provided in J2000 coordinates, with an accuracy of 0.1 minutes of time in the original table. Measured in hours.">
+                @Html.DisplayNameFor(model => model.RA)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Right_ascension" hidden>
+                @Html.DisplayNameFor(model => model.RightAscension)
+            </th>
+            <th class="Right_ascension_H" hidden>
+                @Html.DisplayNameFor(model => model.RightAscensionH)
+            </th>
+            <th class="Right_ascension_M" hidden>
+                @Html.DisplayNameFor(model => model.RightAscensionM)
+            </th>
+            <th class="Right_ascension_S" hidden>
+                @Html.DisplayNameFor(model => model.RightAscensionS)
+            </th>
+            <th class="DEC" title="BII – Galactic latitude of the NGC/IC object – declination (analogous to latitude on Earth's surface) of the NGC/IC object on the selected equinox date. Provided in J2000 coordinates, with an accuracy of 1 arcminute in the original table.">
+                @Html.DisplayNameFor(model => model.DEC)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Declination" hidden>
+                @Html.DisplayNameFor(model => model.Declination)
+            </th>
+            <th class="NS" hidden>
+                @Html.DisplayNameFor(model => model.NS)
+            </th>
+            <th class="Declination_D" hidden>
+                @Html.DisplayNameFor(model => model.DeclinationD)
+            </th>
+            <th class="Declination_M" hidden>
+                @Html.DisplayNameFor(model => model.DeclinationM)
+            </th>
+            <th class="Declination_S" hidden>
+                @Html.DisplayNameFor(model => model.DeclinationS)
+            </th>
+            <th class="Constellation">
+                @Html.DisplayNameFor(model => model.Constellation)
+            </th>
+            <th class="MajorAxis" hidden>
+                @Html.DisplayNameFor(model => model.MajorAxis)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="MinorAxis" hidden>
+                @Html.DisplayNameFor(model => model.MinorAxis)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="PositionAngle" hidden>
+                @Html.DisplayNameFor(model => model.PositionAngle)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="App_Mag" title="This field contains the integrated (total) magnitude of the type specified in the app_mag_flag field. Accuracy varies." hidden>
+                @Html.DisplayNameFor(model => model.AppMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="App_Mag_Flag" title="This field contains a flag indicating the magnitude type. It contains a space if the integrated magnitude is visual, or &quot;p&quot; if it is photographic (blue)." hidden>
+                @Html.DisplayNameFor(model => model.AppMagFlag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="b_mag" title="This field contains the brightness of the object in the blue range (B-band, &quotBlue&quot), approximately 440 nm." hidden>
+                @Html.DisplayNameFor(model => model.BMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="v_mag" title="This field contains the stellar magnitude of the object in the visible range (V-band, &quotVisual&quot), around 550 nm." hidden>
+                @Html.DisplayNameFor(model => model.VMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="j_mag" title="This field contains the brightness of the object in the infrared range (J-band), with a wavelength of about 1.25 μm." hidden>
+                @Html.DisplayNameFor(model => model.JMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="h_mag" title="This field contains the brightness of the object in an even longer infrared range (H-band), around 1.65 μm." hidden>
+                @Html.DisplayNameFor(model => model.HMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="k_mag" title="This field contains the brightness of the object further into the infrared range (K-band), around 2.2 μm." hidden>
+                @Html.DisplayNameFor(model => model.KMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Surface_Brigthness" title="It indicates the average brightness of an object per unit area: the brightness of the object distributed over a unit area in the sky (usually expressed in magnitudes per square arcsecond, e.g., mag/arcsec²). The lower the value, the brighter the object appears per unit area!">
+                @Html.DisplayNameFor(model => model.SurfaceBrightness)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Hubble_OnlyGalaxies" title="Hubble type of the galaxy.">
+                @Html.DisplayNameFor(model => model.HubbleOnlyGalaxies)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Cstar_UMag" title="This field contains the brightness (stellar magnitude) of the nearest star in the ultraviolet range (U-band)." hidden>
+                @Html.DisplayNameFor(model => model.CstarUMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Cstar_BMag" title="This field contains the brightness of the nearest star in the blue range (B-band, &quotBlue&quot)." hidden>
+                @Html.DisplayNameFor(model => model.CstarBMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Cstar_VMag" title="This field contains the brightness of the nearest star in visible light (V-band, &quotVisual&quot)." hidden>
+                @Html.DisplayNameFor(model => model.CstarVMag)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Cstar_Names" title="This field contains the names or identifiers of the star specified in the fields: Cstar_UMag, Cstar_BMag, Cstar_VMag." hidden>
+                @Html.DisplayNameFor(model => model.CstarNames)*
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="CommonNames">
+                @Html.DisplayNameFor(model => model.CommonNames)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="NedNotes">
+                @Html.DisplayNameFor(model => model.NedNotes)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="OpenngcNotes">
+                @Html.DisplayNameFor(model => model.OpenngcNotes)
+                <span>&#8595;&#8593;</span>
+            </th>
+            <th class="Image" hidden>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            @if (User.IsInRole("OwnerAdministratorPower"))
+            {
+                <th>Admin functionality</th>
+            }
+        </tr>
+    </thead>
+    <tbody id="catalogTableBody"> @* ПЕРЕЙМЕНУЙ ВСІ КЛАСИ *@
+        @{
+            await Html.RenderPartialAsync("_NGCICTableBody", Model);
+        }
+    </tbody>
+</table>
+

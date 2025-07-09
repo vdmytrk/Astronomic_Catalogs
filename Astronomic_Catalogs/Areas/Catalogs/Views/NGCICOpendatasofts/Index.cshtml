@@ -1,319 +1,418 @@
-﻿@model IEnumerable<Astronomic_Catalogs.Models.NGCICOpendatasoft>
+﻿@model IEnumerable<Astronomic_Catalogs.ViewModels.NGCICViewModel>
 
 @{
     ViewData["Title"] = "NGC/IC";
+    ViewBag.Contorller = "NGCICOpendatasofts";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+    var angDiameterValues = Enumerable.Range(0, 301).Select(i => new SelectListItem { Text = i.ToString(), Value = i.ToString() }).ToList();
+    var hoursValues = Enumerable.Range(0, 24).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
+    var minsSecsValues = Enumerable.Range(0, 60).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
+    var degreesValues = Enumerable.Range(0, 90).Select(i => new SelectListItem { Value = i.ToString("D2"), Text = i.ToString("D2") }).ToList();
+    var poleOptions = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "-", Text = "S" },
+        new SelectListItem { Value = "+", Text = "N" }
+    };
 }
 
-<div class="planetCatalogHeader">
-    <h1>@ViewData["Title"] catalog.</h1>
+<div class="catalogPagesHeader">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1>@ViewData["Title"] catalog</h1>
+        </div>
+        <div class="col-auto ms-auto">
+            <button type="button" class="btn btn-success btn-lg d-inline-block hideFilters">Hide filters</button>
+        </div>
+    </div>
 
-    @if (User.IsInRole("OwnerAdministratorPower"))
-    {
-        <p>
-            <a asp-action="Create">Create New</a>
-        </p>
-    }
+    <div class="restrictedWrapper">
+        <div class="allTopMenuFilters restrictedBlock">
+            <div class="fieldsCheckBoks">
+                <h5 class="pHeader mt-4 p-2">Table columns:</h5>
+                <span>   SubObject: @Html.CheckBox("SubObject", true, new { @class = "check-box chb-SubObject", onclick = "toggleCheckbox(this, 'SubObject')" })                                           <span class="borderBlock pe-2">|</span></span>
+                <span>   Messier: @Html.CheckBox("Messier", true, new { @class = "check-box chb-Messier", onclick = "toggleCheckbox(this, 'Messier')" })                                                   <span class="borderBlock pe-2">|</span></span>
+                <span>   Name UK: @Html.CheckBox("Name_UK", false, new { @class = "check-box chb-Name_UK", onclick = "toggleCheckbox(this, 'Name_UK')" })                                                   <span class="borderBlock pe-2">|</span></span>
+                <span>   Comment: @Html.CheckBox("Comment", true, new { @class = "check-box chb-Comment", onclick = "toggleCheckbox(this, 'Comment')" })                                                   <span class="borderBlock pe-2">|</span></span>
+                <span>   Other names: @Html.CheckBox("Other_names", true, new { @class = "check-box chb-Other_names", onclick = "toggleCheckbox(this, 'Other_names')" })                                   <span class="borderBlock pe-2">|</span></span>
+                <span>   NGC: @Html.CheckBox("NGC", false, new { @class = "check-box chb-NGC", onclick = "toggleCheckbox(this, 'NGC')" })                                                                  <span class="borderBlock pe-2">|</span></span>
+                <span>   IC: @Html.CheckBox("IC", false, new { @class = "check-box chb-IC", onclick = "toggleCheckbox(this, 'IC')" })                                                                      <span class="borderBlock pe-2">|</span></span>
+                <span>   LimitAngDiameter: @Html.CheckBox("LimitAngDiameter", false, new { @class = "check-box chb-LimitAngDiameter", onclick = "toggleCheckbox(this, 'LimitAngDiameter')" })               <span class="borderBlock pe-2">|</span></span>
+                <span>   AngDiameter: @Html.CheckBox("AngDiameter", true, new { @class = "check-box chb-AngDiameter", onclick = "toggleCheckbox(this, 'AngDiameter')" })                                   <span class="borderBlock pe-2">|</span></span>
+                <span>   Object Type Abrev: @Html.CheckBox("ObjectTypeAbrev", true, new { @class = "check-box chb-ObjectTypeAbrev", onclick = "toggleCheckbox(this, 'ObjectTypeAbrev')" })                 <span class="borderBlock pe-2">|</span></span>
+                <span>   Object Type: @Html.CheckBox("ObjectType", false, new { @class = "check-box chb-ObjectType", onclick = "toggleCheckbox(this, 'ObjectType')" })                                     <span class="borderBlock pe-2">|</span></span>
+                <span>   Object type full: @Html.CheckBox("ObjectTypeFull", true, new { @class = "check-box chb-ObjectTypeFull", onclick = "toggleCheckbox(this, 'ObjectTypeFull')" })                     <span class="borderBlock pe-2">|</span></span>
+                <span>   Source Type: @Html.CheckBox("SourceType", false, new { @class = "check-box chb-SourceType", onclick = "toggleCheckbox(this, 'SourceType')" })                                     <span class="borderBlock pe-2">|</span></span>
+                <span>   RA: @Html.CheckBox("RA", true, new { @class = "check-box chb-RA", onclick = "toggleCheckbox(this, 'RA')" })                                                                       <span class="borderBlock pe-2">|</span></span>
+                <span>   DEC: @Html.CheckBox("DEC", true, new { @class = "check-box chb-DEC", onclick = "toggleCheckbox(this, 'DEC')" })                                                                   <span class="borderBlock pe-2">|</span></span>
+                <span>   Constellation: @Html.CheckBox("Constellation", true, new { @class = "check-box chb-Constellation", onclick = "toggleCheckbox(this, 'Constellation')" })                           <span class="borderBlock pe-2">|</span></span>
+                <span>   Major Axis: @Html.CheckBox("MajorAxis", false, new { @class = "check-box chb-MajorAxis", onclick = "toggleCheckbox(this, 'MajorAxis')" })                                         <span class="borderBlock pe-2">|</span></span>
+                <span>   Minor Axis: @Html.CheckBox("MinorAxis", false, new { @class = "check-box chb-MinorAxis", onclick = "toggleCheckbox(this, 'MinorAxis')" })                                         <span class="borderBlock pe-2">|</span></span>
+                <span>   Position Angle: @Html.CheckBox("PositionAngle", false, new { @class = "check-box chb-PositionAngle", onclick = "toggleCheckbox(this, 'PositionAngle')" })                         <span class="borderBlock pe-2">|</span></span>
+                <span>   App Mag: @Html.CheckBox("App_Mag", false, new { @class = "check-box chb-App_Mag", onclick = "toggleCheckbox(this, 'App_Mag')" })                                                  <span class="borderBlock pe-2">|</span></span>
+                <span>   App Mag Flag: @Html.CheckBox("App_Mag_Flag", false, new { @class = "check-box chb-App_Mag_Flag", onclick = "toggleCheckbox(this, 'App_Mag_Flag')" })                              <span class="borderBlock pe-2">|</span></span>
+                <span>   b mag: @Html.CheckBox("b_mag", false, new { @class = "check-box chb-b_mag", onclick = "toggleCheckbox(this, 'b_mag')" })                                                          <span class="borderBlock pe-2">|</span></span>
+                <span>   v mag: @Html.CheckBox("v_mag", false, new { @class = "check-box chb-v_mag", onclick = "toggleCheckbox(this, 'v_mag')" })                                                          <span class="borderBlock pe-2">|</span></span>
+                <span>   j mag: @Html.CheckBox("j_mag", false, new { @class = "check-box chb-j_mag", onclick = "toggleCheckbox(this, 'j_mag')" })                                                          <span class="borderBlock pe-2">|</span></span>
+                <span>   h mag: @Html.CheckBox("h_mag", false, new { @class = "check-box chb-h_mag", onclick = "toggleCheckbox(this, 'h_mag')" })                                                          <span class="borderBlock pe-2">|</span></span>
+                <span>   k mag: @Html.CheckBox("k_mag", false, new { @class = "check-box chb-k_mag", onclick = "toggleCheckbox(this, 'k_mag')" })                                                          <span class="borderBlock pe-2">|</span></span>
+                <span>   Surface Brigthness: @Html.CheckBox("Surface_Brigthness", true, new { @class = "check-box chb-Surface_Brigthness", onclick = "toggleCheckbox(this, 'Surface_Brigthness')" })       <span class="borderBlock pe-2">|</span></span>
+                <span>   Hubble OnlyGalaxies: @Html.CheckBox("Hubble_OnlyGalaxies", true, new { @class = "check-box chb-Hubble_OnlyGalaxies", onclick = "toggleCheckbox(this, 'Hubble_OnlyGalaxies')" })   <span class="borderBlock pe-2">|</span></span>
+                <span>   Cstar UMag: @Html.CheckBox("Cstar_UMag", false, new { @class = "check-box chb-Cstar_UMag", onclick = "toggleCheckbox(this, 'Cstar_UMag')" })                                      <span class="borderBlock pe-2">|</span></span>
+                <span>   Cstar BMag: @Html.CheckBox("Cstar_BMag", false, new { @class = "check-box chb-Cstar_BMag", onclick = "toggleCheckbox(this, 'Cstar_BMag')" })                                      <span class="borderBlock pe-2">|</span></span>
+                <span>   Cstar VMag: @Html.CheckBox("Cstar_VMag", false, new { @class = "check-box chb-Cstar_VMag", onclick = "toggleCheckbox(this, 'Cstar_VMag')" })                                      <span class="borderBlock pe-2">|</span></span>
+                <span>   Cstar Names: @Html.CheckBox("Cstar_Names", false, new { @class = "check-box chb-Cstar_Names", onclick = "toggleCheckbox(this, 'Cstar_Names')" })                                  <span class="borderBlock pe-2">|</span></span>
+                <span>   Common Names: @Html.CheckBox("CommonNames", true, new { @class = "check-box chb-CommonNames", onclick = "toggleCheckbox(this, 'CommonNames')" })                                  <span class="borderBlock pe-2">|</span></span>
+                <span>   Ned Notes: @Html.CheckBox("NedNotes", true, new { @class = "check-box chb-NedNotes", onclick = "toggleCheckbox(this, 'NedNotes')" })                                              <span class="borderBlock pe-2">|</span></span>
+                <span>   Openngc Notes: @Html.CheckBox("OpenngcNotes", true, new { @class = "check-box chb-OpenngcNotes", onclick = "toggleCheckbox(this, 'OpenngcNotes')" })                              <span class="borderBlock pe-2">|</span></span>
+                <span>   Image: @Html.CheckBox("Image", false, new { @class = "check-box chb-Image", onclick = "toggleCheckbox(this, 'Image')" })                                                                                            </span>
+            </div>
+            <div class="marginButton">
+                <button type="button" class="btn btn-primary setDefaultValueForAllFieldsCheckBox">
+                    Restore beginning fields
+                </button>
+                <button type="button" class="btn btn-primary selectAllFieldsCheckBox">
+                    Show all fields
+                </button>
+                <button type="button" class="btn btn-primary deselectAllFieldsCheckBox">
+                    Hide all fields
+                </button>
+            </div>
+
+            <!---------------------------------------------------------------------->
+            <!-----------------------------    FORM    ----------------------------->
+            <!---------------------------------------------------------------------->
+            <div class="topMenuFiltersCatalogs">
+                <div>
+                    <h5 class="pHeader mt-4 p-2">Objects filters:</h5>
+                    <div class="row m-0">
+                        <div class="col-6 nameConstellationFilterBlock">
+                            <div class="filter-grid constellationFilterBlock">
+                                <div class="filter-row">
+                                    <span class="label fw-bold">Object other name:</span>
+                                    <div class="filter-fields">
+                                        @Html.TextBox("Name", "", new { @class = "text-Name w-100" })
+                                    </div>
+                                </div>
+                                <div class="filter-row mt-3">
+                                    <span class="label fw-bold">Constellation:</span>
+                                    <div class="filter-fields">
+                                        <select id="constellationSelect" name="constellations" class="form-select constellationSelectNGCIC" multiple>
+                                            @foreach (var item in ViewBag.Constellations)
+                                            {
+                                                <option value="@item.ShortName">
+                                                    @item.ShortName — @item.LatineNameNominativeCase | @item.EnglishName | @item.UkraineName
+                                                </option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="dropdown pt-3 text-center">
+                                <button class="btn btn-secondary dropdown-toggle w-100 selectContelCollCatBtn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select constellation
+                                </button>
+                                <div class="constellationSelectTableWindow dropdown-menu p-0">
+                                    <table class="table constellationSelectTable table-bordered table-sm m-0">
+                                        <thead class="table-light position-sticky top-0">
+                                            <tr>
+                                                <th style="width: 2rem;">✓</th>
+                                                <th style="width: 4rem;">Abbr.</th>
+                                                <th style="width: 11rem;">Lat. (Nom.)</th>
+                                                <th style="width: 11rem;">Eng.</th>
+                                                <th style="width: 14rem;">Urk.</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in ViewBag.Constellations)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" name="constellations" value="@item.ShortName" />
+                                                    </td>
+                                                    <td>@item.ShortName</td>
+                                                    <td>@item.LatineNameNominativeCase</td>
+                                                    <td>@item.EnglishName</td>
+                                                    <td>@item.UkraineName</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-6">
+                            <div class="filter-grid nGCICObjectPropertyBlock">
+                                @********************************************************************************************************@
+                                <!--°-->
+                                <div class="filter-row">
+                                    <div class="label fw-bold">Apparent dimensions:</div>
+                                    <div class="filter-fields row">
+                                        <!-- FROM -->
+                                        <div class="col-6">
+                                            <div class="fw-semibold">from:</div>
+                                            <div class="row g-1">
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Ang_Diameter_min", new SelectList(angDiameterValues, "Value", "Text", "0"), new { @class = "form-select text-Ang_Diameter_min", id = "Ang_Diameter_min", data_default = "0" })
+                                                        Arcminute ( ' )
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TO -->
+                                        <div class="col-6">
+                                            <div class="fw-semibold">to:</div>
+                                            <div class="row g-1">
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Ang_Diameter_max", new SelectList(angDiameterValues, "Value", "Text", "300"), new { @class = "form-select text-Ang_Diameter_max", id = "Ang_Diameter_max", data_default = "300" })
+                                                        Arcminute  ( ' )
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @********************************************************************************************************@
+                                <!--RA - 0h 8m 27.05s-->
+                                <div class="filter-row">
+                                    <div class="label fw-bold">Right Ascension (RA):</div>
+                                    <div class="filter-fields row g-2 align-items-center">
+                                        <!-- FROM -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">from:</div>
+                                            <div class="row g-1">
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_From_Hours", new SelectList(hoursValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Hours", data_default = "00" })
+                                                        h
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_From_Minutes", new SelectList(minsSecsValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Minutes", data_default = "00" })
+                                                        m
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_From_Seconds", new SelectList(minsSecsValues, "Value", "Text", "0"), new { @class = "form-select", id = "RA_From_Seconds", data_default = "00" })
+                                                        s
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TO -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">to:</div>
+                                            <div class="row g-1">
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_To_Hours", new SelectList(hoursValues, "Value", "Text", "23"), new { @class = "form-select", id = "RA_To_Hours", data_default = "23" })
+                                                        h
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_To_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "RA_To_Minutes", data_default = "59" })
+                                                        m
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("RA_To_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "RA_To_Seconds", data_default = "59" })
+                                                        s
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @********************************************************************************************************@
+                                <!--DEC - 27° 40' 42.1"-->
+                                <div class="filter-row mt-3">
+                                    <div class="label fw-bold">Declination (DEC):</div>
+                                    <div class="filter-fields row g-2 align-items-center">
+                                        <!-- FROM -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">from:</div>
+                                            <div class="row g-1">
+                                                <div class="col minWidth4rem">
+                                                    <div class="flex-wrap text-center">
+                                                        @Html.DropDownList("Dec_From_Pole", new SelectList(poleOptions, "Value", "Text", "-"), new { @class = "form-select text-center", id = "Dec_From_Pole", data_default = "-" })
+                                                        Pole
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_From_Degrees", new SelectList(degreesValues, "Value", "Text", "89"), new { @class = "form-select", id = "Dec_From_Degrees", data_default = "89" })
+                                                        °
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_From_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_From_Minutes", data_default = "59" })
+                                                        '
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_From_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_From_Seconds", data_default = "59" })
+                                                        "
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TO -->
+                                        <div class="col-6" style="min-width: 20rem;">
+                                            <div class="fw-semibold">to:</div>
+                                            <div class="row g-1">
+                                                <div class="col minWidth4rem">
+                                                    <div class="flex-wrap text-center">
+                                                        @Html.DropDownList("Dec_To_Pole", new SelectList(poleOptions, "Value", "Text", "+"), new { @class = "form-select text-center", id = "Dec_To_Pole", data_default = "+" })
+                                                        Pole
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_To_Degrees", new SelectList(degreesValues, "Value", "Text", "89"), new { @class = "form-select", id = "Dec_To_Degrees", data_default = "89" })
+                                                        °
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_To_Minutes", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_To_Minutes", data_default = "59" })
+                                                        '
+                                                    </div>
+                                                </div>
+                                                <div class="col minWidth5rem">
+                                                    <div class="flex-wrap">
+                                                        @Html.DropDownList("Dec_To_Seconds", new SelectList(minsSecsValues, "Value", "Text", "59"), new { @class = "form-select", id = "Dec_To_Seconds", data_default = "59" })
+                                                        "
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @********************************************************************************************************@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="m-0">
+                    <h5 class="pHeader mt-4 p-2">Objects type:</h5>
+                    <div class="responsiveColumnsContainer">
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("*", false, new { @class = "check-box type-SS" })          *</span> - ⭐ - Star.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("**", false, new { @class = "check-box type-DS" })         **</span> - 💫 - Double star.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("*Ass", false, new { @class = "check-box type-Ass" })      *Ass</span> - ✨ - Association of stars.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("GCl", false, new { @class = "check-box type-GCl" })       GCl</span> - 🔘 - Globular Cluster.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("OCl", false, new { @class = "check-box type-OCl" })       OCl</span> - ✨ - Open Cluster.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Cl+N", false, new { @class = "check-box type-Cl+N" })     Cl+N</span> - 🌫️✨🌫️ - Star cluster + Nebula.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("SNR", false, new { @class = "check-box type-SNR" })       SNR</span> - 💥 - Supernova remnant.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Nova", false, new { @class = "check-box type-Nova" })     Nova</span> - 🌟 - Nova star.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("HII", false, new { @class = "check-box type-HII" })       HII</span> - 🌫️ - HII Ionized region.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Neb", false, new { @class = "check-box type-Neb" })       Neb</span> - 💨 - Nebula.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("EmN", false, new { @class = "check-box type-EmN" })       EmN</span> - 💨 - Emission Nebula.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("PN", false, new { @class = "check-box type-PN" })         PN</span> - 🌀 - Planetary Nebula.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("RfN", false, new { @class = "check-box type-RfN" })       RfN</span> - 🌫️ - Reflection Nebula.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("G", false, new { @class = "check-box type-Gal" })         G</span> - 🌌 - Galaxy.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("GPair", false, new { @class = "check-box type-GPair" })   GPair</span> - 🌌🌀 - Galaxy Pair.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("GTrpl", false, new { @class = "check-box type-GTrpl" })   GTrpl</span> - 🌌🌀🌌 - Galaxy Triplet.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("GGroup", false, new { @class = "check-box type-GGroup" }) GGroup</span> - 🌌🌀🌌🌀 - Galaxy group.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Dup", false, new { @class = "check-box type-Dup" })       Galaxy duplicate</span> - 🌀🌀 - The object is a duplicate entry of another galaxy in the catalog.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("Other", false, new { @class = "check-box type-Other" })   Other</span> - 🧠 - Others.</p>
+                        <p class="ps-4"><span class="fw-bold">@Html.CheckBox("NonEx", false, new { @class = "check-box type-NonEx" })   NonEx</span> - 🚫 - Object called nonexistent in the RNGC (Sulentic and Tifft 1973).</p>
+                    </div>
+                </div>
+
+                <div class="mt-0 additionalBlock">
+                    <h5 class="pHeader mt-4 p-2">Additional:</h5>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="d-flex flex-wrap align-items-center typeCatalogFilters">
+                                <h6 class="mx-2">Catalogs:</h6>
+                                <span class="ms-4 me-2">NGC: </span> @Html.CheckBox("NGC_Catalog", true, new { @class = "check-box chb-NGC-Catalog" })
+                                <span class="ms-4 me-2">IC: </span> @Html.CheckBox("IC_Catalog", true, new { @class = "check-box chb-IC-Catalog" })
+                                <span class="ms-4">Messier: </span> @Html.CheckBox("Messier_Catalog", true, new { @class = "check-box chb-Messier-Catalog" })
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="d-flex flex-wrap align-items-center">
+                                <h6 class="pe-2">Number of elements on the page:</h6>
+                                @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30", "50", "100" }, "50"),
+                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "50", @class = "form-select RowOnPageCatal" })
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-3">Fix the column width: </div>
+                                <label class="switchButton switchButtonDualColor switchButtonFixColumnWidth">
+                                    <input type="checkbox" checked>
+                                    <span class="slider sliderDualColor">
+                                        @* In testing:                                        
+                                    <span class="text-on">ON</span>
+                                    <span class="text-off">OFF</span> *@
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="marginButton">
+                    <button type="button" id="" class="btn btn-danger applyFiltersBtn m-2" data-controller="@ViewBag.Contorller">
+                        APPLY FILTERS
+                    </button>
+                    <button type="button" class="btn btn-primary resetObjectSelection m-2" onclick="resetObjectSelection()">
+                        Reset object selection
+                    </button>
+                    <button type="button" class="btn btn-primary  m-2" onclick="resetAllFilters()">
+                        Reset all filters
+                    </button>
+                </div>
+            </div>
+            <!------------------------------------------------------------------------>
+            <!-----------------------------   END FORM   ----------------------------->
+            <!------------------------------------------------------------------------>
+
+        </div>
+    </div>
+
+
+
+    <div id="paginationBodyBlockContainer">
+        @await Html.PartialAsync("_PaginationLine")
+    </div>
+
 </div>
 
-<table class="table table-responsive table-toFixColumns-1 table-toFixRows-1 table-fixed-headers table-set-size">
-    <thead>
-        <tr class="tr-oun-style">
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SubObject)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Messier)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name_UK)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Comment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OtherNames)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NGC)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IC)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ObjectTypeAbrev)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ObjectType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ObjectTypeFull)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SourceType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RA)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscension)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscensionH)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscensionM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RightAscensionS)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DEC)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Declination)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NS)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeclinationD)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeclinationM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeclinationS)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Constellation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MajorAxis)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MinorAxis)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PositionAngle)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AppMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AppMagFlag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.VMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.JMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.KMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SurfaceBrightness)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HubbleOnlyGalaxies)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CstarUMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CstarBMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CstarVMag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CstarNames)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CommonNames)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NedNotes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OpenngcNotes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Image)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PageNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PageCount)
-            </th>
-            @if (User.IsInRole("OwnerAdministratorPower"))
-            {
-                <th></th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <div>@item.NGC_IC @item.Name</div>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SubObject)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Messier)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name_UK)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Comment)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.OtherNames)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NGC)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IC)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ObjectTypeAbrev)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ObjectType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ObjectTypeFull)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SourceType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RA)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscension)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscensionH)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscensionM)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RightAscensionS)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DEC)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Declination)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NS)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DeclinationD)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DeclinationM)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DeclinationS)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Constellation)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MajorAxis)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MinorAxis)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PositionAngle)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AppMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.AppMagFlag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.VMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.JMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.KMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SurfaceBrightness)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HubbleOnlyGalaxies)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CstarUMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CstarBMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CstarVMag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CstarNames)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CommonNames)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NedNotes)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.OpenngcNotes)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Image)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PageNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PageCount)
-                </td>
-                @if (User.IsInRole("OwnerAdministratorPower"))
-                {
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    </td>
-                }
-            </tr>
-        }
-    </tbody>
-</table>
+<div id="nGCICTableContainer" class="hideShowColumnTable">
+    @await Html.PartialAsync("_NGCICTableHeaders", Model)
+</div>
+
+<script>
+    window.isAuthenticated = @isAuthenticated.ToString().ToLower();
+</script>
+
+@section ScriptsAstroTableFilters {
+    <script src="~/js/AstroTableFilters.min.js" asp-append-version="true"></script>
+}
+@section ScriptsFormHandler {
+    <script src="~/js/formHandler.min.js" asp-append-version="true"></script>
+}
+
+
+
+
+
+

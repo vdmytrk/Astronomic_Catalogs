@@ -15,12 +15,14 @@ public class NGCICOpendatasoftExtensionConfiguration : IEntityTypeConfiguration<
         builder.Property(e => e.NGC_IC).HasMaxLength(13);
         builder.Property(e => e.Name).HasColumnName("Name"); // The name matches, but "Name" is a reserved word, so explicit specification is appropriate.
         builder.Property(e => e.SubObject).HasMaxLength(15);
-        builder.Property(e => e.Messier).HasMaxLength(15);
+        builder.Property(e => e.Messier).HasDefaultValue(0);
         builder.Property(e => e.Name_UK).HasMaxLength(50);
         builder.Property(e => e.Comment).HasMaxLength(50);
         builder.Property(e => e.OtherNames).HasColumnName("Other_names").HasMaxLength(400);
         builder.Property(e => e.NGC).HasMaxLength(14);
         builder.Property(e => e.IC).HasMaxLength(23);
+        builder.Property(e => e.LimitAngDiameter).HasColumnName("Limit_Ang_Diameter").HasMaxLength(1);
+        builder.Property(e => e.AngDiameter).HasColumnName("Ang_Diameter");
         builder.Property(e => e.ObjectTypeAbrev).HasMaxLength(21);
         builder.Property(e => e.ObjectType).HasMaxLength(26);
         builder.Property(e => e.ObjectTypeFull).HasColumnName("Object_type").HasMaxLength(60);
@@ -84,9 +86,12 @@ public class NGCICOpendatasoftExtensionConfiguration : IEntityTypeConfiguration<
         builder.Property(e => e.CstarVMag).HasColumnName("Cstar_VMag").HasDefaultValue(0.0);
         builder.Property(e => e.CstarNames).HasColumnName("Cstar_Names").HasMaxLength(21);
         builder.Property(e => e.CommonNames).HasMaxLength(110);
-        builder.Property(e => e.NedNotes).HasMaxLength(110);
-        builder.Property(e => e.OpenngcNotes).HasMaxLength(330);
+        builder.Property(e => e.NedNotes).HasColumnType("varchar(max)");
+        builder.Property(e => e.OpenngcNotes).HasColumnType("varchar(max)");
         builder.Property(e => e.Image).HasColumnName("Image"); // The name matches, but "Image" is a reserved word, so explicit specification is appropriate.
+
+        builder.Property(e => e.RowOnPage).IsRequired(false);
+        builder.Property(e => e.SourceTable).IsRequired(false);
 
     }
 }

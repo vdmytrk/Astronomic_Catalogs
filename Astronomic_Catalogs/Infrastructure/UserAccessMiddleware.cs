@@ -57,7 +57,7 @@ public class UserAccessMiddleware(
                 }
             }
 
-            await _next(context);            
+            await _next(context);
         }
     }
 

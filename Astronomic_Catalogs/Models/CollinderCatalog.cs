@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Astronomic_Catalogs.Models;
+﻿namespace Astronomic_Catalogs.Models;
 
 public class CollinderCatalog
 {
@@ -12,27 +10,26 @@ public class CollinderCatalog
 
     public string? RightAscension { get; set; }
     public int RightAscensionH { get; set; }
-    public float RightAscensionM { get; set; }
-    public float RightAscensionS { get; set; }
+    public double RightAscensionM { get; set; }
+    public double RightAscensionS { get; set; }
 
 
     public string? Declination { get; set; }
     public string? NS { get; set; }
     public int DeclinationD { get; set; }
     public int DeclinationM { get; set; }
-    public float DeclinationS { get; set; }
+    public double DeclinationS { get; set; }
 
 
-    public float? AppMag { get; set; }
+    public double? AppMag { get; set; }
     public string? AppMagFlag { get; set; }
     public string? CountStars { get; set; }
     public int? CountStarsToFinding { get; set; }
-    public string? AngDiameterOld { get; set; }
-    public float? AngDiameterNew { get; set; }
+    public string? AngDiameter { get; set; }
+    public double? AngDiameterNew { get; set; }
     public string? Class { get; set; }
     public string? Comment { get; set; }
 
 
-    public int? PageNumber { get; set; }
-    public int? PageCount { get; set; }
+    public int? RowOnPage { get; set; }
 }

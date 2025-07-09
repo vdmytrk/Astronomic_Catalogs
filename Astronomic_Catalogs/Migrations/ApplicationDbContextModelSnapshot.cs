@@ -22,6 +22,88 @@ namespace Astronomic_Catalogs.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Astronomic_Catalogs.DTO.PlanetarySystemFlatRow", b =>
+                {
+                    b.Property<string>("GaiaId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("HabitablZone")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("HdName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HipName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Hostname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlLetter")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("PlMassJ")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PlMasse")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PlOrbsmax")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PlRadJ")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PlRade")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("RowOnPage")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("StAge")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("StLum")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("StLumSunAbsol")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("StMass")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("StMet")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("StMetratio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("StRad")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("StSpectype")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("StTeff")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("SyDist")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TicId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("PlanetarySystemsCatalog");
+                });
+
             modelBuilder.Entity("Astronomic_Catalogs.Models.AspNetRole", b =>
                 {
                     b.Property<string>("Id")
@@ -244,17 +326,17 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<float?>("AngDiameterNew")
-                        .HasColumnType("real")
-                        .HasColumnName("Ang_Diameter_NEW");
-
-                    b.Property<string>("AngDiameterOld")
+                    b.Property<string>("AngDiameter")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)")
-                        .HasColumnName("Ang_Diameter_OLD");
+                        .HasColumnName("Ang_Diameter");
 
-                    b.Property<float?>("AppMag")
-                        .HasColumnType("real")
+                    b.Property<double?>("AngDiameterNew")
+                        .HasColumnType("float")
+                        .HasColumnName("Ang_Diameter_Max");
+
+                    b.Property<double?>("AppMag")
+                        .HasColumnType("float")
                         .HasColumnName("App_Mag");
 
                     b.Property<string>("AppMagFlag")
@@ -294,8 +376,8 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Declination_M");
 
-                    b.Property<float>("DeclinationS")
-                        .HasColumnType("real")
+                    b.Property<double>("DeclinationS")
+                        .HasColumnType("float")
                         .HasColumnName("Declination_S");
 
                     b.Property<string>("NS")
@@ -312,16 +394,6 @@ namespace Astronomic_Catalogs.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
-                    b.Property<int?>("PageCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(133);
-
-                    b.Property<int?>("PageNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
-
                     b.Property<string>("RightAscension")
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)")
@@ -331,13 +403,18 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("int")
                         .HasColumnName("Right_ascension_H");
 
-                    b.Property<float>("RightAscensionM")
-                        .HasColumnType("real")
+                    b.Property<double>("RightAscensionM")
+                        .HasColumnType("float")
                         .HasColumnName("Right_ascension_M");
 
-                    b.Property<float>("RightAscensionS")
-                        .HasColumnType("real")
+                    b.Property<double>("RightAscensionS")
+                        .HasColumnType("float")
                         .HasColumnName("Right_ascension_S");
+
+                    b.Property<int?>("RowOnPage")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
 
                     b.HasKey("Id");
 
@@ -402,6 +479,11 @@ namespace Astronomic_Catalogs.Migrations
 
                     b.Property<int>("Area")
                         .HasColumnType("int");
+
+                    b.Property<string>("EnglishName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("English_name");
 
                     b.Property<string>("LatineNameGenitiveCase")
                         .IsRequired()
@@ -628,12 +710,6 @@ namespace Astronomic_Catalogs.Migrations
                     b.Property<int>("ObmFlag")
                         .HasColumnType("int")
                         .HasColumnName("Obm_flag");
-
-                    b.Property<int?>("PageCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PageNumber")
-                        .HasColumnType("int");
 
                     b.Property<float>("PlBmassJ")
                         .HasColumnType("real")
@@ -1173,6 +1249,9 @@ namespace Astronomic_Catalogs.Migrations
                         .HasDefaultValue(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified))
                         .HasColumnName("Releasedate");
 
+                    b.Property<int?>("RowOnPage")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Rowupdate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -1710,6 +1789,10 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<double?>("AngDiameter")
+                        .HasColumnType("float")
+                        .HasColumnName("Ang_Diameter");
+
                     b.Property<double?>("AppMag")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
@@ -1823,14 +1906,20 @@ namespace Astronomic_Catalogs.Migrations
                         .HasDefaultValue(0.0)
                         .HasColumnName("k_mag");
 
+                    b.Property<string>("LimitAngDiameter")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)")
+                        .HasColumnName("Limit_Ang_Diameter");
+
                     b.Property<double?>("MajorAxis")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
                         .HasDefaultValue(0.0);
 
-                    b.Property<string>("Messier")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                    b.Property<int?>("Messier")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<double?>("MinorAxis")
                         .ValueGeneratedOnAdd()
@@ -1858,8 +1947,7 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("NedNotes")
-                        .HasMaxLength(110)
-                        .HasColumnType("nvarchar(110)");
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("ObjectType")
                         .HasMaxLength(26)
@@ -1875,19 +1963,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnName("Object_type");
 
                     b.Property<string>("OpenngcNotes")
-                        .HasMaxLength(330)
-                        .HasColumnType("nvarchar(330)");
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("OtherNames")
                         .HasMaxLength(400)
                         .HasColumnType("nvarchar(400)")
                         .HasColumnName("Other_names");
-
-                    b.Property<int?>("PageCount")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PageNumber")
-                        .HasColumnType("int");
 
                     b.Property<int?>("PositionAngle")
                         .ValueGeneratedOnAdd()
@@ -1922,6 +2003,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("float")
                         .HasDefaultValue(0.0)
                         .HasColumnName("Right_ascension_S");
+
+                    b.Property<int?>("RowOnPage")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceTable")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SourceType")
                         .HasMaxLength(5)
@@ -1962,6 +2049,10 @@ namespace Astronomic_Catalogs.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<double?>("AngDiameter")
+                        .HasColumnType("float")
+                        .HasColumnName("Ang_Diameter");
+
                     b.Property<double?>("AppMag")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
@@ -2075,14 +2166,20 @@ namespace Astronomic_Catalogs.Migrations
                         .HasDefaultValue(0.0)
                         .HasColumnName("k_mag");
 
+                    b.Property<string>("LimitAngDiameter")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)")
+                        .HasColumnName("Limit_Ang_Diameter");
+
                     b.Property<double?>("MajorAxis")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("float")
                         .HasDefaultValue(0.0);
 
-                    b.Property<string>("Messier")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                    b.Property<int?>("Messier")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<double?>("MinorAxis")
                         .ValueGeneratedOnAdd()
@@ -2110,8 +2207,7 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("NedNotes")
-                        .HasMaxLength(110)
-                        .HasColumnType("nvarchar(110)");
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("ObjectType")
                         .HasMaxLength(26)
@@ -2127,8 +2223,7 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnName("Object_type");
 
                     b.Property<string>("OpenngcNotes")
-                        .HasMaxLength(330)
-                        .HasColumnType("nvarchar(330)");
+                        .HasColumnType("varchar(max)");
 
                     b.Property<string>("OtherNames")
                         .HasMaxLength(400)
@@ -2168,6 +2263,12 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("float")
                         .HasDefaultValue(0.0)
                         .HasColumnName("Right_ascension_S");
+
+                    b.Property<int?>("RowOnPage")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceTable")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SourceType")
                         .HasMaxLength(5)
@@ -2214,7 +2315,7 @@ namespace Astronomic_Catalogs.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime2(7)")
                         .HasDefaultValueSql("GETUTCDATE()");
 
                     b.Property<string>("Exception")
@@ -2227,7 +2328,7 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("varchar(10)");
 
                     b.Property<DateTime>("Logged")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2(7)");
 
                     b.Property<string>("Logger")
                         .HasColumnType("varchar(300)");
@@ -2248,7 +2349,7 @@ namespace Astronomic_Catalogs.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id")
-                        .HasName("PK_NLog");
+                        .HasName("PK_NLogApplicationCode");
 
                     b.ToTable("NLogApplicationCode", (string)null);
                 });

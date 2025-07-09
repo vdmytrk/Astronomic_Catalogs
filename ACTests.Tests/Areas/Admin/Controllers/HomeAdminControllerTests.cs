@@ -13,7 +13,7 @@ public class HomeAdminControllerTests
 {
     private ApplicationDbContext _context;
     private HomeAdminController _controller;
-    private ILogger<DatabaseInitializer> _logger;
+    private ILogger<HomeAdminController> _logger;
     private IConnectionStringProvider _connectionStringProvider;
     private DateTime date_1 = new DateTime(2025, 02, 01);
     private DateTime date_2 = new DateTime(2025, 01, 01);
@@ -26,7 +26,7 @@ public class HomeAdminControllerTests
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _context = new ApplicationDbContext(options);
-        _logger = A.Fake<ILogger<DatabaseInitializer>>();
+        _logger = A.Fake<ILogger<HomeAdminController>>();
         _connectionStringProvider = A.Fake<IConnectionStringProvider>();
         A.CallTo(() => _connectionStringProvider.ConnectionString).Returns("FakeConnectionString");
         _controller = new HomeAdminController(_context, _logger, _connectionStringProvider);

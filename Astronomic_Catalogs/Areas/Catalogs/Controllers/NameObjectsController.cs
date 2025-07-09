@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Astronomic_Catalogs.Data;
+﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
 {
@@ -16,16 +12,44 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
     public class NameObjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<NameObjectsController> _logger;
 
-        public NameObjectsController(ApplicationDbContext context)
+        public NameObjectsController(ApplicationDbContext context, ILogger<NameObjectsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Catalogs/NameObjects
         public async Task<IActionResult> Index()
         {
-            return View(await _context.NameObjects.ToListAsync());
+            List<NameObject> nameObjects = new();
+            try
+            {
+                nameObjects = await _context.NameObjects.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                _logger.LogError(
+                    ex,
+                    "An unexpected error occurred during data retrieval in NameObjectsController. RequestId: {RequestId}",
+                    requestId
+                );
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
+
+            return View(nameObjects);
         }
 
         // GET: Catalogs/NameObjects/Details/5
@@ -39,14 +63,32 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
                 return NotFound();
             }
 
-            var nameObject = await _context.NameObjects
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (nameObject == null)
+            try
             {
-                return NotFound();
-            }
+                var nameObject = await _context.NameObjects
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (nameObject == null)
+                {
+                    return NotFound();
+                }
 
-            return View(nameObject);
+                return View(nameObject);
+            }
+            catch (Exception ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                _logger.LogError(ex, "Error retrieving details for NameObjects by ID {Id}. RequestId: {RequestId}", id, requestId);
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
         }
 
         // GET: Catalogs/NameObjects/Create
@@ -70,9 +112,38 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(nameObject);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(nameObject);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogError(ex, "Database update error during creation of NameObject: {@NameObject}", nameObject);
+                    ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+                }
+                catch (Exception ex)
+                {
+                    var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                    _logger.LogError(
+                        ex,
+                        "Unexpected error during creation of NameObject: {@NameObject}. RequestId: {RequestId}",
+                        nameObject,
+                        requestId
+                    );
+
+                    TempData["RequestId"] = requestId;
+                    TempData["ErrorMessage"] = ex.Message;
+                    TempData["StackTrace"] = ex.ToString();
+                    TempData["Path"] = HttpContext.Request.Path.ToString();
+#if DEBUG
+                    throw;
+#else
+                    return StatusCode(500);
+#endif
+                }
             }
             return View(nameObject);
         }
@@ -118,19 +189,60 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
                     _context.Update(nameObject);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException dbUpConcEx)
                 {
                     if (!NameObjectExists(nameObject.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                    TempData["RequestId"] = requestId;
+                    TempData["ErrorMessage"] = dbUpConcEx.Message;
+                    TempData["StackTrace"] = dbUpConcEx.ToString();
+                    TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                    _logger.LogError(
+                        dbUpConcEx,
+                        "Concurrency error occurred during editing NameObject: {@NameObject}. RequestId: {RequestId}",
+                        nameObject,
+                        requestId
+                    );
+                    TempData["IsLogged"] = true;
+#if DEBUG
+                    throw;
+#else
+                    return RedirectToAction("Error", "Error");
+#endif
                 }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogError(ex, "Database update error during editing NameObject: {@NameObject}", nameObject);
+                    ModelState.AddModelError("", "Failed to save changes. Please try again later.");
+                }
+                catch (Exception ex)
+                {
+                    var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                    TempData["RequestId"] = requestId;
+                    TempData["ErrorMessage"] = ex.Message;
+                    TempData["StackTrace"] = ex.ToString();
+                    TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                    _logger.LogError(
+                        ex,
+                        "Unexpected error during editing NameObject: {@NameObject}. RequestId: {RequestId}",
+                        nameObject,
+                        requestId
+                    );
+#if DEBUG
+                    throw;
+#else
+                    return StatusCode(500);
+#endif
+                }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(nameObject);
         }
 
@@ -163,14 +275,60 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var nameObject = await _context.NameObjects.FindAsync(id);
-            if (nameObject != null)
+            try
             {
-                _context.NameObjects.Remove(nameObject);
-            }
+                var nameObject = await _context.NameObjects.FindAsync(id);
+                if (nameObject != null)
+                {
+                    _context.NameObjects.Remove(nameObject);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException ex)
+            {
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    ex,
+                    "Database update error during deletion of NameObjects {Id}. RequestId: {RequestId}",
+                    id,
+                    requestId
+                );
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during deletion of NameObjects ID by {Id}", id);
+                var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+
+                TempData["RequestId"] = requestId;
+                TempData["ErrorMessage"] = ex.Message;
+                TempData["StackTrace"] = ex.ToString();
+                TempData["Path"] = HttpContext.Request.Path.ToString();
+
+                _logger.LogError(
+                    ex,
+                    "Unexpected error during deletion of NameObjects ID by {Id}. RequestId: {RequestId}",
+                    id,
+                    requestId
+                );
+#if DEBUG
+                throw;
+#else
+                return StatusCode(500);
+#endif
+            }
         }
 
         private bool NameObjectExists(int id)

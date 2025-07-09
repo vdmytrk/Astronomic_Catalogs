@@ -1,0 +1,75 @@
+﻿@model IEnumerable<Astronomic_Catalogs.Entities.PlanetarySystem>
+
+<table id="sizeFilterTable" class="table table-responsive table-set-size">
+    <thead class="table-light">
+        <tr>
+            <th colspan="10" class="text-center">Planetary System</th>
+        </tr>
+        <tr>
+            <th class="Hostname" style="">@Html.DisplayNameFor(model => model.Hostname)</th>
+            <th class="StSpectype">@Html.DisplayNameFor(model => model.StSpectype)</th>
+            <th class="StTeff">@Html.DisplayNameFor(model => model.StTeff)</th>
+            <th class="StRad">@Html.DisplayNameFor(model => model.StRad)</th>
+            <th class="StMass">@Html.DisplayNameFor(model => model.StMass)</th>
+            <th class="StMet">@Html.DisplayNameFor(model => model.StMet)</th>
+            <th class="StMetratio">@Html.DisplayNameFor(model => model.StMetratio)</th>
+            <th class="StLum">@Html.DisplayNameFor(model => model.StLum)</th>
+            <th class="StLumSunAbsol">@Html.DisplayNameFor(model => model.StLumSunAbsol)</th>
+            <th class="HabitablZone">@Html.DisplayNameFor(model => model.HabitablZone)</th>
+            <th class="StAge">@Html.DisplayNameFor(model => model.StAge)</th>
+            <th class="SyDist">@Html.DisplayNameFor(model => model.SyDist)</th>
+        </tr>
+    </thead>
+    <tbody id="catalogTableBody">
+        @foreach (var system in Model)
+        {
+            <tr class="table-primary">
+                <td>@system.Hostname</td>
+                <td>@system.StSpectype</td>
+                <td>@system.StTeff?.ToString("0.######")</td>
+                <td>@system.StRad?.ToString("0.######")</td>
+                <td>@system.StMass?.ToString("0.######")</td>
+                <td>@system.StMet?.ToString("0.######")</td>
+                <td>@system.StMetratio</td>
+                <td>@system.StLum?.ToString("0.######")</td>
+                <td>@system.StLumSunAbsol?.ToString("0.######")</td>
+                <td>@system.HabitablZone?.ToString("0.######")</td>
+                <td>@system.StAge?.ToString("0.######")</td>
+                <td>@system.SyDist?.ToString("0.######")</td>
+            </tr>
+
+            @if (system.Exoplanets?.Any() == true)
+            {
+                <tr>
+                    <td colspan="10" class="p-0">
+                        <table class="table mb-0 table-sm" style="">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th style="">Letter</th>
+                                    <th>Radius (Earth)</th>
+                                    <th>Radius (Jupiter)</th>
+                                    <th>Mass (Earth)</th>
+                                    <th>Mass (Jupiter)</th>
+                                    <th>Orbital Semi-Major Axis</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var planet in system.Exoplanets)
+                                {
+                                    <tr>
+                                        <td>@planet.PlLetter</td>
+                                        <td>@planet.PlRade?.ToString("0.######")</td>
+                                        <td>@planet.PlRadJ?.ToString("0.######")</td>
+                                        <td>@planet.PlMasse?.ToString("0.######")</td>
+                                        <td>@planet.PlMassJ?.ToString("0.######")</td>
+                                        <td>@planet.PlOrbsmax?.ToString("0.######")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
