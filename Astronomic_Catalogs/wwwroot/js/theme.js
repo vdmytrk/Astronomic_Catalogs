@@ -1,34 +1,32 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initialize = initialize;
+exports.planetSysVisualizationTheme = planetSysVisualizationTheme;
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
+let inputs;
+let themeButton;
 function initialize(body) {
-    const inputs = document.querySelectorAll(".form-control");
-    const themeButton = document.getElementById("theme-toggle");
-    updateThemeBackground(body);
+    inputs = document.querySelectorAll(".form-control");
+    themeButton = document.getElementById("theme-toggle");
+    updateThemeBackground(inputs, body);
     themeToggle(themeButton, inputs, body);
     fixSelectBehavior();
-    // Updating autofill styles on page load.
-    if (inputs) {
-        updateAutofill(inputs);
-    }
 }
 function themeToggle(themeButton, inputs, body) {
     if (themeButton) {
         themeButton.addEventListener("click", () => {
             body.classList.toggle("dark-theme");
             localStorage.setItem("theme", body.classList.contains("dark-theme") ? "dark" : "light");
-            updateThemeBackground(body);
-            if (inputs) {
-                updateAutofill(inputs);
-            }
+            updateThemeBackground(inputs, body);
         });
     }
     ;
 }
-function updateThemeBackground(body) {
+function updateThemeBackground(inputs, body) {
+    console.log(" >>> FUNCTION: updateThemeBackground");
     const updateBodyBg = () => {
+        console.log(" >>> FUNCTION: updateBodyBg");
         const isDark = localStorage.getItem("theme") === "dark";
         const bg = isDark ? "#121212" : "#FFF";
         if (isDark) {
@@ -37,8 +35,12 @@ function updateThemeBackground(body) {
         document.documentElement.style.backgroundColor = bg;
         body.style.backgroundColor = bg;
     };
+    // Updating autofill styles on page load.
+    if (inputs) {
+        updateAutofill(inputs);
+    }
     updateBodyBg();
-    window.addEventListener("load", updateBodyBg); // For the planet-grphic page where the background changes after load.
+    //window.addEventListener("load", updateBodyBg); // For the planet-grphic page where the background changes after load.
 }
 /////////////////////////////////////////////
 // Style for HTMLInputElement
@@ -145,4 +147,30 @@ function fixSelectBehavior() {
     });
 }
 ;
+/////////////////////////////////////////////
+// Style on _PlanetarySystemVisualization.
+/////////////////////////////////////////////
+function planetSysVisualizationTheme(isVisualization) {
+    console.log("FUNCTION: planetSysVisualizationTheme");
+    const inputs = document.querySelectorAll(".form-control");
+    const topMenu = document.querySelector(".toFixLayoutHeader");
+    themeButton = document.getElementById("theme-toggle");
+    const isDark = localStorage.getItem("theme") === "dark";
+    if (!isDark) {
+        document.body.classList.toggle("dark-theme");
+    }
+    if (isVisualization) {
+        topMenu.classList.add("d-none");
+        themeButton.classList.add("d-none");
+        document.body.classList.add("planetary-system-visualization-style");
+        updateThemeBackground(inputs, document.body);
+        document.documentElement.style.backgroundColor = "#121212";
+    }
+    else {
+        topMenu.classList.remove("d-none");
+        themeButton.classList.remove("d-none");
+        document.body.classList.remove("planetary-system-visualization-style");
+        updateThemeBackground(inputs, document.body);
+    }
+}
 //# sourceMappingURL=theme.js.map

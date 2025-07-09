@@ -2,7 +2,9 @@
   "author": "",
   "description": "",
   "devDependencies": {
+    "@types/d3": "^7.4.3",
     "@types/jquery": "^3.5.32",
+    "d3": "^7.9.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.2",

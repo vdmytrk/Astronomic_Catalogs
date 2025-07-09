@@ -61,7 +61,7 @@ function initialize() {
 ;
 function switchTable(checkbox) {
     var _a;
-    const container = document.getElementById("twoPlanetarySystemTable");
+    const container = document.querySelector('.twoPlanetarySystemTable');
     if (!container)
         return;
     const form = document.querySelector('.topMenuFiltersCatalogs');

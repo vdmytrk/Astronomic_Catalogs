@@ -84,7 +84,7 @@ public class PlanetsCatalogController : Controller
         try
         {
             // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
-            result = await _filterService.GetFilteredDataAsync(new() { ["pageNumber"] = 1, ["rowOnPage"] = 30 });
+            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberVaulue"] = 1, ["RowOnPageCatalog"] = 30 });
             ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
         }
         catch (Exception ex)

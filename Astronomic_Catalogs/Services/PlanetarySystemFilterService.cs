@@ -23,7 +23,7 @@ public class PlanetarySystemFilterService : IPlanetarySystemFilterService
         ILogger<PlanetarySystemFilterService> logger)
     {
         _context = context;
-        _cache = cache; 
+        _cache = cache;
         _mapper = mapper;
         _logger = logger;
     }

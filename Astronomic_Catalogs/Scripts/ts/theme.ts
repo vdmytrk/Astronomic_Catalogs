@@ -1,17 +1,15 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
-export function initialize(body: HTMLElement): void {
-    const inputs = document.querySelectorAll(".form-control") as NodeListOf<HTMLInputElement>;
-    const themeButton = document.getElementById("theme-toggle") as HTMLElement | null;
+let inputs: NodeListOf<HTMLInputElement>;
+let themeButton: HTMLElement | null;
 
-    updateThemeBackground(body);
+export function initialize(body: HTMLElement): void {
+    inputs = document.querySelectorAll(".form-control") as NodeListOf<HTMLInputElement>;
+    themeButton = document.getElementById("theme-toggle") as HTMLElement | null;
+
+    updateThemeBackground(inputs, body);
     themeToggle(themeButton, inputs, body);
     fixSelectBehavior();
-
-    // Updating autofill styles on page load.
-    if (inputs) {
-        updateAutofill(inputs);
-    }
 }
 
 function themeToggle(themeButton: HTMLElement, inputs: NodeListOf<HTMLInputElement>, body: HTMLElement): void {
@@ -20,17 +18,15 @@ function themeToggle(themeButton: HTMLElement, inputs: NodeListOf<HTMLInputEleme
             body.classList.toggle("dark-theme");
             localStorage.setItem("theme", body.classList.contains("dark-theme") ? "dark" : "light");
 
-            updateThemeBackground(body);
-
-            if (inputs) {
-                updateAutofill(inputs);
-            }
+            updateThemeBackground(inputs, body);
         });
     };
 }
 
-function updateThemeBackground(body: HTMLElement): void {
+function updateThemeBackground(inputs: NodeListOf<HTMLInputElement>, body: HTMLElement): void {
+    console.log(" >>> FUNCTION: updateThemeBackground");
     const updateBodyBg = () => {
+        console.log(" >>> FUNCTION: updateBodyBg");
         const isDark = localStorage.getItem("theme") === "dark";
         const bg = isDark ? "#121212" : "#FFF";
 
@@ -42,8 +38,13 @@ function updateThemeBackground(body: HTMLElement): void {
         body.style.backgroundColor = bg;
     };
 
+    // Updating autofill styles on page load.
+    if (inputs) {
+        updateAutofill(inputs);
+    }
+
     updateBodyBg();
-    window.addEventListener("load", updateBodyBg); // For the planet-grphic page where the background changes after load.
+    //window.addEventListener("load", updateBodyBg); // For the planet-grphic page where the background changes after load.
 }
 
 
@@ -170,5 +171,33 @@ function fixSelectBehavior(): void {
 
 
 
+/////////////////////////////////////////////
+// Style on _PlanetarySystemVisualization.
+/////////////////////////////////////////////
+export function planetSysVisualizationTheme(isVisualization: boolean) {
+    console.log("FUNCTION: planetSysVisualizationTheme");
+    const inputs = document.querySelectorAll(".form-control") as NodeListOf<HTMLInputElement>;
+    const topMenu = document.querySelector(".toFixLayoutHeader") as HTMLElement;
+    themeButton = document.getElementById("theme-toggle") as HTMLElement | null;
+
+    const isDark = localStorage.getItem("theme") === "dark";
+
+    if (!isDark) {
+        document.body.classList.toggle("dark-theme");
+    }
+
+    if (isVisualization) {
+        topMenu.classList.add("d-none");
+        themeButton.classList.add("d-none");
+        document.body.classList.add("planetary-system-visualization-style"); 
+        updateThemeBackground(inputs, document.body);
+        document.documentElement.style.backgroundColor = "#121212";
+    } else {
+        topMenu.classList.remove("d-none");
+        themeButton.classList.remove("d-none");
+        document.body.classList.remove("planetary-system-visualization-style");
+        updateThemeBackground(inputs, document.body);
+    }
+}
 
 

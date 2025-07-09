@@ -1,9 +1,15 @@
 ﻿@model IEnumerable<Astronomic_Catalogs.Entities.PlanetarySystem>
 
-<h1>TEST</h1>
+<div class="planetary-systems-visualization">
+    <div class="planetary-axis-description-wrapper">
+        <svg class="planetary-axis-description"></svg>
+    </div>
 
-@foreach (var system in Model)
-{
-    await Html.RenderPartialAsync("_PlanetarySystemVisualization", system);
-}
+    <svg class="planetary-axis"></svg>
+
+    @foreach (var system in Model)
+    {
+        await Html.RenderPartialAsync("_PlanetarySystemVisualization", system);
+    }
+</div>
 

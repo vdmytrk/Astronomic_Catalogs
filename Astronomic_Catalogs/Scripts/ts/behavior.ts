@@ -5,6 +5,8 @@ export function initialize(): void {
     setupShowFiltersToggles();
     handleHabitableZoneDependency();
     handlePlanetSyzeDependency();
+    selectAllPlanetSize();
+    syncCheckboxWithSelectedOptions();
 }
 
 
@@ -72,13 +74,8 @@ export function setupShowFiltersToggles(): void {
 
 export function hideShowBlockDownAnime(target: HTMLElement, show: boolean, delay: number = 0): void {
     if (!target) return;
-
-    setTimeout(() => {
-        if (show)
-            target.classList.remove("collapsed");
-        else
-            target.classList.add("collapsed");
-    }, delay);
+    const toggle = () => target.classList.toggle("collapsed", !show);
+    delay > 0 ? setTimeout(toggle, delay) : toggle();
 }
 
 function handlePlanetSyzeDependency(): void {
@@ -106,6 +103,7 @@ function handlePlanetSyzeDependency(): void {
     planetSyzeCheckbox.addEventListener('change', updateChoosePlanetSizesAccessibility);
 }
 
+
 function handleHabitableZoneDependency(): void {
     const habitableZoneCheckbox = document.querySelector<HTMLInputElement>('.chb-habitableZonePlanets');
     const terrestrialCheckbox = document.querySelector<HTMLInputElement>('.chb-terrestrialHabitableZonePlanets');
@@ -126,4 +124,48 @@ function handleHabitableZoneDependency(): void {
     updateTerrestrialCheckboxState();
 
     habitableZoneCheckbox.addEventListener('change', updateTerrestrialCheckboxState);
+}
+
+
+function selectAllPlanetSize(): void {
+    const planetSyzeCheckbox = document.querySelector<HTMLInputElement>('.chb-PlanetAllSize');
+    const planetSizeSelect = document.querySelector<HTMLSelectElement>('#planetTypeSelect');
+
+    if (!planetSyzeCheckbox || !planetSizeSelect) return;
+
+    const updateChoosePlanetSizesAccessibility = () => {
+        const options = planetSizeSelect.querySelectorAll<HTMLOptionElement>('option');
+        if (planetSyzeCheckbox.checked) {
+            options.forEach(option => {
+                option.classList.add('selected-fix');
+                option.selected = true;
+            });
+        } else {
+            options.forEach(option => {
+                option.classList.remove('selected-fix')
+                option.selected = false;
+            });
+        }
+    };
+
+    updateChoosePlanetSizesAccessibility();
+
+    planetSyzeCheckbox.addEventListener('change', updateChoosePlanetSizesAccessibility);
+}
+
+function syncCheckboxWithSelectedOptions(): void {
+    const planetSyzeCheckbox = document.querySelector<HTMLInputElement>('.chb-PlanetAllSize');
+    const planetSizeSelect = document.querySelector<HTMLSelectElement>('#planetTypeSelect');
+
+    if (!planetSyzeCheckbox || !planetSizeSelect) return;
+
+    const checkIfAllSelected = () => {
+        const options = planetSizeSelect.querySelectorAll<HTMLOptionElement>('option');
+        const allSelected = Array.from(options).every(option => option.selected);
+        planetSyzeCheckbox.checked = allSelected;
+    };
+
+    planetSizeSelect.addEventListener('mouseup', () => {
+        setTimeout(checkIfAllSelected, 0);
+    });
 }

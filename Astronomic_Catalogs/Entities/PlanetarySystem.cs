@@ -18,9 +18,9 @@ public class PlanetarySystem
     public decimal? StMass { get; set; } // st_mass - Stellar Mass in [Solar mass]
     public decimal? StMet { get; set; } // st_met - Measurement of the metal content of the photosphere of the star as compared to the hydrogen content > Stellar Metallicity [dex]
     public string StMetratio { get; set; } = string.Empty; // st_metratio - Ratio for the Metallicity Value ([Fe/H] denotes iron abundance, [M/H] refers to a general metal content) > Stellar Metallicity Ratio
-    public decimal? StLum { get; set; } // st_lum - Temperature of the star
+    public decimal? StLum { get; set; } // st_lum - Luminosity of the star
     public decimal? StAge { get; set; } // st_age [Gyr]
-    public decimal? SyDist { get; set; } // sy_dist - Distance to the planetary system in units of parsecs">Distance [pc]
+    public decimal? SyDist { get; set; } // sy_dist - Distance to the planetary system in units of parsecs. Distance [pc]
     public decimal? StLumSunAbsol { get; set; }
     public decimal? HabitablZone { get; set; }
     public List<Exoplanet> Exoplanets { get; set; } = new ();

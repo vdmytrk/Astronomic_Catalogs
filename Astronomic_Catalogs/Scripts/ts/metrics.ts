@@ -201,3 +201,23 @@ function distributeItemsIntoColumns(containerSelector: string, remInPixels: numb
         col.style.width = `${columnWidth}px`;
     });
 }
+
+
+
+/////////////////////////////////////////////
+export async function getElementRect(selector: string): Promise<DOMRect> {
+    await new Promise(requestAnimationFrame); // To wait for a stable layout.
+    const element = document.querySelector(selector) as HTMLElement;
+
+    if (!element) {
+        throw new Error(`❌ Element not found for selector: "${selector}". Make sure the selector is correct and the element exists in the DOM.`);
+    }
+
+    if (!(element instanceof HTMLElement)) {
+        throw new Error(`❌ Element found for selector "${selector}" is not an instance of HTMLElement. It may be an SVG or unsupported node.`);
+    }
+
+    const rect = element.getBoundingClientRect();
+    console.log(`📐 Element "${selector}" → Width: ${rect.width}px, Height: ${rect.height}px`);
+    return rect;
+}

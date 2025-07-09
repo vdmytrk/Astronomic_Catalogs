@@ -72,7 +72,7 @@ public class PlanetarySystemController : Controller
 #endif
         }
 
-        ViewBag.RowOnPageCatalog = "10";
+        ViewBag.RowOnPageCatalog = "100";
         ViewBag.PlanetNames = plLetters;
         ViewBag.TelescopNames = telescopes;
         ViewBag.DiscoveryMethod = discoveryMethods;
@@ -82,7 +82,7 @@ public class PlanetarySystemController : Controller
         try
         {
             // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
-            result = await _filterService.GetFilteredDataAsync(new() { ["pageNumber"] = 1, ["rowOnPage"] = 10 });
+            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberVaulue"] = 1, ["RowOnPageCatalog"] = 100 });
             ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
         }
         catch (Exception ex)
@@ -115,7 +115,7 @@ public class PlanetarySystemController : Controller
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
-        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "10";
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "100";
         int? pageNumber = parameters.GetInt("PageNumberVaulue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<PlanetarySystem>? selectedList = new ();
@@ -188,7 +188,7 @@ public class PlanetarySystemController : Controller
     [HttpPost]
     public async Task<IActionResult> PlanetarySystemVisualization([FromBody] Dictionary<string, object> parameters)
     {
-        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "10";
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "100";
         int? pageNumber = parameters.GetInt("PageNumberVaulue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<PlanetarySystem>? selectedList = new();
@@ -221,8 +221,8 @@ public class PlanetarySystemController : Controller
 
         try
         {
-            var tableHtml = await this.RenderViewAsync(partialViewName, selectedList, true);
             var paginationHtml = await this.RenderViewAsync("_PaginationLine", null, true);
+            var tableHtml = await this.RenderViewAsync(partialViewName, selectedList, true);
 
             return Json(new { tableHtml, paginationHtml });
         }

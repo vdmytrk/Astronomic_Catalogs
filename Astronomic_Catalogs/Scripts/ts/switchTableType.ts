@@ -18,7 +18,7 @@ function initialize(): void {
 };
 
 function switchTable(checkbox: HTMLInputElement): void {
-    const container = document.getElementById("twoPlanetarySystemTable") as HTMLElement | null;
+    const container = document.querySelector('.twoPlanetarySystemTable') as HTMLElement | null;
     if (!container) return;
 
     const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement;

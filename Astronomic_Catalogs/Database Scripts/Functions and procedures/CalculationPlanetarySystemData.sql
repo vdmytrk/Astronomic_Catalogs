@@ -66,8 +66,8 @@ BEGIN
 			MAX(St_lum),
 			MAX(St_age),
 			MAX(Sy_dist),
-			POWER(10.0, MAX(St_lum)) AS St_lum_Sun_Absol,
-			POWER(10.0, MAX(St_lum) / 2.0) * 1.26 AS HabitablZone
+			CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(MAX(St_lum) AS decimal(18,10))) AS decimal(18,10)) AS St_lum_Sun_Absol, 
+			CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(MAX(St_lum) AS decimal(18,10)) / 2.0) * 1.26 AS decimal(18,10)) AS HabitablZone 
 		FROM NASAExoplanetCatalogUniquePlanets
 		WHERE Hostname IN (
 			SELECT DISTINCT Hostname
@@ -100,8 +100,11 @@ BEGIN
 			P.Pl_massj,
 			P.LatestDate,
 			CASE  
-				WHEN P.Pl_orbsmax BETWEEN (POWER(10.0, S.St_lum / 2.0) * 0.75) AND (POWER(10.0, S.St_lum / 2.0) * 1.77)
-					THEN 1
+				WHEN P.Pl_orbsmax BETWEEN 
+					CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(S.St_lum AS decimal(18,10)) / 2.0) * 0.75 AS decimal(18,10)) 
+					AND 
+					CAST(POWER(CAST(10.0 AS decimal(18,10)), CAST(S.St_lum AS decimal(18,10)) / 2.0) * 1.77 AS decimal(18,10)) 
+				THEN 1
 				ELSE 0
 			END AS InHabitablZone
 		FROM NASAExoplanetCatalogUniquePlanets P
@@ -169,7 +172,7 @@ BEGIN
                N' Error_line: ' + CAST(@Line AS NVARCHAR);
 
             INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorSeverity, ErrorState, ErrorMessage) 
-            VALUES (@FuncProc, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
+            VALUES (@FuncProcErr, @Line, @ErrorNumber, @ErrorSeverity, @ErrorState, @ErrorMessage);
             
             THROW 51000, @FullEerrorMessage, 0;
 		END TRY

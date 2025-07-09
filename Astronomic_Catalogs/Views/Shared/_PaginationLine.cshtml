@@ -12,22 +12,25 @@
     {
         @if (i != pageNumber)
         {
-            <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
-                @i <span class="borderBlock">|</span>
+            <div class="d-inline-block callStyle">
+                <span class="page_@i paginationCell" value="@i" data-controller="@controller">
+                    @i
+                </span>
+                <span class="borderBlock">|</span>
             </div>
         }
         else
         {
             @if (rowOnPageCatalog != 500)
             {
-                <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
+                <div class="page_@i d-inline-block callStyle" value="@i" data-controller="@controller">
                     <span class="currentPage">@i</span>
                     <span class="borderBlock">|</span>
                 </div>
             }
             else
             {
-                <div class="page_@i paginationCell d-inline-block" value="@i" data-controller="@controller">
+                <div class="page_@i d-inline-block callStyle" value="@i" data-controller="@controller">
                     <span class="currentPage">@i</span>
                     <span class="borderBlock">|</span>
                     <span>Row in result: @amountRowsResult</span>
