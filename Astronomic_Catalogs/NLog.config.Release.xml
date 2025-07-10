@@ -21,7 +21,7 @@
 			<parameter name="@method" layout="${event-properties:item=method}" />
 			<parameter name="@exception" layout="${exception:tostring}" />
 			<parameter name="@message" layout="${message}" />
-			<parameter name="@activityId" layout="${activityid}" />
+			<parameter name="@activityId" layout="${event-properties:item=RequestId}" />
 			<parameter name="@scope" layout="${ndlc}" />
 		</target>
 	</targets>

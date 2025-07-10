@@ -12,7 +12,7 @@ public class NGCICProfile : Profile
     {
         CreateMap<NGCICOpendatasoft, NGCICViewModel>()
             .ForMember(dest => dest.Messier, opt => opt.MapFrom(src =>
-                src.Messier.HasValue && src.Messier > 0 ? "M" + src.Messier.Value.ToString() : null
+                src.Messier != null && src.Messier > 0 ? "M" + src.Messier!.ToString() : null
             ));
 
         CreateMap<NGCICViewModel, NGCICOpendatasoft>()

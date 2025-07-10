@@ -44,7 +44,7 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddSignalR();
         builder.Services.AddRazorPages();
-        builder.Services.AddAutoMapper(typeof(Program));
+        builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
         builder.Services.AddMemoryCache();
 
         var app = builder.Build();
@@ -516,6 +516,10 @@ public class Program
     private static void TestConfigurationUpoaded()
     {
         var config = LogManager.Configuration;
+        if (config == null)
+        {
+            throw new InvalidOperationException("NLog configuration is not initialized.");
+        }
         Console.WriteLine($"\n\nTargets loaded: {config.AllTargets.Count}");
         Console.WriteLine($"Connection rules count: {config.LoggingRules.Count}\n");
         foreach (var target in config.AllTargets)

@@ -9,35 +9,35 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Aspire.Azure.Security.KeyVault" Version="9.1.0" />
-		<PackageReference Include="AutoMapper" Version="14.0.0" />
+		<PackageReference Include="Aspire.Azure.Security.KeyVault" Version="9.3.1" />
+		<PackageReference Include="AutoMapper" Version="15.0.0" />
 		<PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
 		<PackageReference Include="ExcelDataReader" Version="3.7.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.4" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.3" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.3">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.8.1">
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.8.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
-		<PackageReference Include="NLog" Version="5.4.0" />
-		<PackageReference Include="NLog.Database" Version="5.4.0" />
-		<PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" />
-		<PackageReference Include="NLog.Schema" Version="5.4.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.4.0" />
-		<PackageReference Include="System.IO.Packaging" Version="9.0.3" />
+		<PackageReference Include="NLog" Version="6.0.1" />
+		<PackageReference Include="NLog.Database" Version="6.0.1" />
+		<PackageReference Include="NLog.Extensions.Logging" Version="6.0.1" />
+		<PackageReference Include="NLog.Schema" Version="6.0.1" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="6.0.1" />
+		<PackageReference Include="System.IO.Packaging" Version="9.0.7" />
 	</ItemGroup>
 
 	<ItemGroup>
