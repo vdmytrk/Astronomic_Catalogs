@@ -36,9 +36,7 @@ public class Program
         AddServices(builder);
         AddDatabaseServices(builder);
         AddIdentityServices(builder, configuration);
-#if !DEBUG // ALSO SEE UseRateLimiter SETTINGS
         ConfigureRateLimiting(builder);
-#endif
 
         builder.Services.AddHttpClient();
         builder.Services.AddControllersWithViews();
@@ -316,7 +314,7 @@ public class Program
                 CreateSlidingWindowLimiter(600, TimeSpan.FromHours(1), 4),
             #endregion
             #region For unregistered useers
-                CreateTokenBucketLimiter(15, 1, TimeSpan.FromSeconds(10), 1),
+                CreateTokenBucketLimiter(25, 1, TimeSpan.FromSeconds(10), 1),
                 CreateTokenBucketLimiter(70, 0, TimeSpan.FromMinutes(10), 1),
                 CreateTokenBucketLimiter(400, 0, TimeSpan.FromHours(1), 1)
             #endregion
@@ -459,9 +457,7 @@ public class Program
         app.UseStaticFiles();
         app.UseAuthentication();
         app.UseAuthorization();
-#if !DEBUG // ALSO SEE ConfigureRateLimiting SETTINGS
         app.UseRateLimiter();
-#endif
         app.UseMiddleware<UserLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<UserAccessMiddleware>();
