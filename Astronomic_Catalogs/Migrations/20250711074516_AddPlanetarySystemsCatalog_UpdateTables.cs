@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Astronomic_Catalogs.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPlanetarySystemsCatalog_UpdateOthers : Migration
+    public partial class AddPlanetarySystemsCatalog_UpdateTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

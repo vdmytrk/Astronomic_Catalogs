@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Astronomic_Catalogs.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250605105052_AddPlanetarySystemsCatalog_UpdateOthers")]
-    partial class AddPlanetarySystemsCatalog_UpdateOthers
+    [Migration("20250711074516_AddPlanetarySystemsCatalog_UpdateTables")]
+    partial class AddPlanetarySystemsCatalog_UpdateTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -519,9 +519,6 @@ namespace Astronomic_Catalogs.Migrations
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
-
-                    b.Property<bool>("Is_CollinderCatalog_Executed")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("Is_CollinderCatalog_Temporarily_Executed")
                         .HasColumnType("bit");

@@ -86,7 +86,7 @@ public class NGCICOpendatasoftConfiguration : IEntityTypeConfiguration<NGCICOpen
         builder.Property(e => e.CstarVMag).HasColumnName("Cstar_VMag").HasDefaultValue(0.0);
         builder.Property(e => e.CstarNames).HasColumnName("Cstar_Names").HasMaxLength(21);
         builder.Property(e => e.CommonNames).HasMaxLength(110);
-        builder.Property(e => e.NedNotes).HasColumnType("varchar(max)");
+        builder.Property(e => e.NedNotes).HasColumnType("nvarchar(max)");
         builder.Property(e => e.OpenngcNotes).HasColumnType("varchar(max)");
         builder.Property(e => e.Image).HasColumnName("Image"); // The name matches, but "Image" is a reserved word, so explicit specification is appropriate.
 

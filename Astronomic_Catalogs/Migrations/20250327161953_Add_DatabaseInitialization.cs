@@ -21,7 +21,6 @@ namespace Astronomic_Catalogs.Migrations
                     Is_Constellation_Executed = table.Column<bool>(type: "bit", nullable: false),
                     Is_NGC2000_UKTemporarily_Executed = table.Column<bool>(type: "bit", nullable: false),
                     Is_CollinderCatalog_Temporarily_Executed = table.Column<bool>(type: "bit", nullable: false),
-                    Is_CollinderCatalog_Executed = table.Column<bool>(type: "bit", nullable: false),
                     Is_NGCWikipedia_TemporarilySource_Executed = table.Column<bool>(type: "bit", nullable: false),
                     Is_NGCWikipedia_ExtensionTemporarilySource_Executed = table.Column<bool>(type: "bit", nullable: false),
                     Is_NGCICOpendatasoft_Source_Executed = table.Column<bool>(type: "bit", nullable: false)

@@ -333,7 +333,7 @@ public class Program
                 return RateLimitPartition.GetFixedWindowLimiter(user, _ => new FixedWindowRateLimiterOptions
                 {
                     PermitLimit = 15,
-                    QueueLimit = 2,
+                    QueueLimit = 10,
                     Window = TimeSpan.FromSeconds(10)
                 });
             }
@@ -409,7 +409,7 @@ public class Program
     private static async Task InitializeDatabaseAsync(WebApplication app, IConfiguration configuration)
     {
         using var scope = app.Services.CreateScope();
-        var restoreDatabase = configuration.GetValue<bool>("RestoreDatabase");
+        var restoreDatabase = configuration.GetValue<bool>("InitializationDb:RestoreDatabase");
         var dbInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
         if (restoreDatabase)
             await dbInitializer.InitializeDatabaseAsync();

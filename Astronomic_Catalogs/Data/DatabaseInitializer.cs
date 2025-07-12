@@ -4,6 +4,7 @@ using Astronomic_Catalogs.Services.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using System.Security.Claims;
 
 namespace Astronomic_Catalogs.Data;
@@ -13,17 +14,20 @@ public class DatabaseInitializer
     private readonly ApplicationDbContext _context;
     private readonly ILogger<DatabaseInitializer> _logger;
     private readonly RoleControllerService _roleService;
-    private readonly RoleManager<AspNetRole> _roleManager;
-    private readonly UserManager<AspNetUser> _userManager;
+    private readonly RoleManager<Models.AspNetRole> _roleManager;
+    private readonly UserManager<Models.AspNetUser> _userManager;
+    private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _env;
     private readonly string _scriptsDirectory;
+    private readonly bool _restoreDatabase;
 
     public DatabaseInitializer(
         ApplicationDbContext context,
         ILogger<DatabaseInitializer> logger,
         RoleControllerService roleService,
-        RoleManager<AspNetRole> roleManager,
-        UserManager<AspNetUser> userManager,
+        RoleManager<Models.AspNetRole> roleManager,
+        UserManager<Models.AspNetUser> userManager,
+        IConfiguration configuration,
         IWebHostEnvironment env
         )
     {
@@ -33,7 +37,9 @@ public class DatabaseInitializer
         _roleManager = roleManager;
         _userManager = userManager;
         _env = env;
+        _configuration = configuration;
         _scriptsDirectory = Path.Combine(env.ContentRootPath, "Database Scripts");
+        _restoreDatabase = _configuration.GetValue("InitializationDb:DropAzureTable", false);
     }
 
     public async Task InitializeDatabaseAsync()
@@ -79,7 +85,7 @@ public class DatabaseInitializer
         {
             if (!await _roleManager.RoleExistsAsync(role))
             {
-                var newRole = new AspNetRole() { Name = role };
+                var newRole = new Models.AspNetRole() { Name = role };
                 _roleService.SetData(newRole);
                 var roleResult = await _roleManager.CreateAsync(newRole);
                 if (!roleResult.Succeeded)
@@ -99,7 +105,7 @@ public class DatabaseInitializer
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
         if (user == null)
         {
-            user = new AspNetUser
+            user = new Models.AspNetUser
             {
                 UserName = adminEmail,
                 Email = adminEmail,
@@ -180,8 +186,6 @@ public class DatabaseInitializer
         if (await CreateDatabaseAsync())
         {
             await ExecuteAllSqlScriptsAsync();
-            await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
-            await ExecuteStoredProcedureAsync("Recreate_NASAPlanetarySystems_Tables");
         }
 
     }
@@ -191,11 +195,9 @@ public class DatabaseInitializer
         if (isConnectDb)
         {
             _logger.LogWarning("Database is found. Applying migrations...");
-            bool success = await ClearDatabase();
+            bool success = _restoreDatabase ? await DropTables() : await TrancateTables();
             await ApplyMigrationsAsync();
             await ExecuteAllSqlScriptsAsync();
-            await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
-            await ExecuteStoredProcedureAsync("Recreate_NASAPlanetarySystems_Tables");
         }
         else
         {
@@ -206,7 +208,7 @@ public class DatabaseInitializer
     /// <summary>
     /// Truncate tables which are not created by script.
     /// </summary>
-    public async Task<bool> ClearDatabase()
+    public async Task<bool> TrancateTables()
     {
         bool success = true;
         string[] tabels = [
@@ -251,6 +253,112 @@ public class DatabaseInitializer
         return success;
     }
 
+    /// <summary>
+    /// Drop tables which are not created by script.
+    /// </summary>
+    public async Task<bool> DropTables()
+    {
+        bool success = true;
+
+        try
+        {
+            string sql = $"DELETE FROM __EFMigrationsHistory";
+            await _context.Database.ExecuteSqlRawAsync(sql);
+            _logger.LogInformation("Table '__EFMigrationsHistory' was cleaned up.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Failed to clean '__EFMigrationsHistory'. EF will skip migrations.");
+        }
+
+        string[] dropTables = [
+            "AspNetRoleClaims",
+            "AspNetRoles",
+            "AspNetUserClaims",
+            "AspNetUserLogins",
+            "AspNetUserRoles",
+            "AspNetUsers",
+            "AspNetUserTokens",
+            "CollinderCatalog",
+            "CollinderCatalog_Temporarily",
+            "Constellation",
+            "DatabaseInitialization",
+            "DateTable",
+            "LogProcFunc",
+            "NameObject",
+            "NASAExoplanetCatalog",
+            "NASAExoplanetCatalogLastUpdate",
+            "NASAExoplanetCatalogUniquePlanets",
+            "NASAPlanetarySystemsPlanets",
+            "NASAPlanetarySystemsStars",
+            "NGC2000_UKTemporarily",
+            "NGC2000_UKTemporarilySource",
+            "NGCICOpendatasoft",
+            "NGCICOpendatasoft_Extension",
+            "NGCICOpendatasoft_Source",
+            "NGCWikipedia_ExtensionTemporarilySource",
+            "NGCWikipedia_TemporarilySource",
+            "NLogApplicationCode",
+            "PlanetarySystemsCatalog",
+            "RequestLogs", 
+            "SourceType",
+            "TestConnectionForNLog",
+            "UserLogs"
+        ];
+
+        // Disabling all constraints to delete dropTables.
+        string disableConstraintsSql = @"
+            DECLARE @sql NVARCHAR(MAX) = N'';
+
+            SELECT @sql += '
+            ALTER TABLE [' + TABLE_SCHEMA + '].[' + TABLE_NAME + '] NOCHECK CONSTRAINT ALL;'
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_TYPE = 'BASE TABLE';
+
+            EXEC sp_executesql @sql;
+            ";
+
+        await _context.Database.ExecuteSqlRawAsync(disableConstraintsSql);
+                
+        string dropFKsSql = $@"
+            DECLARE @sql NVARCHAR(MAX) = N'';
+
+            SELECT @sql += '
+            ALTER TABLE [' + sch.name + '].[' + t.name + '] DROP CONSTRAINT [' + fk.name + '];'
+            FROM sys.foreign_keys fk
+            INNER JOIN sys.tables t ON fk.parent_object_id = t.object_id
+            INNER JOIN sys.schemas sch ON t.schema_id = sch.schema_id
+            WHERE t.name IN ({string.Join(",", dropTables.Select(t => $"'{t}'"))});
+
+            EXEC sp_executesql @sql;
+        ";
+
+        await _context.Database.ExecuteSqlRawAsync(dropFKsSql);
+
+        var existingTables = await GetExistingTablesAsync(dropTables);
+
+        if (!existingTables.Any())
+        {
+            _logger.LogWarning("No dropTables found to drop.");
+            return success;
+        }
+
+        foreach (string table in existingTables)
+        {
+            try
+            {
+                string sql = $"DROP TABLE [{table}]";
+                await _context.Database.ExecuteSqlRawAsync(sql);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"The table {table} was not dropped: {ex.Message}.");
+            }
+        }
+
+        return success;
+    }
+
     private async Task<List<string>> GetExistingTablesAsync(string[] tabels)
     {
         List<string> existingTables = new();
@@ -287,7 +395,7 @@ public class DatabaseInitializer
     {
         try
         {
-            await _context.Database.EnsureCreatedAsync(); 
+            await _context.Database.EnsureCreatedAsync();
             _logger.LogDebug("Database created successfully.");
             return true;
         }
@@ -386,24 +494,29 @@ public class DatabaseInitializer
         }
     }
 
-    private async Task ExecuteSqlScriptIfNeededAsync(string scriptPath, string propertyName, DatabaseInitialization initStatus)
+    private async Task ExecuteSqlScriptIfNeededAsync(string scriptPath, string propertyName, DatabaseInitialization? initStatus)
     {
-        var prop = typeof(DatabaseInitialization).GetProperty(propertyName);
-        if (prop == null)
-        {
-            _logger.LogError($"Property {propertyName} not found in DatabaseInitialization model.");
-            return;
-        }
+        PropertyInfo? prop = null;
 
-        bool isExecuted = (bool)(prop.GetValue(initStatus) ?? false);
-        if (isExecuted)
+        if (initStatus is not null)
         {
-            _logger.LogInformation($"Skipping execution of {scriptPath} because it's already executed.");
-            return;
+            prop = typeof(DatabaseInitialization).GetProperty(propertyName);
+            if (prop == null)
+            {
+                _logger.LogError($"Property {propertyName} not found in DatabaseInitialization model.");
+                return;
+            }
+
+            bool isExecuted = (bool)(prop.GetValue(initStatus) ?? false);
+            if (isExecuted)
+            {
+                _logger.LogInformation($"Skipping execution of {scriptPath} because it's already executed.");
+                return;
+            }
         }
 
         bool success = await ExecuteSqlScriptAsync(scriptPath);
-        if (success)
+        if (success && prop is not null)
         {
             prop.SetValue(initStatus, true);
             await _context.SaveChangesAsync();
@@ -440,24 +553,17 @@ public class DatabaseInitializer
 
     private async Task ExecuteInsertDataSqlScriptsAsync()
     {
-        var initStatus = await _context.DatabaseInitialization.FirstOrDefaultAsync(x => x.Id == 1);
+        var initStatus = await GetOrCreateInitStatusAsync();
 
-        if (initStatus == null)
-        {
-            initStatus = new DatabaseInitialization { };
-            _context.DatabaseInitialization.Add(initStatus);
-            await _context.SaveChangesAsync();
-        }
-
-        await ExecuteSqlScriptIfNeededAsync("Data/SourceType.sql", nameof(initStatus.Is_SourceType_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarilySource.sql", nameof(initStatus.Is_NGC2000_UKTemporarilySource_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/NameObject.sql", nameof(initStatus.Is_NameObject_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/Constellation.sql", nameof(initStatus.Is_Constellation_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarily.sql", nameof(initStatus.Is_NGC2000_UKTemporarily_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog_Temporarily.sql", nameof(initStatus.Is_CollinderCatalog_Temporarily_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_TemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_TemporarilySource_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_ExtensionTemporarilySource.sql", nameof(initStatus.Is_NGCWikipedia_ExtensionTemporarilySource_Executed), initStatus);
-        await ExecuteSqlScriptIfNeededAsync("Data/NGCICOpendatasoft_Source.sql", nameof(initStatus.Is_NGCICOpendatasoft_Source_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/SourceType.sql", nameof(DatabaseInitialization.Is_SourceType_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarilySource.sql", nameof(DatabaseInitialization.Is_NGC2000_UKTemporarilySource_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NameObject.sql", nameof(DatabaseInitialization.Is_NameObject_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/Constellation.sql", nameof(DatabaseInitialization.Is_Constellation_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGC2000_UKTemporarily.sql", nameof(DatabaseInitialization.Is_NGC2000_UKTemporarily_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog_Temporarily.sql", nameof(DatabaseInitialization.Is_CollinderCatalog_Temporarily_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_TemporarilySource.sql", nameof(DatabaseInitialization.Is_NGCWikipedia_TemporarilySource_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGCWikipedia_ExtensionTemporarilySource.sql", nameof(DatabaseInitialization.Is_NGCWikipedia_ExtensionTemporarilySource_Executed), initStatus);
+        await ExecuteSqlScriptIfNeededAsync("Data/NGCICOpendatasoft_Source.sql", nameof(DatabaseInitialization.Is_NGCICOpendatasoft_Source_Executed), initStatus);
     }
 
     private async Task ExecuteCreateProcedureFunctionSqlScriptsAsync()
@@ -483,16 +589,29 @@ public class DatabaseInitializer
 
     private async Task ExecuteInsertDataSqlByStoredProcedureAsync()
     {
-        var initStatus = await _context.DatabaseInitialization.FirstOrDefaultAsync(x => x.Id == 1);
+        var initStatus = await GetOrCreateInitStatusAsync();
 
-        if (initStatus == null)
+        await ExecuteStoredProcedureAsync("InsertCollinderCatalog");
+        await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
+    }
+
+    private async Task<DatabaseInitialization?> GetOrCreateInitStatusAsync()
+    {
+        var existingDbInit = await GetExistingTablesAsync(["DatabaseInitialization"]);
+
+        if (!_restoreDatabase || existingDbInit.Any())
         {
-            initStatus = new DatabaseInitialization { };
-            _context.DatabaseInitialization.Add(initStatus);
-            await _context.SaveChangesAsync();
+            var initStatus = await _context.DatabaseInitialization.FirstOrDefaultAsync(x => x.Id == 1);
+            if (initStatus == null)
+            {
+                initStatus = new DatabaseInitialization();
+                _context.DatabaseInitialization.Add(initStatus);
+                await _context.SaveChangesAsync();
+            }
+            return initStatus;
         }
 
-        await ExecuteSqlScriptIfNeededAsync("Data/CollinderCatalog.sql", nameof(initStatus.Is_CollinderCatalog_Executed), initStatus);
+        return null;
     }
     #endregion
 

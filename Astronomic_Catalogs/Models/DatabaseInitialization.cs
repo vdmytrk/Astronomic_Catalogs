@@ -12,7 +12,6 @@ public class DatabaseInitialization
     public bool Is_Constellation_Executed { get; set; }
     public bool Is_NGC2000_UKTemporarily_Executed { get; set; }
     public bool Is_CollinderCatalog_Temporarily_Executed { get; set; }
-    public bool Is_CollinderCatalog_Executed { get; set; }
     public bool Is_NGCWikipedia_TemporarilySource_Executed { get; set; }
     public bool Is_NGCWikipedia_ExtensionTemporarilySource_Executed { get; set; }
     public bool Is_NGCICOpendatasoft_Source_Executed { get; set; }

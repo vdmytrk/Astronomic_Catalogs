@@ -23,10 +23,26 @@ public class UserLoggingMiddleware(
     private readonly IMemoryCache _cache = cache;
     private readonly ILogger<UserLoggingMiddleware> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private static readonly string[] _ignoredPaths = new[]
+    {
+        "/lib", "/css", "/js", "/less", "/images", "/favicon.ico"
+    };
 
+    private static readonly string[] _ignoredExtensions = new[]
+    {
+        ".js", ".css", ".png", ".jpg", ".svg", ".woff2", ".ttf", ".ico"
+    };
 
     public async Task InvokeAsync(HttpContext context)
     {
+        string path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+
+        if (_ignoredPaths.Any(path.StartsWith) || _ignoredExtensions.Any(path.EndsWith))
+        {
+            await _next(context);
+            return;
+        }
+
         string userAgent = context.Request.Headers["User-Agent"].ToString();
         var osName = GetOsName(userAgent);
         var browserName = GetBrowserName(userAgent);
@@ -74,7 +90,7 @@ public class UserLoggingMiddleware(
 
         await _next(context);
         log.StatusCode = context.Response.StatusCode;
-        
+
         try
         {
             using (var scope = _serviceScopeFactory.CreateScope())
@@ -115,6 +131,12 @@ public class UserLoggingMiddleware(
         {
             var response = await _httpClient.GetStringAsync($"https://ipapi.co/{log.IpAddress}/json/");
             var geoData = JsonSerializer.Deserialize<JsonElement>(response);
+
+            if (geoData.TryGetProperty("error", out var errorProp) && errorProp.GetBoolean())
+            {
+                _logger.LogWarning("IPAPI returned error for {IpAddress}: {Response}", log.IpAddress, response);
+                return;
+            }
 
             var newGeoData = new GeoLocationData
             {

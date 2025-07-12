@@ -11,6 +11,8 @@ BEGIN
     SET NOCOUNT ON; 
 	
 	BEGIN TRY
+		TRUNCATE TABLE CollinderCatalog;
+
 		INSERT CollinderCatalog (
 			[Namber_name], 
 			[NameOtherCat], 

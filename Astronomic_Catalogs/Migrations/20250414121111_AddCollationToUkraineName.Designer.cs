@@ -438,9 +438,6 @@ namespace Astronomic_Catalogs.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Is_CollinderCatalog_Executed")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("Is_CollinderCatalog_Temporarily_Executed")
                         .HasColumnType("bit");
 
