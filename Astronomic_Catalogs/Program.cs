@@ -42,7 +42,6 @@ public class Program
         builder.Services.AddControllersWithViews();
         builder.Services.AddSignalR();
         builder.Services.AddRazorPages();
-        builder.Services.AddAutoMapper(cfg => cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies()));
         builder.Services.AddMemoryCache();
 
         var app = builder.Build();

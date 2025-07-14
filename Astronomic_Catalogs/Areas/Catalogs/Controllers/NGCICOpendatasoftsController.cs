@@ -1,12 +1,12 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Exceptions;
+using Astronomic_Catalogs.Mappers;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Constants;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Astronomic_Catalogs.ViewModels;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,19 +20,16 @@ public class NGCICOpendatasoftsController : Controller
     private readonly ApplicationDbContext _context;
     private readonly INGCICFilterService _filterService;
     private readonly ILogger<NGCICOpendatasoftsController> _logger;
-    private readonly IMapper _mapper;
     private readonly IExceptionRedirectUrlService _exRedirectService;
 
     public NGCICOpendatasoftsController(
         ApplicationDbContext context,
         INGCICFilterService filterService,
-        IMapper mapper,
         ILogger<NGCICOpendatasoftsController> logger,
         IExceptionRedirectUrlService exceptionRedirectService)
     {
         _context = context;
         _filterService = filterService;
-        _mapper = mapper;
         _logger = logger;
         _exRedirectService = exceptionRedirectService;
     }
@@ -49,7 +46,7 @@ public class NGCICOpendatasoftsController : Controller
         try
         {
             (countNGCTask, countNGCE_Task, constellations, catalogItems) = await _filterService.GetNGCICOpendatasoftDataAsync();
-            catalogViewModels = _mapper.Map<List<NGCICViewModel>>(catalogItems);
+            catalogViewModels = catalogItems.ToViewModelList();
         }
         catch (Exception ex)
         {
@@ -108,7 +105,7 @@ public class NGCICOpendatasoftsController : Controller
         if (selectedList == null)
             return NotFound();
 
-        var viewModelList = _mapper.Map<List<NGCICViewModel>>(selectedList);
+        var viewModelList = selectedList.ToViewModelList();
         var firstItem = viewModelList.FirstOrDefault();
 
         // TODO: Use Dapper to return an output parameter
@@ -171,7 +168,7 @@ public class NGCICOpendatasoftsController : Controller
             var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
             if (entity == null) return NotFound();
 
-            var viewModel = _mapper.Map<NGCICViewModel>(entity);
+            var viewModel = entity.ToViewModel();
             return View(viewModel);
         }
         catch (Exception ex)
@@ -215,7 +212,7 @@ public class NGCICOpendatasoftsController : Controller
         {
             try
             {
-                var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
+                var entity = viewModel.ToEntity();
                 _context.Add(entity);
                 await _context.SaveChangesAsync();
 
@@ -267,7 +264,7 @@ public class NGCICOpendatasoftsController : Controller
         var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
         if (entity == null) return NotFound();
 
-        var viewModel = _mapper.Map<NGCICViewModel>(entity);
+        var viewModel = entity.ToViewModel();
         return View(viewModel);
     }
 
@@ -287,7 +284,7 @@ public class NGCICOpendatasoftsController : Controller
         {
             try
             {
-                var entity = _mapper.Map<NGCICOpendatasoft>(viewModel);
+                var entity = viewModel.ToEntity();
                 _context.Update(entity);
                 await _context.SaveChangesAsync();
             }
@@ -362,7 +359,7 @@ public class NGCICOpendatasoftsController : Controller
         var entity = await _context.NGCIC_Catalog.FirstOrDefaultAsync(m => m.Id == id);
         if (entity == null) return NotFound();
 
-        var viewModel = _mapper.Map<NGCICViewModel>(entity);
+        var viewModel = entity.ToViewModel();
         return View(viewModel);
     }
 

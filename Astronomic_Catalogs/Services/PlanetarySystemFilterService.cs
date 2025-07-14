@@ -3,7 +3,6 @@ using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Entities;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
-using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -13,18 +12,15 @@ public class PlanetarySystemFilterService : IPlanetarySystemFilterService
 {
     private readonly ApplicationDbContext _context;
     private readonly ICacheService _cache;
-    private readonly IMapper _mapper;
     private readonly ILogger<PlanetarySystemFilterService> _logger;
 
     public PlanetarySystemFilterService (
         ApplicationDbContext context, 
         ICacheService cache, 
-        IMapper mapper,
         ILogger<PlanetarySystemFilterService> logger)
     {
         _context = context;
         _cache = cache;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -84,21 +80,49 @@ public class PlanetarySystemFilterService : IPlanetarySystemFilterService
     public List<PlanetarySystem> MapToSystems(List<PlanetarySystemFlatRow> flatRows)
     {
         return flatRows
-            .GroupBy(row => row.Hostname)
-            .Select(group =>
+        .GroupBy(row => row.Hostname)
+        .Select(group =>
+        {
+            var first = group.First();
+
+            var system = new PlanetarySystem
             {
-                var system = _mapper.Map<PlanetarySystem>(group.First());
+                Hostname = first.Hostname,
+                HdName = first.HdName,
+                HipName = first.HipName,
+                TicId = first.TicId,
+                GaiaId = first.GaiaId,
+                StSpectype = first.StSpectype,
+                StTeff = first.StTeff,
+                StRad = first.StRad,
+                StMass = first.StMass,
+                StMet = first.StMet,
+                StMetratio = first.StMetratio,
+                StLum = first.StLum,
+                StAge = first.StAge,
+                SyDist = first.SyDist,
+                StLumSunAbsol = first.StLumSunAbsol,
+                HabitablZone = first.HabitablZone,
+                RowOnPage = first.RowOnPage
+            };
 
-                system.Exoplanets = group
-                    .Select((row, index) =>
-                    {
-                        var planet = _mapper.Map<Exoplanet>(row);
-                        planet.Id = index + 1;
-                        return planet;
-                    }).ToList();
+            system.Exoplanets = group
+                .Select((row, index) => new Exoplanet
+                {
+                    Id = index + 1,
+                    Hostname = row.Hostname,
+                    PlLetter = row.PlLetter,
+                    PlRade = row.PlRade,
+                    PlRadJ = row.PlRadJ,
+                    PlMasse = row.PlMasse,
+                    PlMassJ = row.PlMassJ,
+                    PlOrbsmax = row.PlOrbsmax
+                })
+                .ToList();
 
-                return system;
-            }).ToList();
+            return system;
+        })
+        .ToList();
     }
 
 }

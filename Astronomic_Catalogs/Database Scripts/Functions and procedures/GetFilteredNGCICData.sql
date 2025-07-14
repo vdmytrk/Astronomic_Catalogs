@@ -180,38 +180,79 @@ BEGIN
 				SET @Offset = (@PageCountInResult - 1) * @RowOnPage; 
 			END 
 
-		SELECT
-			Id, NGC_IC, [Name], SubObject, Messier,
-			Name_UK, Comment, Other_names, NGC, IC,
-			Limit_Ang_Diameter, Ang_Diameter,
-			ObjectTypeAbrev, ObjectType, Object_type, Source_Type,
-			RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S,
-			[DEC], Declination, NS, Declination_D, Declination_M, Declination_S,
-			Constellation, MajorAxis, MinorAxis, PositionAngle,
-			App_Mag, App_Mag_Flag,
-			b_mag, v_mag, j_mag, h_mag, k_mag,
-			Surface_Brigthness, Hubble_OnlyGalaxies,
-			Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names,
-			CommonNames, NedNotes, OpenngcNotes,
-			[Image] AS Image,
-			SourceTable,
-			COUNT(*) OVER() AS RowOnPage 
-		FROM #SummaryTable
-		ORDER BY 
-			CASE 
-				WHEN @IncludeNGC = 0 AND @IncludeIC = 0 AND @IncludeMessier = 1 
-				THEN CAST(Messier AS INT)				
-			END,
-			CASE 
-				WHEN @IncludeNGC = 1 OR @IncludeIC = 1 OR @IncludeMessier = 0
-				THEN NGC_IC
-			END DESC,
-			CASE 
-				WHEN @IncludeNGC = 1 OR @IncludeIC = 1 OR @IncludeMessier = 0
-				THEN [Name]
-			END
-		OFFSET @Offset ROWS FETCH NEXT @RowOnPage ROWS ONLY;
-		
+
+
+		-- Not a CASE because of different field types: Messier is INT, while NGC_IC and [Name] are not.
+		DECLARE @MessierOnly BIT = IIF(@IncludeNGC = 0 AND @IncludeIC = 0 AND @IncludeMessier = 1, 1, 0);
+		DECLARE @NGCOrICOnly BIT = IIF((@IncludeNGC = 1 OR @IncludeIC = 1) AND @IncludeMessier = 0, 1, 0);
+
+		IF @MessierOnly = 1 
+		BEGIN
+			SELECT 
+				Id, NGC_IC, [Name], SubObject, Messier,
+				Name_UK, Comment, Other_names, NGC, IC,
+				Limit_Ang_Diameter, Ang_Diameter,
+				ObjectTypeAbrev, ObjectType, Object_type, Source_Type,
+				RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S,
+				[DEC], Declination, NS, Declination_D, Declination_M, Declination_S,
+				Constellation, MajorAxis, MinorAxis, PositionAngle,
+				App_Mag, App_Mag_Flag,
+				b_mag, v_mag, j_mag, h_mag, k_mag,
+				Surface_Brigthness, Hubble_OnlyGalaxies,
+				Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names,
+				CommonNames, NedNotes, OpenngcNotes,
+				[Image] AS Image,
+				SourceTable,
+				COUNT(*) OVER() AS RowOnPage 
+			FROM #SummaryTable
+			ORDER BY CAST(Messier AS INT)
+			OFFSET @Offset ROWS FETCH NEXT @RowOnPage ROWS ONLY;
+		END
+		ELSE IF @NGCOrICOnly = 1 
+		BEGIN			
+			SELECT 
+				Id, NGC_IC, [Name], SubObject, Messier,
+				Name_UK, Comment, Other_names, NGC, IC,
+				Limit_Ang_Diameter, Ang_Diameter,
+				ObjectTypeAbrev, ObjectType, Object_type, Source_Type,
+				RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S,
+				[DEC], Declination, NS, Declination_D, Declination_M, Declination_S,
+				Constellation, MajorAxis, MinorAxis, PositionAngle,
+				App_Mag, App_Mag_Flag,
+				b_mag, v_mag, j_mag, h_mag, k_mag,
+				Surface_Brigthness, Hubble_OnlyGalaxies,
+				Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names,
+				CommonNames, NedNotes, OpenngcNotes,
+				[Image] AS Image,
+				SourceTable,
+				COUNT(*) OVER() AS RowOnPage
+			FROM #SummaryTable
+			ORDER BY NGC_IC
+			OFFSET @Offset ROWS FETCH NEXT @RowOnPage ROWS ONLY;
+		END
+		ELSE 
+		BEGIN			
+			SELECT 
+				Id, NGC_IC, [Name], SubObject, Messier,
+				Name_UK, Comment, Other_names, NGC, IC,
+				Limit_Ang_Diameter, Ang_Diameter,
+				ObjectTypeAbrev, ObjectType, Object_type, Source_Type,
+				RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S,
+				[DEC], Declination, NS, Declination_D, Declination_M, Declination_S,
+				Constellation, MajorAxis, MinorAxis, PositionAngle,
+				App_Mag, App_Mag_Flag,
+				b_mag, v_mag, j_mag, h_mag, k_mag,
+				Surface_Brigthness, Hubble_OnlyGalaxies,
+				Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names,
+				CommonNames, NedNotes, OpenngcNotes,
+				[Image] AS Image,
+				SourceTable,
+				COUNT(*) OVER() AS RowOnPage
+			FROM #SummaryTable
+			ORDER BY [Name]
+			OFFSET @Offset ROWS FETCH NEXT @RowOnPage ROWS ONLY;
+		END
+
 		DROP TABLE #SummaryTable;
 		
 	END TRY

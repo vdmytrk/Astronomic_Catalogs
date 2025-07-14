@@ -3,7 +3,6 @@ using Astronomic_Catalogs.Entities;
 using Astronomic_Catalogs.Exceptions;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
@@ -16,7 +15,6 @@ public class PlanetarySystemController : Controller
     private readonly ApplicationDbContext _context;
     private readonly IPlanetarySystemFilterService _filterService;
     private readonly IPlanetFilterService _planetFilterService;
-    private readonly IMapper _mapper;
     private readonly ILogger<PlanetarySystemController> _logger;
     private readonly IExceptionRedirectUrlService _exRedirectService;
 
@@ -24,7 +22,6 @@ public class PlanetarySystemController : Controller
         ApplicationDbContext context,
         IPlanetarySystemFilterService filterService,
         IPlanetFilterService planetFilterService,
-        IMapper mapper,
         ILogger<PlanetarySystemController> logger,
         IExceptionRedirectUrlService exRedirectService
         )
@@ -32,7 +29,6 @@ public class PlanetarySystemController : Controller
         _context = context;
         _filterService = filterService;
         _planetFilterService = planetFilterService;
-        _mapper = mapper;
         _logger = logger;
         _exRedirectService = exRedirectService;
     }
