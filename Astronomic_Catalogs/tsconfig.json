@@ -6,7 +6,7 @@
     "noImplicitAny": false,
     "outDir": "./wwwroot/js",
     "rootDir": "./Scripts/ts",
-    "removeComments": false,
+    "removeComments": true,
     "sourceMap": true,
     "target": "ES6",
     "types": [ "node", "jquery" ],
