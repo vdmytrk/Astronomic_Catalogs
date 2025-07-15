@@ -64,9 +64,10 @@ public class NGCICFilterService : INGCICFilterService
         bool includeIC = parameters.GetBool("IC_Catalog");
         bool includeMessier = parameters.GetBool("Messier_Catalog");
 
-        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        int? pageNumber = parameters.GetInt("PageNumberValue"); 
         int? rowOnPage = parameters.GetInt("RowOnPageCatalog");
 
+        _logger.LogWarning("Params before SP call: {Params}", JsonSerializer.Serialize(parameters));
 
         string cacheKey = parameters.ToCacheKey("CollinderData");
 
@@ -189,8 +190,8 @@ public class NGCICFilterService : INGCICFilterService
                     OpenngcNotes,
                     Image,
 
-                    RowOnPage,
-                    SourceTable
+                    SourceTable,
+                    RowOnPage
                 FROM NGCICOpendatasoft
                 ORDER BY NGC_IC DESC, Name ASC;
             ";

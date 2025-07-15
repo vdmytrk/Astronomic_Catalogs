@@ -62,6 +62,6 @@ public class NGCICOpendatasoftExtension
     public string? Image { get; set; }
 
 
-    public int? RowOnPage { get; set; }
     public string? SourceTable { get; set; }
+    public int? RowOnPage { get; set; }
 }

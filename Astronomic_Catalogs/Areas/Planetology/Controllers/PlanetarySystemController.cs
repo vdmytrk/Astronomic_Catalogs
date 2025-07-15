@@ -78,7 +78,7 @@ public class PlanetarySystemController : Controller
         try
         {
             // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
-            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberVaulue"] = 1, ["RowOnPageCatalog"] = 100 });
+            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberValue"] = 1, ["RowOnPageCatalog"] = 100 });
             ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
         }
         catch (Exception ex)
@@ -112,7 +112,7 @@ public class PlanetarySystemController : Controller
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "100";
-        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        int? pageNumber = parameters.GetInt("PageNumberValue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<PlanetarySystem>? selectedList = new ();
 
@@ -185,7 +185,7 @@ public class PlanetarySystemController : Controller
     public async Task<IActionResult> PlanetarySystemVisualization([FromBody] Dictionary<string, object> parameters)
     {
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "100";
-        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        int? pageNumber = parameters.GetInt("PageNumberValue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<PlanetarySystem>? selectedList = new();
 

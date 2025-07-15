@@ -88,7 +88,7 @@ namespace Astronomic_Catalogs.Areas.Catalogs.Controllers
         {
             string rowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
             ViewBag.RowOnPageCatalog = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
-            int? pageNumber = parameters.GetInt("PageNumberVaulue");
+            int? pageNumber = parameters.GetInt("PageNumberValue");
             ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
             List<CollinderCatalog>? selectedList;
 

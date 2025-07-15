@@ -39,7 +39,7 @@ public class PlanetarySystemFilterService : IPlanetarySystemFilterService
         bool habitableZone = parameters.GetBool("HabitableZonePlanets");
         bool terrestrialHabitableZone = parameters.GetBool("TerrestrialHabitableZonePlanets");
 
-        int? pageNumber = parameters.GetInt("PageNumberVaulue") ?? 1;
+        int? pageNumber = parameters.GetInt("PageNumberValue") ?? 1;
         int? rowOnPage = parameters.GetInt("RowOnPageCatalog") ?? 10;
 
         string cacheKey = parameters.ToCacheKey("PlanetarySystem");

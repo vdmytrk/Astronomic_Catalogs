@@ -83,7 +83,7 @@ public class NGCICOpendatasoftsController : Controller
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
-        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        int? pageNumber = parameters.GetInt("PageNumberValue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<NGCICOpendatasoft>? selectedList;
 

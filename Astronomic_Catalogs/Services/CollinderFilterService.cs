@@ -58,7 +58,7 @@ public class CollinderFilterService : ICollinderFilterService
             .ToList();
         string? objectTypesJson = objectTypes.Any() ? JsonSerializer.Serialize(objectTypes) : null;
 
-        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        int? pageNumber = parameters.GetInt("PageNumberValue");
         string rowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "50";
         int? rowOnPage = rowOnPageCatalog == "All" ? 500 : int.Parse(rowOnPageCatalog);
 

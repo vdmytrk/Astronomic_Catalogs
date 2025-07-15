@@ -51,7 +51,7 @@ public class PlanetFilterService : IPlanetFilterService
         bool habitableZone = parameters.GetBool("HabitableZonePlanets");
         bool terrestrialHabitableZone = parameters.GetBool("TerrestrialHabitableZonePlanets");
 
-        int? pageNumber = parameters.GetInt("PageNumberVaulue") ?? 1;
+        int? pageNumber = parameters.GetInt("PageNumberValue") ?? 1;
         int? rowOnPage = parameters.GetInt("RowOnPageCatalog") ?? 30;
 
         string cacheKey = parameters.ToCacheKey("Planet");

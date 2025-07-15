@@ -207,7 +207,7 @@ export function serializeForm(rootElement: HTMLElement | null, pageNumber: strin
             data = getPartialViewName(data, checkbox);
     }
 
-    data["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
+    data["PageNumberValue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
 
     console.log("serializeForm (after): ", data);
     return data;
@@ -252,7 +252,7 @@ async function submitFormAndUpdatePartial(
         };
 
         fallbackParams["PartialViewName"] = "_PlanetarySystemVisualizationBase";
-        fallbackParams["PageNumberVaulue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
+        fallbackParams["PageNumberValue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
         json = fallbackParams;
     }
 

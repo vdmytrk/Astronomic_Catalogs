@@ -101,7 +101,7 @@ namespace Astronomic_Catalogs.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("PlanetarySystemsCatalog");
+                    b.ToTable("PlanetarySystemsCatalog", (string)null);
                 });
 
             modelBuilder.Entity("Astronomic_Catalogs.Models.AspNetRole", b =>
@@ -546,7 +546,7 @@ namespace Astronomic_Catalogs.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DatabaseInitialization");
+                    b.ToTable("DatabaseInitialization", (string)null);
                 });
 
             modelBuilder.Entity("Astronomic_Catalogs.Models.LogProcFunc", b =>

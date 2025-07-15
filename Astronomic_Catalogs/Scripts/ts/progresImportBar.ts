@@ -112,7 +112,7 @@ function resetUI(): void {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            PageNumberVaulue: 1,
+            PageNumberValue: 1,
             RowOnPageCatalog: 30
         })
     })

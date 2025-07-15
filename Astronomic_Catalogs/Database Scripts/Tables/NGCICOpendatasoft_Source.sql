@@ -24,7 +24,7 @@ BEGIN
 		ObjectTypeAbrev	varchar(21) default null,
 		ObjectType varchar(26) default null,
 		RA varchar(30) default null,
-		[DEC]	varchar(31) default null,
+		[DEC] varchar(31) default null,
 		Constellation varchar(21) default null,
 		MajorAxis float default 0,
 		MinorAxis float default 0,

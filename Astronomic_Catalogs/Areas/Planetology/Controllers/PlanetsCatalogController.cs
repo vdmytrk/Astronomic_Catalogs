@@ -84,7 +84,7 @@ public class PlanetsCatalogController : Controller
         try
         {
             // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
-            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberVaulue"] = 1, ["RowOnPageCatalog"] = 30 });
+            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberValue"] = 1, ["RowOnPageCatalog"] = 30 });
             ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
         }
         catch (Exception ex)
@@ -121,7 +121,7 @@ public class PlanetsCatalogController : Controller
             throw new ArgumentNullException("Not given value into the parameters parameter.");
 
         ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "30";
-        int? pageNumber = parameters.GetInt("PageNumberVaulue");
+        int? pageNumber = parameters.GetInt("PageNumberValue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<NASAExoplanetCatalog>? selectedList = new();
 
