@@ -288,6 +288,7 @@ public class Program
     private static void ConfigureRateLimiting(WebApplicationBuilder builder)
     {
         #region For registered useers
+        // TODO: Logging of rate limit triggers.
         builder.Services.AddRateLimiter(options =>
         {
             options.OnRejected = async (context, cancellationToken) =>
@@ -309,13 +310,13 @@ public class Program
             options.GlobalLimiter = PartitionedRateLimiter.CreateChained(
             #region For registered users
                 CreateFixedWindowLimiter(),
-                CreateSlidingWindowLimiter(90, TimeSpan.FromMinutes(10), 2),
-                CreateSlidingWindowLimiter(600, TimeSpan.FromHours(1), 4),
+                CreateSlidingWindowLimiter(350, TimeSpan.FromMinutes(10), 4),
+                CreateSlidingWindowLimiter(1600, TimeSpan.FromHours(1), 6),
             #endregion
             #region For unregistered useers
-                CreateTokenBucketLimiter(25, 1, TimeSpan.FromSeconds(10), 1),
-                CreateTokenBucketLimiter(70, 0, TimeSpan.FromMinutes(10), 1),
-                CreateTokenBucketLimiter(400, 0, TimeSpan.FromHours(1), 1)
+                CreateTokenBucketLimiter(20, 2, TimeSpan.FromSeconds(10), 1),
+                CreateTokenBucketLimiter(60, 2, TimeSpan.FromMinutes(10), 2),
+                CreateTokenBucketLimiter(300, 2, TimeSpan.FromHours(1), 5)
             #endregion
             );
         });
@@ -331,8 +332,8 @@ public class Program
                 string user = GetUserKey(context);
                 return RateLimitPartition.GetFixedWindowLimiter(user, _ => new FixedWindowRateLimiterOptions
                 {
-                    PermitLimit = 15,
-                    QueueLimit = 10,
+                    PermitLimit = 30,
+                    QueueLimit = 5,
                     Window = TimeSpan.FromSeconds(10)
                 });
             }

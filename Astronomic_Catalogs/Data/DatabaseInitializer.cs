@@ -593,6 +593,7 @@ public class DatabaseInitializer
 
         await ExecuteStoredProcedureAsync("InsertCollinderCatalog");
         await ExecuteStoredProcedureAsync("MigrateNGCICOStoNGCICO_W");
+        await ExecuteStoredProcedureAsync("Recreate_NASAPlanetarySystems_Tables"); // To have access to the empty PlanetsCatalog page in order to import data.
     }
 
     private async Task<DatabaseInitialization?> GetOrCreateInitStatusAsync()
