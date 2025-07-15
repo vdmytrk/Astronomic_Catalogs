@@ -66,7 +66,12 @@ BEGIN
 
 		SELECT * INTO #SummaryTable
 		FROM (
-			SELECT * FROM NGCICOpendatasoft
+			SELECT Id, NGC_IC, [Name], SubObject, Messier, Name_UK, Comment, Other_names, NGC, IC, ObjectTypeAbrev, ObjectType, Object_type,
+				Source_Type, RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S, DEC, Declination, NS, Declination_D,
+				Declination_M, Declination_S, Constellation, MajorAxis, MinorAxis, PositionAngle, App_Mag, App_Mag_Flag, b_mag, v_mag, j_mag, h_mag,
+				k_mag, Surface_Brigthness, Hubble_OnlyGalaxies, Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names, CommonNames, NedNotes, OpenngcNotes,
+				[Image], Ang_Diameter, Limit_Ang_Diameter, SourceTable, RowOnPage
+			FROM NGCICOpendatasoft
 			WHERE
 				(@Name IS NULL OR [Other_names] LIKE '%' + @Name + '%')
 				AND (
@@ -113,7 +118,12 @@ BEGIN
 
 			UNION ALL
 
-			SELECT * FROM NGCICOpendatasoft_Extension
+			SELECT Id, NGC_IC, [Name], SubObject, Messier, Name_UK, Comment, Other_names, NGC, IC, ObjectTypeAbrev, ObjectType, Object_type,
+				Source_Type, RA, Right_ascension, Right_ascension_H, Right_ascension_M, Right_ascension_S, DEC, Declination, NS, Declination_D,
+				Declination_M, Declination_S, Constellation, MajorAxis, MinorAxis, PositionAngle, App_Mag, App_Mag_Flag, b_mag, v_mag, j_mag, h_mag,
+				k_mag, Surface_Brigthness, Hubble_OnlyGalaxies, Cstar_UMag, Cstar_BMag, Cstar_VMag, Cstar_Names, CommonNames, NedNotes, OpenngcNotes,
+				[Image], Ang_Diameter, Limit_Ang_Diameter, SourceTable, RowOnPage
+			FROM NGCICOpendatasoft_Extension
 			WHERE
 				(@Name IS NULL OR [Other_names] LIKE '%' + @Name + '%')
 				AND (
