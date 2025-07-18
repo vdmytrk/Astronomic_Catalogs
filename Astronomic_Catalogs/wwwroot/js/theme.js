@@ -2,8 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initialize = initialize;
 exports.planetSysVisualizationTheme = planetSysVisualizationTheme;
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
 let inputs;
 let themeButton;
 function initialize(body) {
@@ -35,17 +33,11 @@ function updateThemeBackground(inputs, body) {
         document.documentElement.style.backgroundColor = bg;
         body.style.backgroundColor = bg;
     };
-    // Updating autofill styles on page load.
     if (inputs) {
         updateAutofill(inputs);
     }
     updateBodyBg();
-    //window.addEventListener("load", updateBodyBg); // For the planet-grphic page where the background changes after load.
 }
-/////////////////////////////////////////////
-// Style for HTMLInputElement
-/////////////////////////////////////////////
-// Change the style of autofilled browser fields
 function updateAutofill(inputs) {
     if (!inputs)
         return;
@@ -53,19 +45,17 @@ function updateAutofill(inputs) {
     forceAutofillFix(inputs);
     forceAutofillReRender(inputs);
 }
-// Forced autofill update.
 function refreshAutofillStyles(inputs) {
     console.log("🔄 Forced autofill update.");
     inputs.forEach(input => {
-        const prevName = input.getAttribute("name"); // Saving the old name.
+        const prevName = input.getAttribute("name");
         if (prevName !== null) {
-            input.setAttribute("name", prevName + "_tmp"); // Changing it so the browser forgets autofill.
-            input.offsetHeight; // Trick for re-rendering.
-            input.setAttribute("name", prevName); // Restoring the name.
+            input.setAttribute("name", prevName + "_tmp");
+            input.offsetHeight;
+            input.setAttribute("name", prevName);
         }
     });
 }
-// Autofill fix after theme switching.
 function forceAutofillFix(inputs) {
     console.log("🎨 Applied autofill fix.");
     inputs.forEach(input => {
@@ -76,7 +66,6 @@ function forceAutofillFix(inputs) {
                 input.style.transition = "background-color 0.3s ease, color 0.3s ease";
             }
         });
-        // Artificial autofill refresh via focus-blur.
         const value = input.value;
         input.value = "";
         setTimeout(() => {
@@ -84,25 +73,16 @@ function forceAutofillFix(inputs) {
         }, 100);
     });
 }
-// Forcing autofill re-render.
 function forceAutofillReRender(inputs) {
     console.log("🔄 Forcing autofill re-render.");
     inputs.forEach(input => {
         input.classList.remove("force-repaint");
-        void input.offsetWidth; // Trick for forced re-render.
+        void input.offsetWidth;
         input.classList.add("force-repaint");
     });
 }
-/////////////////////////////////////////////
-// Style for the selected element of the multiselect list.
-/////////////////////////////////////////////
-// To solve problem with the background color of selected items in browser.
-// Used in:
-//      Admin:
-//          Role: Create, Edit;
-//          User: Create, Edit;
 function fixSelectBehavior() {
-    let selects = document.querySelectorAll("select.form-select"); // Can be used with "select.form-control"
+    let selects = document.querySelectorAll("select.form-select");
     selects.forEach(select => {
         if (!select.multiple)
             return;
@@ -142,14 +122,11 @@ function fixSelectBehavior() {
                     option.classList.add("selected-fix");
                 }
             }
-            return false; // Prevents selected values ​​from "disappearing"
+            return false;
         });
     });
 }
 ;
-/////////////////////////////////////////////
-// Style on _PlanetarySystemVisualization.
-/////////////////////////////////////////////
 function planetSysVisualizationTheme(isVisualization) {
     console.log("FUNCTION: planetSysVisualizationTheme");
     const inputs = document.querySelectorAll(".form-control");

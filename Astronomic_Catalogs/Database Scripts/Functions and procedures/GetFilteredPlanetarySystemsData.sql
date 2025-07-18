@@ -6,32 +6,32 @@
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR ALTER PROC GetFilteredPlanetarySystemsData
-	@PlanetType NVARCHAR(MAX) = NULL, 
+	@PlanetType NVARCHAR(MAX) = NULL,
 	@Name NVARCHAR(MAX) = NULL,
 	@PlenetsCountFrom INT = NULL,
-	@PlenetsCountTo INT = NULL, 
-	@OrderBy INT = NULL, 
+	@PlenetsCountTo INT = NULL,
+	@OrderBy INT = NULL,
 	@HabitableZone BIT = NULL,
 	@TerrestrialHabitableZone BIT = NULL,
 	@SyDistFrom FLOAT = NULL,
 	@SyDistTo FLOAT = NULL,
+
 	@PageNumber INT = 1,
     @RowOnPage INT = 10
 AS
 BEGIN	
 	DECLARE @TotalCount INT = 0, @PageCountInResult INT = 0, @Offset INT = 0;
 		
-    SET NOCOUNT ON; 
+    SET NOCOUNT ON;
 
 	BEGIN TRY
 		-- Parameter validation
-
-		DECLARE @InvalidPattern  NVARCHAR(100) = '%[^A-Za-z0-9 \-_,.''`]%'; 
+		DECLARE @InvalidPattern  NVARCHAR(100) = '%[^A-Za-z0-9 \-_,.''`]%';
 
 		BEGIN
-			IF @PlanetType IS NOT NULL AND @PlanetType != '[]' 
+			IF @PlanetType IS NOT NULL AND @PlanetType != '[]'
 			BEGIN
-				IF EXISTS ( 
+				IF EXISTS (
 					SELECT [value]
 					FROM OPENJSON(@PlanetType)
 					WHERE TRY_CAST([value] AS INT) IS NULL OR TRY_CAST([value] AS INT) NOT BETWEEN 1 AND 9
@@ -76,7 +76,7 @@ BEGIN
 				RAISERROR('@SyDistFrom cannot be greater than @SyDistTo.', 16, 1);
 				RETURN;
 			END
-						
+
 
 			IF @HabitableZone IS NOT NULL AND @HabitableZone NOT IN (0, 1)
 				OR (@TerrestrialHabitableZone IS NOT NULL AND @TerrestrialHabitableZone NOT IN (0, 1))
@@ -84,8 +84,8 @@ BEGIN
 				RAISERROR('Invalid value for one of the BIT parameters.', 16, 1);
 				RETURN;
 			END
-	
 
+			
 			IF @Name IS NOT NULL AND @Name LIKE @InvalidPattern  ESCAPE '\'
 			BEGIN
 				RAISERROR('Invalid characters in @Name.', 16, 1);
@@ -96,18 +96,18 @@ BEGIN
 		-- Default value blok
 		SET @PageNumber = ISNULL(@PageNumber, 1);
 		SET @RowOnPage = ISNULL(@RowOnPage, 10);
+		SET @OrderBy = ISNULL(@OrderBy, 0);
 		
 
 		
-		-- Parsing the input JSON parameters into a tables.
 		DECLARE @PlanetTypes TABLE (TypeId INT);
 		IF ISJSON(@PlanetType) = 1
 		BEGIN
 			INSERT INTO @PlanetTypes (TypeId)
 			SELECT TRY_CAST([value] AS INT)
-			FROM OPENJSON(@PlanetType)
-			WHERE TRY_CAST([value] AS INT) BETWEEN 1 AND 9;
+			FROM OPENJSON(@PlanetType);
 		END;
+		
 
 		SELECT 
 			S.Hostname,
@@ -137,50 +137,55 @@ BEGIN
 			P.Pl_massj,
 			P.LatestDate,
 			P.InHabitablZone,
-			COUNT(*) OVER (PARTITION BY S.Hostname) AS PlanetsCount
-		INTO #PlanetWithCounts
+			COUNT(*) OVER (PARTITION BY S.Hostname) AS SystemPlanetCount
+		INTO #PlanetWithCount
 		FROM dbo.NASAPlanetarySystemsPlanets AS P
 		INNER JOIN dbo.NASAPlanetarySystemsStars AS S ON P.StarId = S.Id;
 		
-		CREATE NONCLUSTERED INDEX IX_PlanetWithCounts_Hostname ON #PlanetWithCounts(Hostname);
+		CREATE NONCLUSTERED INDEX IX_PlanetWithCounts_Hostname ON #PlanetWithCount(Hostname);
 
 
+		
+		DECLARE @IsPlanetTypeFilterDisabled BIT =
+			CASE 
+				WHEN @PlanetType IS NULL OR @PlanetType = '[]' 
+				THEN 1 
+				ELSE 0 
+			END;
 
 		SELECT DISTINCT pwc.Hostname
-		INTO #ValidHostnames 
-		FROM #PlanetWithCounts pwc
+		INTO #ValidHostname 
+		FROM #PlanetWithCount pwc
 		OUTER APPLY (
 			SELECT 
-				MAX(CASE WHEN ISNULL(p.Pl_orbsmax, 0) <> 0 THEN 1 END) AS HasOrbit,
-				MAX(CASE WHEN ISNULL(p.Pl_rade, 0) <> 0 THEN 1 END) AS HasRade,
-				MAX(CASE WHEN p.InHabitablZone = 1 THEN 1 END) AS HasHabitable,
-				MAX(CASE WHEN p.InHabitablZone = 1 AND p.Pl_rade BETWEEN 0.27 AND 1.2 THEN 1 END) AS HasTerrestrialHZ,
-				MAX(CASE WHEN p.Sy_dist >= ISNULL(@SyDistFrom, -9999) THEN 1 END) AS HasSyDistFrom,
-				MAX(CASE WHEN p.Sy_dist <= ISNULL(@SyDistTo, 9999999) THEN 1 END) AS HasSyDistTo,
-				MAX(CASE WHEN Pl_rade BETWEEN 0.04 AND 50 THEN Pl_rade END) AS SampleRade,
-				COUNT(*) AS SystemPlanetCount
-			FROM #PlanetWithCounts p
+				MAX(CASE WHEN p.Pl_orbsmax IS NOT NULL AND p.Pl_orbsmax > 0 THEN 1 ELSE 0 END) AS HasOrbit,
+				MAX(CASE WHEN p.Pl_rade IS NOT NULL AND p.Pl_rade > 0 THEN 1 ELSE 0 END) AS HasRade,
+				MAX(CASE WHEN p.InHabitablZone = 1 THEN 1 ELSE 0 END) AS HasHabitable,
+				MAX(CASE WHEN p.InHabitablZone = 1 AND p.Pl_rade BETWEEN 0.27 AND 1.2 THEN 1 ELSE 0 END) AS HasTerrestrialHZ,
+				MAX(CASE WHEN @SyDistFrom IS NOT NULL AND p.Sy_dist >= @SyDistFrom THEN 1 ELSE 0 END) AS HasSyDistFrom,
+				MAX(CASE WHEN @SyDistTo IS NULL THEN 1 WHEN p.Sy_dist <= @SyDistTo THEN 1 ELSE 0 END) AS HasSyDistTo
+			FROM #PlanetWithCount p
 			WHERE p.Hostname = pwc.Hostname
 		) ap
 		WHERE 
-			(@PlanetType IS NULL OR @PlanetType = '[]' OR ap.HasRade = 1)
+			(@IsPlanetTypeFilterDisabled = 1 OR ap.HasRade = 1)
 			AND (@OrderBy NOT IN (1,2,3,4) OR ap.HasOrbit = 1)
 			AND (@OrderBy NOT IN (5,6) OR ap.HasRade = 1)
 			AND (
-				@PlanetType IS NULL OR @PlanetType = '[]' OR NOT EXISTS (SELECT 1 FROM @PlanetTypes)
+				@IsPlanetTypeFilterDisabled = 1 
+				OR NOT EXISTS (SELECT 1 FROM @PlanetTypes)
 				OR EXISTS (
-					SELECT 1 
-					FROM @PlanetTypes pt
-					WHERE
-						(pt.TypeId = 1 AND ap.SampleRade BETWEEN 0.04 AND 0.27) OR
-						(pt.TypeId = 2 AND ap.SampleRade > 0.27 AND ap.SampleRade <= 0.7) OR
-						(pt.TypeId = 3 AND ap.SampleRade > 0.7  AND ap.SampleRade <= 1.2) OR
-						(pt.TypeId = 4 AND ap.SampleRade > 1.2  AND ap.SampleRade <= 1.9) OR
-						(pt.TypeId = 5 AND ap.SampleRade > 1.9  AND ap.SampleRade <= 3.1) OR
-						(pt.TypeId = 6 AND ap.SampleRade > 3.1  AND ap.SampleRade <= 5.1) OR
-						(pt.TypeId = 7 AND ap.SampleRade > 5.1  AND ap.SampleRade <= 8.3) OR
-						(pt.TypeId = 8 AND ap.SampleRade > 8.3  AND ap.SampleRade <= 13.7) OR
-						(pt.TypeId = 9 AND ap.SampleRade > 13.7 AND ap.SampleRade <= 50)
+					SELECT 1 FROM @PlanetTypes pt
+					WHERE 
+						(pt.TypeId = 1 AND pwc.Pl_rade BETWEEN 0.04 AND 0.27) OR
+						(pt.TypeId = 2 AND pwc.Pl_rade >  0.27 AND pwc.Pl_rade <= 0.7) OR
+						(pt.TypeId = 3 AND pwc.Pl_rade >  0.7  AND pwc.Pl_rade <= 1.2) OR
+						(pt.TypeId = 4 AND pwc.Pl_rade >  1.2  AND pwc.Pl_rade <= 1.9) OR
+						(pt.TypeId = 5 AND pwc.Pl_rade >  1.9  AND pwc.Pl_rade <= 3.1) OR
+						(pt.TypeId = 6 AND pwc.Pl_rade >  3.1  AND pwc.Pl_rade <= 5.1) OR
+						(pt.TypeId = 7 AND pwc.Pl_rade >  5.1  AND pwc.Pl_rade <= 8.3) OR
+						(pt.TypeId = 8 AND pwc.Pl_rade >  8.3  AND pwc.Pl_rade <= 13.7) OR
+						(pt.TypeId = 9 AND pwc.Pl_rade > 13.7  AND pwc.Pl_rade <= 50)
 				)
 			)
 			AND (
@@ -192,10 +197,10 @@ BEGIN
 				pwc.Gaia_id LIKE '%' + @Name + '%'
 			)
 			AND (
-				@PlenetsCountFrom IS NULL OR ap.SystemPlanetCount >= @PlenetsCountFrom
+				@PlenetsCountFrom IS NULL OR pwc.SystemPlanetCount >= @PlenetsCountFrom
 			)
 			AND (
-				@PlenetsCountTo IS NULL OR ap.SystemPlanetCount <= @PlenetsCountTo
+				@PlenetsCountTo IS NULL OR pwc.SystemPlanetCount <= @PlenetsCountTo
 			)
 			AND (
 				@HabitableZone IS NULL OR @HabitableZone = 0 OR ap.HasHabitable = 1
@@ -208,11 +213,10 @@ BEGIN
 				AND	(@SyDistTo IS NULL OR ap.HasSyDistTo = 1)
 			);
 
-		CREATE NONCLUSTERED INDEX IX_ValidHostnames_Hostname ON #ValidHostnames(Hostname);
+		CREATE NONCLUSTERED INDEX IX_ValidHostnames_Hostname ON #ValidHostname(Hostname);
+		
 
-
-
-		-- Aggregated values for sorting (excluding nulls)
+		-- Aggregated values for sorting
 		SELECT
 			Hostname,
 			MIN(NULLIF(Pl_orbsmax, 0)) AS MinPlOrbsmax,
@@ -220,30 +224,35 @@ BEGIN
 			MIN(NULLIF(Pl_rade, 0)) AS MinPlRade,
 			MAX(NULLIF(Pl_rade, 0)) AS MaxPlRade
 		INTO #SystemAggregates
-		FROM #PlanetWithCounts
+		FROM #PlanetWithCount
 		GROUP BY Hostname;
-		
 
-		SELECT 
-			pwc.*, 
-			DENSE_RANK() OVER (ORDER BY pwc.Hostname) AS SystemCount,
+
+
+		SELECT DISTINCT
+			vh.Hostname,
 			CASE @OrderBy
 				WHEN 1 THEN ISNULL(sa.MinPlOrbsmax, 9999999)
-				WHEN 2 THEN ISNULL(sa.MaxPlOrbsmax, 9999999)
-				WHEN 3 THEN ISNULL(-1 * sa.MinPlOrbsmax, -9999999)
+				WHEN 2 THEN ISNULL(-1 * sa.MinPlOrbsmax, -9999999)
+				WHEN 3 THEN ISNULL(sa.MaxPlOrbsmax, 9999999)
 				WHEN 4 THEN ISNULL(-1 * sa.MaxPlOrbsmax, -9999999)
 				WHEN 5 THEN ISNULL(sa.MinPlRade, 9999999)
 				WHEN 6 THEN ISNULL(sa.MaxPlRade, 9999999)
 				ELSE NULL
 			END AS SortKey
-		INTO #SummaryTable
-		FROM #PlanetWithCounts pwc
-		INNER JOIN #SystemAggregates sa ON pwc.Hostname = sa.Hostname
-		INNER JOIN #ValidHostnames vh ON pwc.Hostname = vh.Hostname;
+		INTO #SortKeyTable
+		FROM #ValidHostname vh
+		JOIN #SystemAggregates sa ON vh.Hostname = sa.Hostname;
 
+
+		SELECT *, ROW_NUMBER() OVER (ORDER BY SortKey, Hostname) AS SystemNumber
+		INTO #HostnameOrdered
+		FROM #SortKeyTable;
 		
+
+
 		-- Paggination		
-		SET @TotalCount = (SELECT TOP 1 SystemCount FROM #SummaryTable ORDER BY SystemCount DESC);
+		SET @TotalCount = (SELECT TOP 1 SystemNumber FROM #HostnameOrdered ORDER BY SystemNumber DESC); 
 		SET @PageCountInResult = CEILING(1.0 * @TotalCount / @RowOnPage);
 
 		IF @PageCountInResult = 0
@@ -260,11 +269,11 @@ BEGIN
 				SET @Offset = (@PageCountInResult - 1) * @RowOnPage; 
 				SET @PageNumber = @PageCountInResult;
 			END
-			
 
+		
 		SELECT 
-			SystemCount,
-			Hostname, 
+			SystemNumber,
+			ho.Hostname, 
 			Hd_name as HdName, 
 			Hip_name as HipName, 
 			Tic_id as TicId, 
@@ -286,16 +295,18 @@ BEGIN
 			Pl_radj as PlRadJ, 
 			Pl_masse as PlMasse, 
 			Pl_massj as PlMassJ, 
-			RowOnPage = @TotalCount 
-		FROM #SummaryTable
-		WHERE SystemCount BETWEEN @Offset + 1 AND (@Offset + @RowOnPage) 
-		ORDER BY SortKey, Hostname, Pl_name;
-		
+			SystemPlanetCount,
+			RowOnPage = @TotalCount -- Using the RowOnPage field of the database table to pass a value of @TotalCount.
+			-- Because EF Core does not support reading OUTPUT parameters directly in FromSql*-methods. Dapper is required.		
+		FROM #HostnameOrdered ho
+		LEFT JOIN #PlanetWithCount pwc ON ho.Hostname = pwc.Hostname
+		WHERE ho.SystemNumber BETWEEN @Offset + 1 AND (@Offset + @RowOnPage);
 
-		DROP TABLE #PlanetWithCounts;
-		DROP TABLE #ValidHostnames;
+		DROP TABLE #PlanetWithCount;
+		DROP TABLE #ValidHostname;
 		DROP TABLE #SystemAggregates;
-		DROP TABLE #SummaryTable;
+		DROP TABLE #SortKeyTable;
+		DROP TABLE #HostnameOrdered;
 
 
 	END TRY

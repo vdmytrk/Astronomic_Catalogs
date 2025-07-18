@@ -42,8 +42,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
 const formHandler = __importStar(require("./formHandler"));
 const behavior_1 = require("./behavior");
 document.addEventListener("DOMContentLoaded", () => {
@@ -89,12 +87,9 @@ function submitFormAndUpdatePartialSwitchTable(form_1, url_1, container_1, showG
     return __awaiter(this, arguments, void 0, function* (form, url, container, showGrouped, pageNumber = '1') {
         console.log(`FUNCTOIN: submitFormAndUpdatePartial (SwitchTable)_(form: ${form}, url: ${url}, container: ${container}, pageNumber: ${pageNumber}!!!`);
         let tableBody = document.getElementById('catalogTableBody');
-        // 1. Collect form data into JSON
-        const json = formHandler.serializeForm(form, pageNumber);
+        const json = formHandler.serializeForm(form, pageNumber, false);
         try {
-            // 2. Show spinner
             console.log(`Adding spinnerHTML.`);
-            // Remove the old spinner, if it exists
             const existingSpinnerTr = document.getElementById("spinnerTr");
             if (existingSpinnerTr) {
                 existingSpinnerTr.remove();
@@ -102,16 +97,13 @@ function submitFormAndUpdatePartialSwitchTable(form_1, url_1, container_1, showG
             if (tableBody) {
                 tableBody.insertAdjacentHTML('afterbegin', formHandler.createSpinnerHTML());
             }
-            // 3. Send request      TypeError: Failed to execute 'fetch' on: HEAD method cannot have body.
             const response = yield fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(json),
             });
-            // 4. Check for success
             if (!response.ok)
                 throw new Error(`HTTP error! Failed to load table. Status: ${response.status}`);
-            // 5. Check if JSON or HTML and receive data
             let data;
             let isJson = false;
             const contentType = response.headers.get("content-type");
@@ -120,16 +112,14 @@ function submitFormAndUpdatePartialSwitchTable(form_1, url_1, container_1, showG
                 isJson = true;
             }
             else {
-                data = yield response.text(); // HTML
+                data = yield response.text();
             }
             console.log("Fetched data:", data);
-            // 6. Check if redirect is needed
             if (data.redirectTo) {
                 console.log("Redirecting to:", data.redirectTo);
                 window.location.href = data.redirectTo;
-                return; // Exit function to prevent further execution
+                return;
             }
-            // 7. Insert received HTML into the DOM
             container.innerHTML = showGrouped
                 ? `<div id="planetsSystemTableContainer" class="hideShowColumnTable p-3">${data}</div>`
                 : `<div id="planetsInGroupsSystemTableContainer" class="p-3">${data}</div>`;

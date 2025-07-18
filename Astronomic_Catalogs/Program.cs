@@ -11,6 +11,7 @@ using Astronomic_Catalogs.Services.Interfaces;
 using Azure.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -44,6 +45,7 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddMemoryCache();
 
+        StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
         var app = builder.Build();
 
         ConfigureServices(app, builder);
@@ -310,13 +312,13 @@ public class Program
             options.GlobalLimiter = PartitionedRateLimiter.CreateChained(
             #region For registered users
                 CreateFixedWindowLimiter(),
-                CreateSlidingWindowLimiter(350, TimeSpan.FromMinutes(10), 4),
-                CreateSlidingWindowLimiter(1600, TimeSpan.FromHours(1), 6),
+                CreateSlidingWindowLimiter(700, TimeSpan.FromMinutes(10), 8),
+                CreateSlidingWindowLimiter(3200, TimeSpan.FromHours(1), 12),
             #endregion
             #region For unregistered useers
-                CreateTokenBucketLimiter(20, 2, TimeSpan.FromSeconds(10), 1),
-                CreateTokenBucketLimiter(60, 2, TimeSpan.FromMinutes(10), 2),
-                CreateTokenBucketLimiter(300, 2, TimeSpan.FromHours(1), 5)
+                CreateTokenBucketLimiter(40, 4, TimeSpan.FromSeconds(10), 2),
+                CreateTokenBucketLimiter(120, 4, TimeSpan.FromMinutes(10), 4),
+                CreateTokenBucketLimiter(600, 4, TimeSpan.FromHours(1), 10)
             #endregion
             );
         });
@@ -332,8 +334,8 @@ public class Program
                 string user = GetUserKey(context);
                 return RateLimitPartition.GetFixedWindowLimiter(user, _ => new FixedWindowRateLimiterOptions
                 {
-                    PermitLimit = 30,
-                    QueueLimit = 5,
+                    PermitLimit = 120,
+                    QueueLimit = 20,
                     Window = TimeSpan.FromSeconds(10)
                 });
             }
@@ -457,7 +459,22 @@ public class Program
         app.UseStaticFiles();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseRateLimiter();
+        app.UseWhen(context =>
+            {
+                string path = context.Request.Path.Value ?? "";
+                return !path.EndsWith(".js") &&
+                       !path.EndsWith(".css") &&
+                       !path.EndsWith(".jpg") &&
+                       !path.EndsWith(".jpeg") &&
+                       !path.EndsWith(".png") &&
+                       !path.EndsWith(".svg") &&
+                       !path.EndsWith(".gif") &&
+                       !path.EndsWith(".woff") &&
+                       !path.EndsWith(".woff2") &&
+                       !path.EndsWith(".ttf");
+            },
+            appBuilder => appBuilder.UseRateLimiter()
+        );
         app.UseMiddleware<UserLoggingMiddleware>();
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<UserAccessMiddleware>();

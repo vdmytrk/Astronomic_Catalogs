@@ -14,9 +14,5 @@ public class LogProcFuncConfiguration : IEntityTypeConfiguration<LogProcFunc>
 
         builder.Property(e => e.Time)
             .HasDefaultValueSql("GETUTCDATE()");
-
-        builder.Property(e => e.FuncProc)
-            .HasMaxLength(50)
-            .HasColumnName("FuncProc");
     }
 }

@@ -51,7 +51,7 @@ async function submitFormAndUpdatePartialSwitchTable(form: HTMLElement, url: str
     let tableBody = document.getElementById('catalogTableBody') as HTMLTableSectionElement | null;
 
     // 1. Collect form data into JSON
-    const json = formHandler.serializeForm(form, pageNumber);
+    const json = formHandler.serializeForm(form, pageNumber, false);
 
     try {
         // 2. Show spinner

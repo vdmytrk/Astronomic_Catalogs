@@ -1,6 +1,7 @@
 ﻿const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const fs = require("fs");
+const removeDebugLogs = 0; 
 
 const entry = {
     alertOfSwal: "./Scripts/ts/alertOfSwal.ts",
@@ -61,9 +62,16 @@ module.exports = {
         minimizer: [
             new TerserPlugin({
                 terserOptions: {
-                    compress: {
-                        drop_console: true,
-                    },
+                    compress: (() => {
+                        switch (removeDebugLogs) {
+                            case 0:
+                                return { drop_console: false };
+                            case 1:
+                                return { pure_funcs: ["console.log", "console.info", "console.debug"] };
+                            default:
+                                return { drop_console: true };
+                        }
+                    })(),
                     format: {
                         comments: false,
                     },
@@ -73,4 +81,3 @@ module.exports = {
         ],
     },
 };
-

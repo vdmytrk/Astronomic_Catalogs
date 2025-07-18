@@ -4,8 +4,6 @@ import { dataVisualization } from "./planetarySystemVisualization";
 import { planetSysVisualizationTheme } from "./theme";
 import { hideShowBlockDownAnime } from "./behavior";
 
-//sessionStorage.getItem("isSysVisualization") === "true";
-
 if (!(window as any).__formHandlerInitialized) {
     (window as any).__formHandlerInitialized = true;
 
@@ -27,47 +25,45 @@ function astronomicCatalogFormHandler() {
         console.log(new Date().toLocaleString());
 
         let controller = target.getAttribute("data-controller");
-        const isVisualization = sessionStorage.getItem("isSysVisualization") === "true"; // Current value
+        const isVisualization = sessionStorage.getItem("isSysVisualization") === "true"; // Get current value
         console.log("🔁 isSysVisualization (before toggle):", isVisualization);
 
-        const plSysVisualizationBtn = target.closest(".platetarySystemVisualization") as HTMLElement;
+        const plSysVisualizationBtn = target.matches(".platetarySystemVisualization"); 
         const currentPageElement = document.querySelector(".paginationBodyBlock .currentPage") as HTMLElement | null;
         const paginationCell = target.classList.contains("paginationCell");
         const filterBtn = target.classList.contains("applyFiltersBtn");
         const pageButton = paginationCell ? target : currentPageElement;
 
         if (filterBtn || (paginationCell && !isVisualization)) {
-            console.log("   ✅ filterBtn || (paginationCell && !isSysVisualization)");
-            updateCatalogData(controller, pageButton);
+            console.log(`   ✅ filterBtn(${filterBtn}) || (paginationCell(${paginationCell}) && !isVisualization(${!isVisualization}))`);
+            console.log(`   ✅ plSysVisualizationBtn(${plSysVisualizationBtn})`);
+            updateCatalogData(controller, pageButton, !!isVisualization);
         }
 
         if (plSysVisualizationBtn || (paginationCell && isVisualization)) {
-            console.log("   ✅ plSysVisualizationBtn || (paginationCell && isSysVisualization)");
+            console.log(`   ✅ plSysVisualizationBtn(${plSysVisualizationBtn}) || (paginationCell(${paginationCell}) && isVisualization(${isVisualization}))`);
 
-            const isPlSysVisBtn: boolean = !!plSysVisualizationBtn;
-
-            let newIsVisualization: boolean;
-            if (!paginationCell)
-                newIsVisualization = toggleSysVisualization();
-            console.log(`🔁 Toggle: isSysVisualization = ${newIsVisualization}`); // New value
+            let isVisualizationMode: boolean;
+            isVisualizationMode = !paginationCell ? toggleSysVisualization() : true;
+            console.log(`🔁 Toggle: isVisualizationMode = ${isVisualizationMode}`);
 
             let parameters: FormData | null;
-            if (newIsVisualization) {
+            if (isVisualizationMode) {
                 controller = controller + "_Visualization";
-                parameters = parametersInitialization(isPlSysVisBtn, target);
+                parameters = parametersInitialization(plSysVisualizationBtn, target, true);
 
                 console.log(`Controller (if): ${controller}`);
-                updateCatalogData(controller, pageButton, parameters);
+                updateCatalogData(controller, pageButton, isVisualizationMode, parameters);
             } else {
                 console.log(`Controller (else): ${controller}`);
-                updateCatalogData(controller, pageButton, parameters);
+                updateCatalogData(controller, pageButton, isVisualizationMode, parameters);
             }
 
             if (plSysVisualizationBtn) {
                 const table = document.querySelector<HTMLSelectElement>('#planetsSystemTableContainer');
                 console.log(` ⚠️ table = ${table}`);
                 hideShowBlockDownAnime(table, false);
-                planetSysVisualizationTheme(newIsVisualization);
+                planetSysVisualizationTheme(isVisualizationMode);
             }
         }
     });
@@ -85,18 +81,19 @@ interface FormData {
     [key: string]: string | string[];
 }
 
-function parametersInitialization(isPlSysVisBtn: boolean, target: HTMLElement | null): FormData | null {
+function parametersInitialization(plSysVisualizationBtn: boolean, target: HTMLElement | null, isVisualizationMode: boolean): FormData | null {
     console.log('FUNCTION: parametersInitialization');
     let parameters = {};
-    let dataParams = target?.getAttribute("data-parameters");
+    const plSysVisualizationBtn2 = document.querySelector(".platetarySystemVisualization") as HTMLElement;
+    let dataParams = plSysVisualizationBtn2?.getAttribute("data-parameters");
     console.log("data-parameters =", dataParams);
 
 
-    if (isPlSysVisBtn) {
+    if (plSysVisualizationBtn) {
         console.log(`⚠️ First load of the _PlanetarySystemVisualizationBase page'`);
         const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement | null;
         if (!form) return null;
-        parameters = serializeForm(form, "0");
+        parameters = serializeForm(form, "0", isVisualizationMode);
     } else if (dataParams) {
         try {
             parameters = JSON.parse(dataParams) as FormData;
@@ -144,7 +141,7 @@ function hideGlobalSpinner() {
     if (spinner) spinner.style.display = "none";
 }
 
-export function serializeForm(rootElement: HTMLElement | null, pageNumber: string): FormData {
+export function serializeForm(rootElement: HTMLElement | null, pageNumber: string, isVisualizationMode: boolean): FormData {
     let data: FormData = {};
 
     // Text inputs, selects (single & multiple), dropdowns
@@ -198,13 +195,15 @@ export function serializeForm(rootElement: HTMLElement | null, pageNumber: strin
         }
     }
 
-    const isVisualization = sessionStorage.getItem("isSysVisualization") === "true";
-    if (isVisualization) {
-        data = getPartialViewName(data, null);
+    console.log(`FUNCTION: serializeForm(..., isVisualizationMode(${isVisualizationMode}))`);
+    if (isVisualizationMode) {
+        data = getPartialViewName(data, isVisualizationMode);
     } else {
         const checkbox = document.querySelector("label.switchTableType input[type='checkbox']") as HTMLInputElement;
-        if (checkbox)
-            data = getPartialViewName(data, checkbox);
+        if (!!checkbox)
+            data = getPartialViewName(data, isVisualizationMode, checkbox);
+        else 
+            data = getPartialViewName(data, isVisualizationMode);
     }
 
     data["PageNumberValue"] = pageNumber.match(/^\d+/)?.[0] ?? '1';
@@ -213,17 +212,17 @@ export function serializeForm(rootElement: HTMLElement | null, pageNumber: strin
     return data;
 }
 
-function getPartialViewName(data, checkbox?: HTMLInputElement): FormData {
-    console.log("FUNCTION: getPartialViewName");
+function getPartialViewName(data, isVisualizationMode: boolean, checkbox?: HTMLInputElement): FormData {
+    console.log(`FUNCTION: getPartialViewName(data, checkbox(${checkbox}), isVisualizationMode(${isVisualizationMode}))`);
 
-    const isVisualization = sessionStorage.getItem("isSysVisualization") === "true";
-    if (isVisualization) {
-        console.log(`  >>> IS VISUALIZATION: ${isVisualization}`);
+    if (isVisualizationMode) {
+        console.log(`  >>> IF isVisualizationMode: ${isVisualizationMode}`);
         data["PartialViewName"] = "_PlanetarySystemVisualizationBase";
-    } else if (checkbox) {
-        console.log(`  >>> IS VISUALIZATION: ${isVisualization}`);
-        data["PartialViewName"] = checkbox.checked ? "_PlanetarySystemTable" : "_PlanetarySystemTableInGroups";
-    }
+    } else {
+        console.log(`  >>> ELSE checkbox: ${!!checkbox}`);
+        data["PartialViewName"] = checkbox?.checked === false ? "_PlanetarySystemTableInGroups" : "_PlanetarySystemTable";
+    } 
+    
     console.log(`PartialViewName: ${data["PartialViewName"]}`);
     return data;
 }
@@ -233,20 +232,19 @@ async function submitFormAndUpdatePartial(
     url: string,
     partialSelector: string,
     pageNumber: string = '1',
-    parameters?: FormData)
-{
-    console.log(`FUNCTOIN: submitFormAndUpdatePartial(form: ${form}, url: ${url}, partialSelector: ${partialSelector}, pageNumber: ${pageNumber}!!!`);
-    const tableHeader = document.querySelector(partialSelector);
-    const paginationBodyBlock = document.getElementById("paginationBodyBlockContainer");
-    const plSysVisualizationBtn = document.querySelector(".platetarySystemVisualization") as HTMLElement;
+    isVisualizationMode: boolean,
+    parameters?: FormData
+) {
+    console.log(`FUNCTOIN: submitFormAndUpdatePartial(form: ${form}, url: ${url}, partialSelector: ${partialSelector}, pageNumber: ${pageNumber}` +
+        `, isVisualizationMode(${isVisualizationMode}))`);
     let json: FormData;
 
     // 1. Collect input data into JSON
     if (form) {
-        console.log("  >>>  FORM IS NOT NULL");
-        json = serializeForm(form, pageNumber);
+        console.log("1.  >>>  FORM IS NOT NULL");
+        json = serializeForm(form, pageNumber, isVisualizationMode);
     } else {
-        console.log("  >>>  FORM IS NULL");
+        console.log("1.  >>>  FORM IS NULL");
         const fallbackParams: FormData = {
             ...(parameters ?? {}) // If `parameters` is undefined — create an empty object.
         };
@@ -260,7 +258,7 @@ async function submitFormAndUpdatePartial(
         // 2. Show spinner
         showGlobalSpinner();
 
-        console.log(`JSON argument: ${JSON.stringify(json)}`);
+        console.log(`2.   JSON argument: ${JSON.stringify(json)}`);
 
         // 3. Send request
         const response = await fetch(url, {
@@ -270,41 +268,46 @@ async function submitFormAndUpdatePartial(
         });
 
         // 4. Check for success
+        console.log(`4. Check for success. response.ok = ${response.ok}`);
         if (!response.ok) {
-            console.log(`4. Check for success. response.ok = ${response.ok}`);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         // 5. Receive partial HTML
         const data = await response.json();
-        console.log("Fetched data:", data);
+        console.log("5.  Fetched data:", data);
 
         // 6. Check if redirect is needed
         if (data.redirectTo) {
-            console.log("Redirecting to:", data.redirectTo);
+            console.log("6.  Redirecting to:", data.redirectTo);
             window.location.href = data.redirectTo;
             return; // Exit function to prevent further execution
         }
 
         // 7. Insert received HTML into the DOM
+        const paginationBodyBlock = document.getElementById("paginationBodyBlockContainer");
         if (paginationBodyBlock)
             paginationBodyBlock.innerHTML = data.paginationHtml;
         else
-            console.error(`Partial container with selector "paginationBodyBlockContainer" not found.`);
+            console.error(`7.  Partial container with selector "paginationBodyBlockContainer" not found.`);
 
+        const tableHeader = document.querySelector(partialSelector);
         if (tableHeader && data.tableHtml) {
             tableHeader.innerHTML = data.tableHtml;
 
-            if (plSysVisualizationBtn) {
+            const plSysVisualizationBtn = document.querySelector(".platetarySystemVisualization") as HTMLElement;
+            console.log(`7.  isVisualizationMode(${!!isVisualizationMode}) && plSysVisualizationBtn(${!!plSysVisualizationBtn})`);
+            // isVisualizationMode(undefined) && plSysVisualizationBtn([object HTMLButtonElement])
+            if (!!isVisualizationMode && !!plSysVisualizationBtn) {
                 plSysVisualizationBtn.setAttribute("data-parameters", JSON.stringify(json));
                 dataVisualization();
-
-                // ✅ ⬇️ Після всього — показати вміст
-                const table = document.querySelector<HTMLElement>('#planetsSystemTableContainer');
-                hideShowBlockDownAnime(table, true);
             }
+
+            // ✅ ⬇️ Після всього — показати вміст
+            const table = document.querySelector<HTMLElement>('#planetsSystemTableContainer');
+            hideShowBlockDownAnime(table, true);
         } else {
-            console.error(`Partial container with selector "${partialSelector}" not found.`);
+            console.error(`7.  Partial container with selector "${partialSelector}" not found.`);
         }
 
     } catch (error) {
@@ -330,40 +333,67 @@ async function submitFormAndUpdatePartial(
             `;
         }
     } finally {
+        console.log(`   submitFormAndUpdatePartial: finally`);
         hideGlobalSpinner();
     }
 }
 
-function updateCatalogData(catalog: string, pageButton: HTMLElement | null, parameters?: FormData) {
-    const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement;
-    if (!form && !parameters) return;
+type CatalogRouteInfo = {
+    url: string;
+    requiresForm: boolean;
+};
+
+const catalogRoutes: Record<string, CatalogRouteInfo> = {
+    NGCICOpendatasofts: {
+        url: '/Catalogs/NGCICOpendatasofts/Index',
+        requiresForm: true,
+    },
+    CollinderCatalogs: {
+        url: '/Catalogs/CollinderCatalogs/Index',
+        requiresForm: true,
+    },
+    PlanetsCatalog: {
+        url: '/Planetology/PlanetsCatalog/Index',
+        requiresForm: true,
+    },
+    PlanetarySystem: {
+        url: '/Planetology/PlanetarySystem/Index',
+        requiresForm: true,
+    },
+    PlanetarySystem_Visualization: {
+        url: '/Planetology/PlanetarySystem/PlanetarySystemVisualization',
+        requiresForm: false,
+    }
+};
+
+function updateCatalogData(catalog: string, pageButton: HTMLElement | null, isVisualizationMode: boolean, parameters?: FormData) {
+    const routeInfo = catalogRoutes[catalog];
+    if (!routeInfo) {
+        console.warn(`❌ Unknown catalog: "${catalog}"`);
+        return;
+    }
+
+    //if (isVisualizationMode == null) {
+    //    console.error(`❌ isVisualizationMode is undefined`);
+    //    return;
+    //}
 
     const pageNumber = pageButton?.textContent?.trim() || '1';
+    const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement | null;
 
-    console.log(`updateCatalogData(catalog = ${catalog}, form = ${form}, pageNumber = ${pageNumber}): `);
-
-    if (catalog === 'NGCICOpendatasofts') {
-        console.log("  >>> catalog === 'NGCICOpendatasofts'");
-        submitFormAndUpdatePartial(form, '/Catalogs/NGCICOpendatasofts/Index', '#sizeFilterTable', pageNumber);
+    if (routeInfo.requiresForm && !form && !parameters) {
+        console.warn(`⚠️ No form or parameters provided for catalog: "${catalog}"`);
+        return;
     }
 
-    if (catalog === 'CollinderCatalogs') {
-        console.log("  >>> catalog === 'CollinderCatalogs'");
-        submitFormAndUpdatePartial(form, '/Catalogs/CollinderCatalogs/Index', '#sizeFilterTable', pageNumber);
-    }
+    console.log(`FUNCTOIN: 📦 updateCatalogData:   >>>  catalog="${catalog}", page=${pageNumber}, isVisualizationMode(${isVisualizationMode})`);
 
-    if (catalog === 'PlanetsCatalog') {
-        console.log("  >>> catalog === 'PlanetsCatalog'");
-        submitFormAndUpdatePartial(form, '/Planetology/PlanetsCatalog/Index', '#sizeFilterTable', pageNumber);
-    }
-
-    if (catalog === 'PlanetarySystem') {
-        console.log("  >>> catalog === 'PlanetarySystem'");
-        submitFormAndUpdatePartial(form, '/Planetology/PlanetarySystem/Index', '#sizeFilterTable', pageNumber);
-    }
-
-    if (catalog === 'PlanetarySystem_Visualization') {
-        console.log("  >>> catalog === 'PlanetarySystem_Visualization'");
-        submitFormAndUpdatePartial(null, '/Planetology/PlanetarySystem/PlanetarySystemVisualization', '#sizeFilterTable', pageNumber, parameters);
-    }
+    submitFormAndUpdatePartial(
+        routeInfo.requiresForm ? form : null,
+        routeInfo.url,
+        '#sizeFilterTable',
+        pageNumber,
+        isVisualizationMode,
+        !routeInfo.requiresForm ? parameters : null
+    );
 }
