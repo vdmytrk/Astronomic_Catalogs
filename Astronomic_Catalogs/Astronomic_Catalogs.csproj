@@ -45,6 +45,7 @@
 		<TypeScriptCompile Remove="Scripts\ts\behavior.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\calendarHandler.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\development.ts" />
+		<TypeScriptCompile Remove="Scripts\ts\deviceUtils.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\formHandler.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\mainCO.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\metrics.ts" />

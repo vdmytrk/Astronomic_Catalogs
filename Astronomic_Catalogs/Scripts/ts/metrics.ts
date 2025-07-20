@@ -9,6 +9,7 @@ export function initialize(remInPixels: number): void {
     onWindowLoad(remInPixels);
     updateOnResizeWindow();
     updateOnResizeElement();
+    adjustRestrictedBlockHeight(remInPixels);
 }
 
 function updateOnResizeElement() {
@@ -26,7 +27,7 @@ function updateOnResizeElement() {
                 isLayoutUpdating = true;
                 handleTable(remInPixels);
                 isLayoutUpdating = false;
-            }, 100); 
+            }, 100);
         });
     }
 
@@ -200,6 +201,56 @@ function distributeItemsIntoColumns(containerSelector: string, remInPixels: numb
     columns.forEach(col => {
         col.style.width = `${columnWidth}px`;
     });
+}
+
+
+
+/////////////////////////////////////////////
+let isExpanded = false;
+let originalHeight: number | null = null;
+
+function adjustRestrictedBlockHeight(remInPixels: number): void {
+
+    const setupAdjustHeightOnDropdownClick = () => {
+
+        const restrictedBlock = document.querySelector('.allTopMenuFilters.restrictedBlock') as HTMLElement;
+        const table = document.querySelector('.planetTypeSelect.table') as HTMLElement;
+
+        if (!restrictedBlock || !table) return;
+
+        if (!isExpanded) {
+            const divRect = restrictedBlock.getBoundingClientRect();
+            const tableRect = table.getBoundingClientRect();
+
+            const divBottom = divRect.top + divRect.height + window.scrollY;
+            const tableBottom = tableRect.top + tableRect.height + window.scrollY + remInPixels / 2;
+
+            if (tableBottom > divBottom) {
+                const requiredIncrease = tableBottom - divBottom;
+                const currentComputedHeight = parseFloat(getComputedStyle(restrictedBlock).height);
+
+                originalHeight = currentComputedHeight;
+
+                restrictedBlock.style.height = (currentComputedHeight + requiredIncrease) + remInPixels / 2 + 'px';
+                isExpanded = true;
+            }
+        } else {
+            if (originalHeight !== null) {
+                restrictedBlock.style.height = originalHeight + 'px';
+                isExpanded = false;
+            }
+        }
+    }
+
+    const button = document.querySelector('.adjustHeightDropdownBtn.dropdown-toggle');
+
+    if (button) {
+        button.addEventListener('click', () => {
+            setTimeout(() => {
+                setupAdjustHeightOnDropdownClick();
+            }, 2);
+        });
+    }
 }
 
 

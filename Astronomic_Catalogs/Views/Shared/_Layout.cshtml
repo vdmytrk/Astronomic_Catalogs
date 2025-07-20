@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/less/site.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/less/themes.min.css" asp-append-version="true" />
-    @RenderSection("PlanetarySystemVisualization", required: false)
     <script src="~/lib/signalr/signalr.min.js"></script>
 </head>
 <body>
@@ -106,7 +105,9 @@
     @await RenderSectionAsync("ScriptsPlanetarySystem", required: false)
     @await RenderSectionAsync("ScriptsCalendarHandler", required: false)
     @await RenderSectionAsync("ScriptsProgresImportBar", required: false)
+    @await RenderSectionAsync("PlanetarySystemVisualization", required: false)
     @await RenderSectionAsync("Development", required: false)
+    @await RenderSectionAsync("ScriptsSelect2", required: false)
 
     <div id="global-spinner-overlay" style="display: none;">
         <div id="global-spinner"></div>

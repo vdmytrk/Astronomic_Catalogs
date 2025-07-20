@@ -20,12 +20,25 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Users in Role</label>
-                <select name="selectedUsers" class="form-select" multiple>
+                <select class="multipleSelect form-select" name="selectedUsers" multiple>
                     @foreach (var user in ViewData["Users"] as SelectList ?? new SelectList(new List<AspNetUserRole>()))
                     {
                         <option value="@user.Value" selected="@(Model.UserRoles != null && Model.UserRoles.Any(r => r.UserId == user.Value))">@user.Text</option>
                     }
                 </select>
+                <table class="tableSelect table table-bordered table-sm m-0">
+                    <tbody>
+                        @foreach (var user in ViewData["Users"] as SelectList ?? new SelectList(new List<AspNetUserRole>()))
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    <input class="check-box" type="checkbox" name="selectedUsers" value="@user.Value" />
+                                </td>
+                                <td>@user.Text</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
             <div class="form-group mt-4">
                 <input type="submit" value="Save" class="btn btn-primary" /> |

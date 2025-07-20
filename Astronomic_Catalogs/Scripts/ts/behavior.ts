@@ -1,5 +1,7 @@
 ﻿//////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////// 
+import { DeviceUtils } from './deviceUtils';
+
 export function initialize(): void {
     setupShowTextBlockToggles();
     setupShowFiltersToggles();
@@ -7,6 +9,7 @@ export function initialize(): void {
     handlePlanetSyzeDependency();
     selectAllPlanetSize();
     syncCheckboxWithSelectedOptions();
+    applyDeviceResponsiveUI();
 }
 
 
@@ -80,21 +83,38 @@ export function hideShowBlockDownAnime(target: HTMLElement, show: boolean, delay
 
 function handlePlanetSyzeDependency(): void {
     const planetSyzeCheckbox = document.querySelector<HTMLInputElement>('.chb-PlanetWithSize');
-    const planetSizeSelect = document.querySelector<HTMLSelectElement>('#planetTypeSelect');
-    const choosePlanetSizes = document.querySelector<HTMLElement>('.chooseWhichPlanetSizes');
+    const choosePlanetSizes = document.querySelectorAll<HTMLElement>('.chooseWhichPlanetSizes');
+    const planetSizeSelects = document.querySelectorAll<HTMLSelectElement>('.planetTypeEnabled');
+    const planetTypeCheckboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"][name="PlanetType"]');
 
-    if (!planetSyzeCheckbox || !planetSizeSelect || !choosePlanetSizes) return;
+    if (!planetSyzeCheckbox || (planetSizeSelects.length === 0 &&  choosePlanetSizes.length === 0 && planetTypeCheckboxes.length === 0)) return;
 
     const updateChoosePlanetSizesAccessibility = () => {
-        if (planetSyzeCheckbox.checked) {
-            planetSizeSelect.disabled = false;
-            choosePlanetSizes.classList.remove('disabled-opacity');
+        const isChecked = planetSyzeCheckbox.checked;
+
+        choosePlanetSizes.forEach(block => {
+            block.classList.toggle('disabled-opacity', !isChecked);
+        });
+
+        planetSizeSelects.forEach(select => {
+            select.disabled = !isChecked;
+
+            if (!isChecked) {
+                select.selectedIndex = -1;
+
+                const options = select.querySelectorAll<HTMLOptionElement>('option');
+                options.forEach(option => option.classList.remove('selected-fix'));
+            }
+        });
+
+        if (!isChecked) {
+            planetTypeCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
         } else {
-            planetSizeSelect.disabled = true;
-            planetSizeSelect.selectedIndex = -1;
-            const options = planetSizeSelect.querySelectorAll<HTMLOptionElement>('option');
-            options.forEach(option => option.classList.remove('selected-fix'));
-            choosePlanetSizes.classList.add('disabled-opacity');
+            planetTypeCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
         }
     };
 
@@ -129,7 +149,7 @@ function handleHabitableZoneDependency(): void {
 
 function selectAllPlanetSize(): void {
     const planetSyzeCheckbox = document.querySelector<HTMLInputElement>('.chb-PlanetAllSize');
-    const planetSizeSelect = document.querySelector<HTMLSelectElement>('#planetTypeSelect');
+    const planetSizeSelect = document.querySelector<HTMLSelectElement>('.planetTypeEnabled');
 
     if (!planetSyzeCheckbox || !planetSizeSelect) return;
 
@@ -155,7 +175,7 @@ function selectAllPlanetSize(): void {
 
 function syncCheckboxWithSelectedOptions(): void {
     const planetSyzeCheckbox = document.querySelector<HTMLInputElement>('.chb-PlanetAllSize');
-    const planetSizeSelect = document.querySelector<HTMLSelectElement>('#planetTypeSelect');
+    const planetSizeSelect = document.querySelector<HTMLSelectElement>('.planetTypeEnabled');
 
     if (!planetSyzeCheckbox || !planetSizeSelect) return;
 
@@ -168,4 +188,24 @@ function syncCheckboxWithSelectedOptions(): void {
     planetSizeSelect.addEventListener('mouseup', () => {
         setTimeout(checkIfAllSelected, 0);
     });
+}
+
+
+function applyDeviceResponsiveUI(): void {
+    const applyResponsiveChanges = () => {
+        const deviceType = DeviceUtils.getDeviceType();      // 'mobile' | 'tablet' | 'desktop' | 'unknown'
+        const platform = DeviceUtils.getDevicePlatform();    // 'windows' | 'macos' | 'android' | 'ios' | 'linux' | 'unknown'
+        console.log(` ⚠️ 📐 DEVICE CHARACTERISTICS: deviceType: ${deviceType}, platform: ${platform}`);
+
+
+        const tableSelectBlocks = document.querySelectorAll<HTMLElement>('.tableSelect');
+        const multipleSelectBlocks = document.querySelectorAll<HTMLElement>('.multipleSelect');
+
+        if (deviceType === 'desktop')
+            tableSelectBlocks.forEach(e => e.remove());
+        else
+            multipleSelectBlocks.forEach(e => e.remove());
+    };
+    
+    window.addEventListener("DOMContentLoaded", applyResponsiveChanges);
 }

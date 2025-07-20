@@ -129,11 +129,6 @@ BEGIN
 				RETURN;
 			END
 
-
-			INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorMessage) 
-				VALUES ('GetFilteredPlanetsData - @PlanetName', 0, 0, ISNULL(@PlanetName, 'NULL'));
-			INSERT INTO LogProcFunc (FuncProc, Line, ErrorNumber, ErrorMessage) 
-				VALUES ('GetFilteredPlanetsData - @Name', 0, 0, ISNULL(@Name, 'NULL'));
 		END
 
 
@@ -180,7 +175,7 @@ BEGIN
 
 
 		DECLARE @DiscoveryMethods TABLE (Name NVARCHAR(100));
-		IF ISJSON(@PlanetType) = 1
+		IF ISJSON(@DiscoveryMethod) = 1
 		BEGIN
 			INSERT INTO @DiscoveryMethods (Name)
 			SELECT [value]

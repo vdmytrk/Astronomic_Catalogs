@@ -37,15 +37,15 @@ public class NGCICOpendatasoftsController : Controller
     // GET: Catalogs/NGCICOpendatasofts
     public async Task<IActionResult> Index()
     {
-        int countNGCTask;
-        int countNGCE_Task;
+        int countNGC;
+        int countNGCE;
         List<ConstellationDto>? constellations;
         List<NGCICOpendatasoft>? catalogItems;
         List<NGCICViewModel> catalogViewModels;
 
         try
         {
-            (countNGCTask, countNGCE_Task, constellations, catalogItems) = await _filterService.GetNGCICOpendatasoftDataAsync();
+            (countNGC, countNGCE, constellations, catalogItems) = await _filterService.GetNGCICOpendatasoftDataAsync();
             catalogViewModels = catalogItems.ToViewModelList();
         }
         catch (Exception ex)
@@ -73,7 +73,7 @@ public class NGCICOpendatasoftsController : Controller
         }
 
         ViewBag.RowOnPageCatalog = "50";
-        ViewBag.AmountRowsResult = countNGCTask + countNGCE_Task;
+        ViewBag.AmountRowsResult = countNGC + countNGCE;
         ViewBag.Constellations = constellations;
 
         return View(catalogViewModels);

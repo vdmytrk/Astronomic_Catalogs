@@ -26,13 +26,8 @@
         .ToList();
 
     var planetNames = ViewBag.PlanetNames as List<SelectListItem> ?? new();
-    planetNames.Insert(0, new SelectListItem { Value = "0", Text = "All planets" });
-
     var telescopeNames = ViewBag.TelescopNames as List<SelectListItem> ?? new();
-    telescopeNames.Insert(0, new SelectListItem { Value = "0", Text = "All telescopes" });
-
     var discoveryMethods = ViewBag.DiscoveryMethod as List<SelectListItem> ?? new();
-    discoveryMethods.Insert(0, new SelectListItem { Value = "0", Text = "All methods" });
 }
 
 <div class="catalogPagesHeader p-3">
@@ -121,30 +116,27 @@
                     <div class="row gx-0 gy-3 m-0">
                         <div class="col-12 col-xl">
                             <div class="d-flex flex-wrap gap-3">
+
                                 <!-- Planet size block -->
                                 <div class="flex-grow-1">
-                                    <div class="d-flex flex-column align-items-center text-center planetFilterSizeBlock">
+                                    <div class="d-flex flex-column planetFilterSizeBlock">
                                         <div class="mt-3 mt-md-3">
-                                            <div class="w-100 text-start">
+                                            <div class="w-100">
                                                 <div class="d-flex justify-content-center">
                                                     <span class="label fw-bold text-start">Planet syze:</span>
                                                 </div>
-                                                <div class="d-flex justify-content-center text-start">
-                                                    <span class="label">Show only planets with a defined size:</span>
-                                                    <span class="label">
-                                                        <span>
-                                                            @Html.CheckBox("PlanetWithSize", false, new { @class = "check-box chb-PlanetWithSize ms-2", onclick = "toggleCheckbox(this, 'PlanetWithSize')" })
-                                                        </span>
+                                                <div class="d-flex align-items-center justify-content-center ms-2">
+                                                    <span class="label text-start">
+                                                        <span class="me-4">Show only planets with a defined size:</span>
+                                                        @Html.CheckBox("PlanetWithSize", false, new { @class = "check-box chb-PlanetWithSize" })
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div class="chooseWhichPlanetSizes">
-                                                <div class="d-flex justify-content-center mt-4">
-                                                    <span class="label fw-bold text-start">Choose which planet sizes to show (all are selected by default):</span>
+                                            <div class="multipleSelect chooseWhichPlanetSizes">
+                                                <div class="d-flex justify-content-center mt-3">
+                                                    <span class="label fw-bold text-start">Choose planet sizes (default: all):</span>
                                                 </div>
-                                                <select id="planetTypeSelect" name="PlanetType"
-                                                        class="form-select mx-auto"
-                                                        multiple>
+                                                <select class="planetTypeSelect planetTypeEnabled form-select mx-auto" name="PlanetType" multiple>
                                                     @foreach (var item in planetType)
                                                     {
                                                         <option value="@item.Value">
@@ -154,27 +146,67 @@
                                                 </select>
                                             </div>
                                         </div>
+
+                                        <div class="tableSelect chooseWhichPlanetSizes dropdown mt-3">
+                                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Choose which planet sizes to show (default: all)
+                                            </button>
+                                            <div class="dropdown-menu p-1" style="min-width: 100%;">
+                                                <table class="planetTypeSelect table table-bordered table-sm m-0">
+                                                    <tbody>
+                                                        @foreach (var item in planetType)
+                                                        {
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input class="check-box" type="checkbox" name="PlanetType" value="@item.Value" />
+                                                                </td>
+                                                                <td>@item.Text — Size from @item.Value_1 to @item.Value_2 radius of Earth</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
 
                                 <!-- Telescope block -->
                                 <div class="flex-grow-1 mt-3 mt-md-3">
-                                    <div class="d-flex flex-column align-items-center text-center telescopFilterSizeBlock">
+                                    <div class="telescopFilterSizeBlock">
                                         <div class="mt-1">
-                                            <div class="d-flex justify-content-center">
-                                                <span class="label fw-bold text-start">Discovered with a telescope:</span>
-                                            </div>
-                                            <select id="exoplanetTelescope" name="Telescope"
-                                                    class="form-select mx-auto"
-                                                    multiple>
+                                            <span class="label fw-bold ms-3">Discovered with a telescope:</span>
+                                            <select class="multipleSelect exoplanetTelescope form-select mx-auto" name="Telescope" multiple>
                                                 @foreach (var item in telescopeNames)
                                                 {
                                                     <option value="@item.Value">@item.Text</option>
                                                 }
                                             </select>
                                         </div>
+
+                                        <div class="tableSelect dropdown mt-3">
+                                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Discovered with a telescope
+                                            </button>
+                                            <div class="exoplanetTelescope dropdown-menu p-1" style="min-width: 100%;">
+                                                <table class="table table-bordered table-sm m-0">
+                                                    <tbody>
+                                                        @foreach (var item in telescopeNames)
+                                                        {
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input class="check-box" type="checkbox" name="Telescope" value="@item.Value" />
+                                                                </td>
+                                                                <td>@item.Text</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                         @********************************************************************************************************@
@@ -183,11 +215,9 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex flex-column">
                                         <!-- Planet name -->
-                                        <div class="mt-3 exoplanetPlanetName">
+                                        <div class="mt-4">
                                             <span class="label fw-bold">Planet name:</span>
-                                            <select id="exoplanetPlanetName" name="PlanetName"
-                                                    class="form-select mx-auto"
-                                                    multiple>
+                                            <select class="exoplanetPlanetName multipleSelect form-select mx-auto" name="PlanetName" multiple>
                                                 @foreach (var item in planetNames)
                                                 {
                                                     <option value="@item.Value">@item.Text</option>
@@ -195,17 +225,57 @@
                                             </select>
                                         </div>
 
+                                        <div class="tableSelect dropdown mt-3">
+                                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Planet name
+                                            </button>
+                                            <div class="exoplanetPlanetName dropdown-menu p-1" style="min-width: 100%;">
+                                                <table class="table table-bordered table-sm m-0">
+                                                    <tbody>
+                                                        @foreach (var item in planetNames)
+                                                        {
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input class="check-box" type="checkbox" name="PlanetName" value="@item.Value" />
+                                                                </td>
+                                                                <td>@item.Text</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
                                         <!-- Discovery method -->
-                                        <div class="mt-3 exoplanetDiscoveryMethod">
+                                        <div class="mt-4">
                                             <span class="label fw-bold">Discovered with a method:</span>
-                                            <select id="exoplanetDiscoveryMethod" name="DiscoveryMethod"
-                                                    class="form-select mx-auto"
-                                                    multiple>
+                                            <select class="exoplanetDiscoveryMethod multipleSelect form-select mx-auto" name="DiscoveryMethod" multiple>
                                                 @foreach (var item in discoveryMethods)
                                                 {
                                                     <option value="@item.Value">@item.Text</option>
                                                 }
                                             </select>
+                                        </div>
+
+                                        <div class="tableSelect dropdown mt-3">
+                                            <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Discovered with a method
+                                            </button>
+                                            <div class="exoplanetDiscoveryMethod dropdown-menu p-1" style="min-width: 100%;">
+                                                <table class="table table-bordered table-sm m-0">
+                                                    <tbody>
+                                                        @foreach (var item in discoveryMethods)
+                                                        {
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input class="check-box" type="checkbox" name="DiscoveryMethod" value="@item.Value" />
+                                                                </td>
+                                                                <td>@item.Text</td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -318,9 +388,9 @@
                             <div class="d-flex flex-wrap align-items-center">
                                 <h6 class="pe-2">Number of elements on the page:</h6>
                                 @Html.DropDownList(
-                                    "RowOnPageCatalog",
-                                    new SelectList(new string[] { "10", "20", "30", "50" }, "30"),
-                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30", @class = "form-select RowOnPageCatal" })
+                                "RowOnPageCatalog",
+                                                                new SelectList(new string[] { "10", "20", "30", "50" }, "30"),
+                                                                new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30", @class = "form-select RowOnPageCatal" })
                             </div>
                         </div>
                         <div class="col-6">
@@ -378,4 +448,16 @@
 }
 @section ScriptsFormHandler {
     <script src="~/js/formHandler.min.js" asp-append-version="true"></script>
+}
+@section ScriptsSelect2 {
+    <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <script src="~/lib/select2/js/select2.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            $('#telescopTypeSelectOld').select2({
+                placeholder: "Select telescopes",
+                width: 'resolve'
+            });
+        });
+    </script>
 }

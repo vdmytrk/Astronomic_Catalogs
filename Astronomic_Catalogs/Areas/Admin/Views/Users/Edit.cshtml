@@ -57,12 +57,25 @@
 
             <div class="mb-3">
                 <label>Assign roles</label>
-                <select name="selectedRoles" class="form-select" multiple>
+                <select class="multipleSelect form-select" name="selectedRoles" multiple>
                     @foreach (var role in (ViewData["Roles"] as SelectList ?? new SelectList(new List<AspNetUserRole>())))
                     {
                         <option value="@role.Value" selected="@(Model.UserRoles != null && Model.UserRoles.Any(r => r.RoleId == role.Value))">@role.Text</option>
                     }
                 </select>
+                <table class="tableSelect table table-bordered table-sm m-0">
+                    <tbody>
+                        @foreach (var role in (ViewData["Roles"] as SelectList ?? new SelectList(new List<AspNetUserRole>())))
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    <input class="check-box" type="checkbox" name="selectedRoles" value="@role.Value" />
+                                </td>
+                                <td>@role.Text</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
                 <span class="text-danger">@Html.ValidationMessage("selectedRoles")</span>
             </div>
 

@@ -6,16 +6,17 @@ const removeDebugLogs = 0;
 const entry = {
     alertOfSwal: "./Scripts/ts/alertOfSwal.ts",
     behavior: "./Scripts/ts/behavior.ts",
+    calendarHandler: "./Scripts/ts/calendarHandler.ts",
+    deviceUtils: "./Scripts/ts/deviceUtils.ts",
     formHandler: "./Scripts/ts/formHandler.ts",
     main: "./Scripts/ts/main.ts",
     metrics: "./Scripts/ts/metrics.ts",
+    planetarySystemVisualization: "./Scripts/ts/planetarySystemVisualization.ts",
     progresImportBar: "./Scripts/ts/progresImportBar.ts",
     scriptTS: "./Scripts/ts/scriptTS.ts",
-    theme: "./Scripts/ts/theme.ts",
-    telescopeViewCalculator: "./Scripts/ts/telescopeViewCalculator.ts",
-    calendarHandler: "./Scripts/ts/calendarHandler.ts",
     switchTableType: "./Scripts/ts/switchTableType.ts",
-    planetarySystemVisualization: "./Scripts/ts/planetarySystemVisualization.ts",
+    telescopeViewCalculator: "./Scripts/ts/telescopeViewCalculator.ts",
+    theme: "./Scripts/ts/theme.ts",
 };
 
 // To avoid building in CI/CD.

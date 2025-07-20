@@ -197,12 +197,12 @@ public class NGCICFilterService : INGCICFilterService
             ";
 
             using var multi = await conn.QueryMultipleAsync(sql);
-            int countNGCTask = await multi.ReadFirstAsync<int>();
-            var countNGCE_Task = await multi.ReadFirstAsync<int>();
+            int countNGC = await multi.ReadFirstAsync<int>();
+            var countNGCE = await multi.ReadFirstAsync<int>();
             var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
             var catalogItems = (await multi.ReadAsync<NGCICOpendatasoft>()).ToList();
 
-            return (countNGCTask, countNGCE_Task, constellations, catalogItems);
+            return (countNGC, countNGCE, constellations, catalogItems);
         }
         catch (Exception sqlEx) when (sqlEx is SqlException || sqlEx is InvalidOperationException)
         {

@@ -1,0 +1,833 @@
+﻿@light-bg: white;
+@light-text: black;
+// Table
+@fixed-rows: 1;
+@fixed-columns-1: 1;
+@fixed-columns-2: 2;
+@missed-columns-1: @fixed-columns-1+1;
+@missed-columns-2: @fixed-columns-2+1;
+
+html {
+    position: relative;
+    min-height: 100%;
+    font-size: 80%;
+}
+
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
+
+.marginButton {
+    margin-top: .1rem !important;
+}
+
+.marginButton button {
+    margin: 0.5rem
+}
+
+.btn,
+.btn:focus,
+.btn:active,
+.btn:hover,
+.btn:visited,
+.btn:focus-visible {
+    box-shadow: none !important;
+}
+
+/*a:hover, .btn:hover {
+    color: darken(#258cfb, 10%);
+    font-weight: bold !important;*/ /* Зробити жирним */
+/*text-decoration: none;*/ /* (опційно) прибрати підкреслення у <a> */
+/*}*/
+.divination {
+    border-bottom: .1rem solid #708090;
+}
+
+// The identity block style block
+.identityStyle {
+    max-height: 2.5rem;
+}
+a.identityBlockStyle {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+// Select behavior block
+.disabled-opacity {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Planets controller
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+.planetPropErr1 {
+    font-size: 1em;
+    /*font-weight: bold;*/
+}
+
+.planetPropErr2 {
+    font-size: 0.6em;
+    line-height: 1;
+    margin-top: .1rem !important;
+}
+
+.comparison-sign-on {
+    white-space: nowrap;
+    display: inline;
+    margin-right: -0.3em;
+}
+
+.comparison-sign-off {
+    white-space: nowrap;
+    display: inline;
+    margin-right: 0.7em;
+}
+
+.comparison-main-intagers {
+    display: inline;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Table
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Стилі елементів блоку вибірки Сузір'я
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+table.constellationSelectTable thead {
+    z-index: 1;
+}
+
+#sizeFilterTable {
+    min-height: 20rem !Important;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+table {
+    //border-collapse: separate; // Щоб не ховалися межі закріпленого рядка при прокрутці
+    border-collapse: collapse; // Щоб не зникали межі всіх інших рядків. Перекриває верхній стиль!!!
+    border-spacing: 0;
+}
+
+table thead tr.tr-oun-style th {
+    padding-top: 1em !important;
+    padding-bottom: 1em !important;
+}
+
+table thead tr th {
+    padding: .5em;
+}
+
+table tbody tr td {
+    padding-left: .5em !important;
+}
+table tbody tr.thickTopBorder {
+    border-top: .16rem solid;
+}
+
+
+
+//// Table - вертикальна прокрутка ////
+.table-fixed-headers {
+    position: relative;
+    display: block;
+}
+
+.table-fixed-headers {
+    top: 0;
+    z-index: 1013; // значення 1060 перекриє вікно функції showAlert()!
+}
+
+.toFixLayoutHeader {
+    position: sticky;
+    top: 0;
+    z-index: 1014; // значення 1060 перекриє вікно функції showAlert()!
+}
+
+// Фіксація першого рядка заголовка всіх колонок вказаних в змінній missed-columns-X відповідно до класу table-toFixColumns-X
+table.table-toFixRows-1.table-toFixColumns-1 thead tr th:nth-child(n+@{missed-columns-1}) { // Вибрати всі th починаючи з 2-го.
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1004;
+}
+
+table.table-toFixRows-1.table-toFixColumns-2 thead tr th:nth-child(n+@{missed-columns-2}) { // Вибрати всі th починаючи з 3-го.
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1004;
+}
+
+
+
+//// Table - горизонтальна прокрутка ////
+// Фіксація першого стовпця
+table.table-toFixColumns-1 tbody tr td:nth-child(-n+@{fixed-columns-1}), // Вибрати перший th.
+table.table-toFixColumns-1 thead tr th:nth-child(-n+@{fixed-columns-1}) {
+    position: sticky;
+    z-index: 1005;
+}
+
+// Фіксація заголовку першого стовпця
+table.table-toFixColumns-1 thead tr th:nth-child(-n+@{fixed-columns-1}) { // Вибрати перший th.
+    position: sticky;
+    top: 0;
+    z-index: 1006;
+}
+
+// Фіксація перших двох стовпців
+table.table-toFixColumns-2 tbody tr td:nth-child(-n+@{fixed-columns-2}), // Вибрати перші 2 th.
+table.table-toFixColumns-2 thead tr th:nth-child(-n+@{fixed-columns-2}) {
+    position: sticky;
+    z-index: 1005;
+}
+
+// Фіксація заголовку перших двох стовпців
+table.table-toFixColumns-2 thead tr th:nth-child(-n+@{fixed-columns-2}) { // Вибрати перші 2 th.
+    position: sticky;
+    top: 0;
+    z-index: 1006;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ФІКСАЦІЯ КОЛОНК, ЇХНЬОЇ ШИРИНИ ТА ПРИХОВУВАННЯ ТЕКСТУ ЩО НЕ ВЛІЗ. ЗА ПОТРЕБИ ДОДАЮТЬСЯ "..."
+// Одна колонка зафіксована
+table.table-toFixColumns-1 tbody tr td:nth-child(-n+@{fixed-columns-1}), // Вибрати перший th.
+table.table-toFixColumns-1 thead tr th:nth-child(-n+@{fixed-columns-1}) {
+    white-space: nowrap;
+    min-width: 4em;
+}
+
+table.table-toFixColumns-1 tbody tr td:nth-last-child(-n+@{fixed-columns-1}), // Вибрати останні @{fixed-columns} td
+table.table-toFixColumns-1 thead tr th:nth-last-child(-n+@{fixed-columns-1}) { // Вибрати останні @{fixed-columns} th
+    white-space: nowrap;
+}
+
+table.table-toFixColumns-1.setColumnWidth tbody tr td:nth-child(n+@{missed-columns-1}):not(:nth-last-child(-n+2)), // Вибрати всі th починаючи з 4-го і не включаючи останні 2.
+table.table-toFixColumns-1.setColumnWidth thead tr th:nth-child(n+@{missed-columns-1}):not(:nth-last-child(-n+2)) {
+    white-space: nowrap; /* Не переносити текст на новий рядок якщо він не поміщається в клітинку */
+    min-width: 5em;
+    max-width: 11em;
+    overflow: hidden; /* Приховує текст який не помістився в клітинку */
+    text-overflow: ellipsis; /* Додає "..." якщо текст не поміщається */
+}
+
+table.table-toFixColumns-1 tbody tr td:nth-child(n+@{missed-columns-1}):not(:nth-last-child(-n+2)), // Вибрати всі th починаючи з 4-го і не включаючи останні 2.
+table.table-toFixColumns-1 thead tr th:nth-child(n+@{missed-columns-1}):not(:nth-last-child(-n+2)) {
+    white-space: nowrap; /* Не переносити текст на новий рядок якщо він не поміщається в клітинку */
+    min-width: 5em;
+    overflow: hidden; /* Приховує текст який не помістився в клітинку */
+    text-overflow: ellipsis; /* Додає "..." якщо текст не поміщається */
+}
+
+// Дві колонки зафіксовані
+table.table-toFixColumns-2 tbody tr td:nth-child(-n+@{fixed-columns-2}), // Вибрати перші 2 th.
+table.table-toFixColumns-2 thead tr th:nth-child(-n+@{fixed-columns-2}) {
+    white-space: nowrap;
+    min-width: 4em;
+}
+
+table.table-toFixColumns-2 tbody tr td:nth-last-child(-n+@{fixed-columns-2}), // Вибрати останні @{fixed-columns} td
+table.table-toFixColumns-2 thead tr th:nth-last-child(-n+@{fixed-columns-2}) { // Вибрати останні @{fixed-columns} th
+    white-space: nowrap;
+}
+
+table.table-toFixColumns-2.setColumnWidth tbody tr td:nth-child(n+@{missed-columns-2}):not(:nth-last-child(-n+2)), // Вибрати всі th починаючи з 4-го і не включаючи останні 2.
+table.table-toFixColumns-2.setColumnWidth thead tr th:nth-child(n+@{missed-columns-2}):not(:nth-last-child(-n+2)) {
+    white-space: nowrap; /* Не переносити текст на новий рядок якщо він не поміщається в клітинку */
+    min-width: 5em;
+    max-width: 11em;
+    overflow: hidden; /* Приховує текст який не помістився в клітинку */
+    text-overflow: ellipsis; /* Додає "..." якщо текст не поміщається */
+}
+
+table.table-toFixColumns-2 tbody tr td:nth-child(n+@{missed-columns-2}):not(:nth-last-child(-n+2)), // Вибрати всі th починаючи з 4-го і не включаючи останні 2.
+table.table-toFixColumns-2 thead tr th:nth-child(n+@{missed-columns-2}):not(:nth-last-child(-n+2)) {
+    white-space: nowrap; /* Не переносити текст на новий рядок якщо він не поміщається в клітинку */
+    min-width: 5em;
+    overflow: hidden; /* Приховує текст який не помістився в клітинку */
+    text-overflow: ellipsis; /* Додає "..." якщо текст не поміщається */
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Рівномірне розподілення блоків по колонках
+/*.responsive-column {
+    display: flex !important;
+}*/
+.responsive-columns-wrapper {
+    display: flex;
+    //gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.responsive-column {
+    flex: 1;
+    min-width: 320px;
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// АНІМАЦІЇ
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Приховування колонок таблиць каталогів
+.fade-column {
+    transition: opacity 0.4s ease, width 0.4s ease, transform 0.4s ease;
+    transform: translateX(0);
+    overflow: hidden;
+    opacity: 1;
+    width: auto;
+    white-space: nowrap;
+}
+
+.fade-column.hidden-column {
+    opacity: 0;
+    width: 0 !important;
+    transform: translateX(-20px);
+    pointer-events: none;
+}
+
+// Приховування філтрів таблиць каталогів та блоків
+.allTopMenuFilters, .hiddenBlock {
+    transition: opacity 0.8s ease, max-height 0.8s ease, transform 0.8s ease;
+    transform: translateY(0);
+    overflow: hidden;
+    opacity: 1;
+}
+
+.allTopMenuFilters.collapsed,
+.hiddenBlock.collapsed {
+    transform: translateY(-15px); // Дивися попердній блок стилів!!!
+    max-height: 0;
+    opacity: 0;
+}
+
+// Приховування вкладених елементів
+.hiddenBlockContent.collapsed > * {
+    transition: opacity 0.8s ease, max-height 0.8s ease, transform 0.8s ease;
+    transform: translateY(-15px);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.hiddenBlockContent > * {
+    transition: opacity 0.8s ease, max-height 0.8s ease, transform 0.8s ease;
+    transform: translateY(0);
+    //max-height: 1000px; /* достатньо велике значення для нормального показу */
+    opacity: 1;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Стилі елементів вибірки для сторінок каталогів
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+.fieldsCheckBoks span {
+    white-space: nowrap;
+
+    span {
+        white-space: normal; /* скидає nowrap для вкладених span */
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Перемикач
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@switch-size: 2em; // висота перемикача (можеш змінювати під свої потреби)
+@switch-width: (@switch-size * 1.8);
+@thumb-size: (@switch-size * 0.8125);
+@thumb-offset: (@switch-size * 0.09375);
+@padding-h: (@switch-size * 0.1875);
+@font-size: (@switch-size * 0.375);
+@thumb-shift: (@switch-width - @thumb-size - 2 * @thumb-offset);
+
+.switchButton {
+    position: relative;
+    display: inline-block;
+    width: @switch-width;
+    height: @switch-size;
+    font-size: @font-size;
+}
+
+.switchButton input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 999em;
+    transition: background-color 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 @padding-h;
+    font-weight: bold;
+    color: white;
+    font-family: sans-serif;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: @thumb-size;
+    width: @thumb-size;
+    left: @thumb-offset;
+    top: @thumb-offset;
+    border-radius: 50%;
+    transition: transform 0.1s;
+    transition: background-color 0.1s;
+    box-shadow: 0 (@switch-size * 0.03125) (@switch-size * 0.09375) rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+input:checked + .slider::before {
+    transform: translateX(@thumb-shift);
+    transition: background-color 0.1s;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+.text-on {
+    margin-left: .4em;
+}
+
+.text-on,
+.text-off {
+    z-index: 0;
+    width: 50%;
+    text-align: center;
+    user-select: none;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    color: red;
+}
+
+input:checked + .slider .text-on {
+    opacity: 1;
+}
+
+input:checked + .slider .text-off {
+    opacity: 0;
+}
+
+input:not(:checked) + .slider .text-on {
+    opacity: 0;
+}
+
+input:not(:checked) + .slider .text-off {
+    opacity: 1;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+.filter-grid {
+    display: grid;
+    row-gap: 0.5rem;
+}
+
+.filter-row {
+    display: contents; //щоб grid працював через parent
+}
+
+.filter-grid {
+    grid-template-columns: max-content 1fr;
+    column-gap: 1rem;
+}
+/* Адаптивний вигляд для мобільних */
+@media (max-width: 576px) {
+    .filter-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .label {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .filter-fields {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .filter-fields input[type="text"] {
+        flex: 1 1 45%;
+        min-width: 80px;
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Стилі елементів блоку пагінації
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+.paginationBodyBlock {
+    border: .2rem solid gray;
+    border-radius: .4rem;
+    margin-bottom: .5rem;
+    min-height: 3rem;
+    max-height: 7rem;
+    /*overflow: hidden;*/
+    overflow-x: auto;
+    /*overflow-x: auto;*/
+    -webkit-user-select: none; // Google Chrome, Opera Next, Safari
+}
+
+.callStyle {
+    /*border-right: .1rem solid red;*/
+    font: bold 1.5rem Arial;
+    padding: .5rem 0rem .5rem .5rem;
+    margin-top: -.2rem;
+    /*height: 1rem;*/
+}
+
+.borderBlock {
+    font: bold 1.7rem Calibry;
+    padding-left: .4rem;
+    /*margin-top: -.7rem;*/
+}
+
+.paginationCell {
+    cursor: pointer;
+}
+
+.paginationCell:hover {
+    //padding: 0.1rem 0.5rem 0 0.5rem;
+    border-radius: 0.3rem;
+    background-color: rgba(128, 128, 128, 0.3);
+}
+
+.paginationCell {
+    cursor: pointer;
+    transition: background-color 0.2s, padding 0.2s;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Telescope View Calculator
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// Максимальна ширина контентів
+.telescopeViewCalculatorInputs input[type="text"] {
+    max-width: 6rem;
+}
+
+.telescopeCharacteristicsContent {
+    max-width: 35rem;
+}
+
+/* Базові flex-властивості для адаптації */
+.telescopeViewCalculatorInputs,
+.telescopeViewCalculatorOutputs,
+.viewProvidedEyepiece,
+.telescopeParameters,
+.typicalMagnifications,
+.otherParameters {
+    flex: 1 1 auto;
+}
+
+/* Мінімальні та максимальні ширини блоків */
+/* Ширини з clamp — забезпечує адаптивність без переповнення */
+/* Калькулятор телескопу */
+.telescopeViewCalculatorInputs {
+    max-width: 80rem;
+    width: auto;
+}
+
+.telescopeCharacteristics {
+    margin-left: 2rem;
+}
+.telescopeViewCalculatorOutputs {
+    max-width: 135rem;
+    width: auto;
+}
+
+.viewProvidedEyepiece {
+    min-width: 25rem;
+    width:auto;
+    margin-left: 2rem;
+}
+.viewProvidedEyepieceContent {
+    max-width: 45rem;
+}
+.otherParametersContent {
+    max-width: 45rem;
+}
+.telescopeParameters {
+    margin-left: 2rem;
+}
+.otherParameters {
+    width: clamp(27rem, 100%, 35rem);
+}
+
+.typicalMagnifications {
+    width: clamp(35rem, 100%, 50rem);
+}
+
+/* Центрування та wrap — обов’язкове */
+#telescopeViewCalculator.container > .row {
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 2rem;
+    column-gap: 2rem;
+}
+
+/* Внутрішні відступи для запобігання виходу за межі */
+.container {
+    padding-inline: 2rem;
+}
+
+//@media (max-width: 2554px) {
+// 1rem = 16px
+@media (max-width: 159.6rem) { 
+    .fullWidthHeader {
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
+        z-index: 1;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ІНШІ СТИЛІ
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* */
+.objectsFiltersCol6BlockL {
+    max-width: 50rem;
+}
+.objectsFiltersCol6BlockR {
+    max-width: 50rem;
+}
+
+.minWidth5rem {
+    min-width: 5rem;
+}
+.minWidth4rem {
+    min-width: 4rem !important;
+}
+
+.width5rem {
+    width: 5rem;
+}
+
+.width4rem {
+    width: 4rem !important;
+}
+///////////////////////////////////////////////
+// Fonts
+@media (min-width: 768px) {
+    .telescopeViewCalculatorInputs {
+        min-width: 40rem;
+    }
+}
+
+@media (min-width: 2600px) {
+    html {
+        font-size: 110%;
+    }
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 90%;
+    }
+}
+
+@media (max-width: 767.9px) {
+    html {
+        font-size: 80%;
+    }
+}
+
+
+// Import planet data
+#stopImportingPlanetDataButton {
+    display: none;
+}
+#progressContainer {
+    height: 2.5em;
+    display: none;
+}
+#importProgress {
+    height: 2.5em;
+    width: 0%;
+}
+
+// Select blocks
+/* Максимальна ширина контенту і центрування */
+#telescopeViewCalculator {
+    max-width: 180rem;
+    margin-inline: auto;
+}
+#constellationSelect {
+    max-width: 38rem;
+}
+.constellationSelectCollCat,
+.constellationSelectNGCIC {
+    height: 10rem;
+}
+.constellationSelectTableWindow {
+    width: 44rem;
+    max-height: 20rem;
+    overflow-y: auto;
+}
+.constellationSelectTable {
+    font-family: 'JetBrains Mono', monospace;
+}
+.selectConstelCollCatBtn {
+    //display: block; // Центрування кнопки
+    max-width: 44rem !important;
+}
+.planetFilterSizeBlock {
+    min-width: 38rem;
+}
+.planetFilterSizeBlock span.label {
+    width: 100%;
+    max-width: 38rem;
+}
+.telescopFilterSizeBlock {
+    min-width: 27rem;
+}
+.exoplanetTelescope { /*******************************/
+    height: 20rem;
+    overflow-y: auto;
+}
+.planetTypeSelect { /*******************************/
+    height: 14rem;
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 37rem;
+    overflow-y: auto;
+}
+select.planetTypeSelect { /*******************************/
+    max-width: 40rem;
+}
+.nGCICObjectPropertyBlock {
+    max-width: 90rem;
+}
+.form-select.RowOnPageCatal {
+    max-width: 5rem;
+}
+.multipleSelect.chooseWhichPlanetSizes {
+    z-index: 3000 !important;
+}
+#paginationBodyBlockContainer {
+    z-index: 300;
+}
+#planetsSystemTableContainer {
+    z-index: 30;
+}
+// Admin page style
+.widthUsersClaimColum {
+    max-width: 20em;
+}
+.nameConstellationFilterBlock {
+    min-width: 40rem;
+}
+.constellationFilterBlock {
+    width: 40rem;
+}
+.exoplanetPlanetName,
+.exoplanetDiscoveryMethod,
+.planetarySystemNameBlock,
+.discoveredPlenetCountBlock,
+.discoveredDateBlock {
+    min-width: 20rem;
+}
+.planetarySystemLeftFilterBlock {
+    min-width: 35rem;
+    max-width: 50rem;
+}
+
+// Habitable zone style
+.habitableZoneAllPalanetText {
+    padding-right: 1rem;
+    display: inline-block;
+    width: 100%;
+}
+
+.habitableZoneTerrestrialPalanetText {
+    padding-left: 3rem;
+    display: inline-block;
+    width: 100%;
+}
+
+.habitableZoneTextColuns{
+    min-width: 20rem;
+    max-width: 25rem;
+}
+
+.habitableZoneBlock{
+    min-width: 29rem;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Завантажувач (spinner) для глобального використання
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#global-spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#global-spinner {
+    width: 20rem;
+    height: 20rem;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    background-color: transparent;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

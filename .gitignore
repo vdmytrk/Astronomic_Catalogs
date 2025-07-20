@@ -391,16 +391,16 @@ _ActualDateTable.cshtml
 
 # Style
 Astronomic_Catalogs/wwwroot/less/themes.css
-Astronomic_Catalogs/wwwroot/less/themes.less
+#Astronomic_Catalogs/wwwroot/less/themes.less
 Astronomic_Catalogs/wwwroot/less/site.css
-Astronomic_Catalogs/wwwroot/less/site.less
+#Astronomic_Catalogs/wwwroot/less/site.less
 Astronomic_Catalogs/wwwroot/less/planetarySystemVisualization.css
-Astronomic_Catalogs/wwwroot/less/planetarySystemVisualization.less
+#Astronomic_Catalogs/wwwroot/less/planetarySystemVisualization.less
 
 # js + typescript
 Astronomic_Catalogs/wwwroot/js/*.js.map
 Astronomic_Catalogs/wwwroot/js/alertOfSwal.js
-Astronomic_Catalogs/wwwroot/js/AstroTableFilters.js
+#Astronomic_Catalogs/wwwroot/js/AstroTableFilters.js
 Astronomic_Catalogs/wwwroot/js/behavior.js
 Astronomic_Catalogs/wwwroot/js/formHandler.js
 Astronomic_Catalogs/wwwroot/js/main.js
