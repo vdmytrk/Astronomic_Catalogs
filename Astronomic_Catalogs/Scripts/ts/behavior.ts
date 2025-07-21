@@ -197,13 +197,12 @@ function applyDeviceResponsiveUI(): void {
         const platform = DeviceUtils.getDevicePlatform();    // 'windows' | 'macos' | 'android' | 'ios' | 'linux' | 'unknown'
         console.log(` ⚠️ 📐 DEVICE CHARACTERISTICS: deviceType: ${deviceType}, platform: ${platform}`);
 
-
         const tableSelectBlocks = document.querySelectorAll<HTMLElement>('.tableSelect');
         const multipleSelectBlocks = document.querySelectorAll<HTMLElement>('.multipleSelect');
 
-        if (deviceType === 'desktop' && platform != 'Android' && platform != 'MacOS')
+        if (deviceType === 'desktop' && platform !== 'Linux') 
             tableSelectBlocks.forEach(e => e.remove());
-        else
+        else 
             multipleSelectBlocks.forEach(e => e.remove());
     };
     

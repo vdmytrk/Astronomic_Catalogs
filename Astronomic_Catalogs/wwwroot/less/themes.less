@@ -232,6 +232,7 @@ table tbody tr td {
     color: @light-text;
 }
 
+
 /*.highlightRowClass {*/
 table tbody tr.highlightRowClass td, table thead tr.highlightRowClass th {
     background-color: @light-highlighting;
@@ -472,6 +473,15 @@ input:checked + .sliderDualColor {
     .borderBlock {
         color: @dark-border-light;
     }
+    /// navbar-toggler ///
+    .navbar-toggler {
+        border-color: red;
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='red' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
     /// Selection ///
     .form-select[multiple], .form-select[size]:not([size="1"]) {
         padding-right: .75rem;
