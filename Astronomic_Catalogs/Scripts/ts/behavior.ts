@@ -201,7 +201,7 @@ function applyDeviceResponsiveUI(): void {
         const tableSelectBlocks = document.querySelectorAll<HTMLElement>('.tableSelect');
         const multipleSelectBlocks = document.querySelectorAll<HTMLElement>('.multipleSelect');
 
-        if (deviceType === 'desktop')
+        if (deviceType === 'desktop' && platform != 'Android' && platform != 'MacOS')
             tableSelectBlocks.forEach(e => e.remove());
         else
             multipleSelectBlocks.forEach(e => e.remove());

@@ -199,7 +199,7 @@ BEGIN
 		LEFT JOIN dbo.NASAPlanetarySystemsStars AS S ON P.StarId = S.Id 
 		WHERE 
 			(
-				@PlanetWithSize IS NULL OR @PlanetWithSize = 0
+				@PlanetWithSize = 0
 				OR (
 					(
 						(ISNULL(P.Pl_rade, 0) > 0 OR ISNULL(P.Pl_radj, 0) > 0)

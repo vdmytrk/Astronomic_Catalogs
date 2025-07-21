@@ -7,15 +7,17 @@ class DeviceUtils {
     }
     static getDeviceType() {
         const ua = navigator.userAgent;
-        if (/Mobi|Android/i.test(ua)) {
-            return /Tablet|iPad/i.test(ua) ? 'tablet' : 'mobile';
+        const uaData = navigator.userAgentData;
+        if (uaData) {
+            if (uaData.mobile) {
+                return 'mobile';
+            }
+            return 'desktop';
         }
-        if (/Tablet|iPad/i.test(ua)) {
-            return 'tablet';
-        }
-        if (window.innerWidth <= 768) {
+        if (/Mobi|Android/i.test(ua))
             return 'mobile';
-        }
+        if (/iPad|Tablet/i.test(ua))
+            return 'tablet';
         return 'desktop';
     }
     static getDevicePlatform() {

@@ -26,6 +26,7 @@ public class PlanetarySystemFilterService : IPlanetarySystemFilterService
 
     public async Task<List<PlanetarySystem>?> GetFilteredDataAsync(Dictionary<string, object> parameters)
     {
+        bool planetWithSize = parameters.GetBool("PlanetWithSize");
         string? planetType = parameters.TryGetValue("PlanetType", out var obj)
             ? JsonSerializerOneUnit.SerializeToNormalizedJson(obj)
             : null;
@@ -50,7 +51,8 @@ public class PlanetarySystemFilterService : IPlanetarySystemFilterService
             {
                 List<PlanetarySystemFlatRow> result = await _context.PlanetarySystemsCatalog
                 .FromSqlInterpolated($@"
-                    EXEC GetFilteredPlanetarySystemsData  
+                    EXEC GetFilteredPlanetarySystemsData 
+                        @PlanetWithSize = {planetWithSize}, 
                         @PlanetType = {planetType},
                         @Name = {name},
                         @PlenetsCountFrom = {plenetCountFom},

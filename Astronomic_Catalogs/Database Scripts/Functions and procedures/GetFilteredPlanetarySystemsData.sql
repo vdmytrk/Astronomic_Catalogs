@@ -6,6 +6,7 @@
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR ALTER PROC GetFilteredPlanetarySystemsData
+	@PlanetWithSize BIT = 0,
 	@PlanetType NVARCHAR(MAX) = NULL,
 	@Name NVARCHAR(MAX) = NULL,
 	@PlenetsCountFrom INT = NULL,
@@ -78,7 +79,8 @@ BEGIN
 			END
 
 
-			IF @HabitableZone IS NOT NULL AND @HabitableZone NOT IN (0, 1)
+			IF @PlanetWithSize NOT IN (0, 1)
+                OR @HabitableZone IS NOT NULL AND @HabitableZone NOT IN (0, 1)
 				OR (@TerrestrialHabitableZone IS NOT NULL AND @TerrestrialHabitableZone NOT IN (0, 1))
 			BEGIN
 				RAISERROR('Invalid value for one of the BIT parameters.', 16, 1);
@@ -94,6 +96,7 @@ BEGIN
 		END
 
 		-- Default value blok
+        SET @PlanetWithSize = ISNULL(@PlanetWithSize, 0);
 		SET @PageNumber = ISNULL(@PageNumber, 1);
 		SET @RowOnPage = ISNULL(@RowOnPage, 10);
 		SET @OrderBy = ISNULL(@OrderBy, 0);
@@ -146,15 +149,8 @@ BEGIN
 
 
 		
-		DECLARE @IsPlanetTypeFilterDisabled BIT =
-			CASE 
-				WHEN @PlanetType IS NULL OR @PlanetType = '[]' 
-				THEN 1 
-				ELSE 0 
-			END;
-
 		SELECT DISTINCT pwc.Hostname
-		INTO #ValidHostname 
+		INTO #ValidHostname
 		FROM #PlanetWithCount pwc
 		OUTER APPLY (
 			SELECT 
@@ -166,26 +162,28 @@ BEGIN
 				MAX(CASE WHEN @SyDistTo IS NULL THEN 1 WHEN p.Sy_dist <= @SyDistTo THEN 1 ELSE 0 END) AS HasSyDistTo
 			FROM #PlanetWithCount p
 			WHERE p.Hostname = pwc.Hostname
-		) ap
-		WHERE 
-			(@IsPlanetTypeFilterDisabled = 1 OR ap.HasRade = 1)
-			AND (@OrderBy NOT IN (1,2,3,4) OR ap.HasOrbit = 1)
-			AND (@OrderBy NOT IN (5,6) OR ap.HasRade = 1)
+		) oa
+		WHERE
+			(@PlanetWithSize = 0 OR oa.HasRade = 1)
+			AND (@OrderBy NOT IN (1,2,3,4) OR oa.HasOrbit = 1)
+			AND (@OrderBy NOT IN (5,6) OR oa.HasRade = 1)
 			AND (
-				@IsPlanetTypeFilterDisabled = 1 
-				OR NOT EXISTS (SELECT 1 FROM @PlanetTypes)
-				OR EXISTS (
-					SELECT 1 FROM @PlanetTypes pt
-					WHERE 
-						(pt.TypeId = 1 AND pwc.Pl_rade BETWEEN 0.04 AND 0.27) OR
-						(pt.TypeId = 2 AND pwc.Pl_rade >  0.27 AND pwc.Pl_rade <= 0.7) OR
-						(pt.TypeId = 3 AND pwc.Pl_rade >  0.7  AND pwc.Pl_rade <= 1.2) OR
-						(pt.TypeId = 4 AND pwc.Pl_rade >  1.2  AND pwc.Pl_rade <= 1.9) OR
-						(pt.TypeId = 5 AND pwc.Pl_rade >  1.9  AND pwc.Pl_rade <= 3.1) OR
-						(pt.TypeId = 6 AND pwc.Pl_rade >  3.1  AND pwc.Pl_rade <= 5.1) OR
-						(pt.TypeId = 7 AND pwc.Pl_rade >  5.1  AND pwc.Pl_rade <= 8.3) OR
-						(pt.TypeId = 8 AND pwc.Pl_rade >  8.3  AND pwc.Pl_rade <= 13.7) OR
-						(pt.TypeId = 9 AND pwc.Pl_rade > 13.7  AND pwc.Pl_rade <= 50)
+				@PlanetWithSize = 0 
+				OR (
+					@PlanetType IS NULL OR @PlanetType = '[]'
+					OR EXISTS (
+						SELECT 1 FROM @PlanetTypes pt
+						WHERE 
+							(pt.TypeId = 1 AND pwc.Pl_rade BETWEEN 0.04 AND 0.27) OR
+							(pt.TypeId = 2 AND pwc.Pl_rade >  0.27 AND pwc.Pl_rade <= 0.7) OR
+							(pt.TypeId = 3 AND pwc.Pl_rade >  0.7  AND pwc.Pl_rade <= 1.2) OR
+							(pt.TypeId = 4 AND pwc.Pl_rade >  1.2  AND pwc.Pl_rade <= 1.9) OR
+							(pt.TypeId = 5 AND pwc.Pl_rade >  1.9  AND pwc.Pl_rade <= 3.1) OR
+							(pt.TypeId = 6 AND pwc.Pl_rade >  3.1  AND pwc.Pl_rade <= 5.1) OR
+							(pt.TypeId = 7 AND pwc.Pl_rade >  5.1  AND pwc.Pl_rade <= 8.3) OR
+							(pt.TypeId = 8 AND pwc.Pl_rade >  8.3  AND pwc.Pl_rade <= 13.7) OR
+							(pt.TypeId = 9 AND pwc.Pl_rade > 13.7  AND pwc.Pl_rade <= 50)
+					)
 				)
 			)
 			AND (
@@ -203,15 +201,15 @@ BEGIN
 				@PlenetsCountTo IS NULL OR pwc.SystemPlanetCount <= @PlenetsCountTo
 			)
 			AND (
-				@HabitableZone IS NULL OR @HabitableZone = 0 OR ap.HasHabitable = 1
+				@HabitableZone IS NULL OR @HabitableZone = 0 OR oa.HasHabitable = 1
 			)
 			AND (
-				@TerrestrialHabitableZone IS NULL OR @TerrestrialHabitableZone = 0 OR ap.HasTerrestrialHZ = 1
+				@TerrestrialHabitableZone IS NULL OR @TerrestrialHabitableZone = 0 OR oa.HasTerrestrialHZ = 1
 			)
 			AND (
-				(@SyDistFrom IS NULL OR ap.HasSyDistFrom = 1) 
-				AND	(@SyDistTo IS NULL OR ap.HasSyDistTo = 1)
-			);
+				(@SyDistFrom IS NULL OR oa.HasSyDistFrom = 1) 
+				AND	(@SyDistTo IS NULL OR oa.HasSyDistTo = 1)
+		);
 
 		CREATE NONCLUSTERED INDEX IX_ValidHostnames_Hostname ON #ValidHostname(Hostname);
 		

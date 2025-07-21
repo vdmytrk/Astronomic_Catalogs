@@ -1,6 +1,6 @@
 ﻿const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
 const fs = require("fs");
+const TerserPlugin = require("terser-webpack-plugin");
 const removeDebugLogs = 0; 
 
 const entry = {
