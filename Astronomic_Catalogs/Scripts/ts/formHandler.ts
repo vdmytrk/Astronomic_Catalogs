@@ -4,6 +4,12 @@ import { dataVisualization } from "./planetarySystemVisualization";
 import { planetSysVisualizationTheme } from "./theme";
 import { hideShowBlockDownAnime } from "./behavior";
 
+declare global {
+    interface Window {
+        updateAllColumnVisibility: () => void;
+    }
+}
+
 if (!(window as any).__formHandlerInitialized) {
     (window as any).__formHandlerInitialized = true;
 
@@ -106,8 +112,8 @@ function parametersInitialization(plSysVisualizationBtn: boolean, target: HTMLEl
     return parameters;
 }
 
-function getCountChecked_fieldsCheckBoks_Checkbox(): number {
-    const container = document.querySelector(".fieldsCheckBoks");
+function getCountChecked_fieldsCheckboks_Checkbox(): number {
+    const container = document.querySelector(".fieldsCheckboks");
     if (!container) return 0;
 
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
@@ -119,7 +125,7 @@ function getCountChecked_fieldsCheckBoks_Checkbox(): number {
 }
 
 export function createSpinnerHTML(): string {
-    const columnCount: number = getCountChecked_fieldsCheckBoks_Checkbox();
+    const columnCount: number = getCountChecked_fieldsCheckboks_Checkbox();
     const spinnerHTML = `
         <tr id="spinnerTr">
             <td colspan="${columnCount}" class="text-center align-items-center" style="height: 20rem;">
@@ -297,7 +303,7 @@ async function submitFormAndUpdatePartial(
 
             const plSysVisualizationBtn = document.querySelector(".platetarySystemVisualization") as HTMLElement;
             console.log(`7.  isVisualizationMode(${!!isVisualizationMode}) && plSysVisualizationBtn(${!!plSysVisualizationBtn})`);
-            // isVisualizationMode(undefined) && plSysVisualizationBtn([object HTMLButtonElement])
+            
             if (!!isVisualizationMode && !!plSysVisualizationBtn) {
                 plSysVisualizationBtn.setAttribute("data-parameters", JSON.stringify(json));
                 dataVisualization();
@@ -305,6 +311,7 @@ async function submitFormAndUpdatePartial(
 
             // ✅ ⬇️ Після всього — показати вміст
             const table = document.querySelector<HTMLElement>('#planetsSystemTableContainer');
+            window.updateAllColumnVisibility();
             hideShowBlockDownAnime(table, true);
         } else {
             console.error(`7.  Partial container with selector "${partialSelector}" not found.`);

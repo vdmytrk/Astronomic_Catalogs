@@ -76,11 +76,11 @@ function switchTable(checkbox) {
         ? "/Planetology/PlanetarySystem/GetFlatTable"
         : "/Planetology/PlanetarySystem/GetGroupedTable";
     submitFormAndUpdatePartialSwitchTable(form, url, container, showGrouped, pageNumber);
-    const fieldsCheckBoksBlock = document.querySelector('.fieldsCheckBoksBlock');
+    const fieldsCheckboksBlock = document.querySelector('.fieldsCheckboksBlock');
     if (showGrouped)
-        (0, behavior_1.hideShowBlockDownAnime)(fieldsCheckBoksBlock, true, 2);
+        (0, behavior_1.hideShowBlockDownAnime)(fieldsCheckboksBlock, true, 2);
     else
-        (0, behavior_1.hideShowBlockDownAnime)(fieldsCheckBoksBlock, false, 2);
+        (0, behavior_1.hideShowBlockDownAnime)(fieldsCheckboksBlock, false, 2);
 }
 ;
 function submitFormAndUpdatePartialSwitchTable(form_1, url_1, container_1, showGrouped_1) {

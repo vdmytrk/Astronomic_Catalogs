@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ////////////////////////////////////////////////////////////////////////////////////////////
     /// Чекбокси
     // Встановлення атрибуту який зберігає занчення за замовчуванням
-    [".fieldsCheckBoks", ".topMenuFiltersCatalogs", ".additionalBlock"].forEach(selector => {
+    [".fieldsCheckboks", ".topMenuFiltersCatalogs", ".additionalBlock"].forEach(selector => {
         const container = document.querySelector(selector);
         if (!container) return;
 
@@ -597,7 +597,6 @@ function toggleColumnWithAnimation(element, show) {
 
 /// Встановлення максимальної/мінімальної ширини колонок
 function setAstroCatalogColumnWidth(checkbox) {
-    console.log("FUNCTION: setAstroCatalogColumnWidth");
     const table = document.querySelector("table.astroCatalogTable");
 
     if (!checkbox || !table) return;
@@ -612,7 +611,7 @@ function setAstroCatalogColumnWidth(checkbox) {
 
 //// Показати/приховати ВСІ колонки на основі прапорця ////
 function toggleCheckboxes(checked) {
-    const container = document.querySelector(".fieldsCheckBoks");
+    const container = document.querySelector(".fieldsCheckboks");
     if (!container) return;
 
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
@@ -625,7 +624,7 @@ function toggleCheckboxes(checked) {
 
 //// Відновити початковий стан усіх чекбоксів які вдображають/приховують поля таблиці ////
 function restoreDefaultCheckboxes() {
-    const container = document.querySelector(".fieldsCheckBoks");
+    const container = document.querySelector(".fieldsCheckboks");
     if (!container) return;
 
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
@@ -663,7 +662,9 @@ function restoreDefaultObjectAdditionalCheckboxes() {
 
 // Оновити відображення всіх колонок згідно з поточним станом чекбоксів
 function updateAllColumnVisibility() {
-    const container = document.querySelector(".fieldsCheckBoks");
+    console.log("########   FUNCTION: updateAllColumnVisibility");
+
+    const container = document.querySelector(".fieldsCheckboks");
     if (!container) return;
 
     const checkboxes = container.querySelectorAll('input[type="checkbox"]');
@@ -677,6 +678,8 @@ function updateAllColumnVisibility() {
         }
     });
 }
+
+window.updateAllColumnVisibility = updateAllColumnVisibility;
 
 
 

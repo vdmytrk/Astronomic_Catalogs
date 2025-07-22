@@ -38,11 +38,11 @@ function switchTable(checkbox: HTMLInputElement): void {
 
     submitFormAndUpdatePartialSwitchTable(form, url, container, showGrouped, pageNumber);
 
-    const fieldsCheckBoksBlock = document.querySelector('.fieldsCheckBoksBlock') as HTMLElement | null;
+    const fieldsCheckboksBlock = document.querySelector('.fieldsCheckboksBlock') as HTMLElement | null;
     if (showGrouped)
-        hideShowBlockDownAnime(fieldsCheckBoksBlock, true, 2);
+        hideShowBlockDownAnime(fieldsCheckboksBlock, true, 2);
     else
-        hideShowBlockDownAnime(fieldsCheckBoksBlock, false, 2);
+        hideShowBlockDownAnime(fieldsCheckboksBlock, false, 2);
 
 };
 
