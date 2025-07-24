@@ -149,8 +149,6 @@ public class Program
         builder.Services.AddScoped<JwtService>();
         builder.Services.AddScoped<UserRegister>();
         builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
-        // TODO: Generate Identity UI (Razor Pages for Identity) in the project:
-        //       dotnet aspnet-codegenerator identity -dc ApplicationDbContext
         builder.Services.AddIdentity<Models.AspNetUser, Models.AspNetRole>(options =>
         {
             options.SignIn.RequireConfirmedAccount = true;
