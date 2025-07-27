@@ -10,6 +10,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Aspire.Azure.Security.KeyVault" Version="9.3.1" />
+		<PackageReference Include="AutoMapper" Version="15.0.1" />
 		<PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.4.0" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
@@ -41,6 +42,26 @@
 
 	<ItemGroup>
 		<Content Include="Scripts\ts\**\*.ts" />
+		<Compile Remove="Areas\Catalogs\Data\**" />
+		<Compile Remove="Areas\Catalogs\Models\**" />
+		<Compile Remove="Areas\Planetology\Data\**" />
+		<Compile Remove="Areas\Planetology\Models\**" />
+		<Content Remove="Areas\Catalogs\Data\**" />
+		<Content Remove="Areas\Catalogs\Models\**" />
+		<Content Remove="Areas\Planetology\Data\**" />
+		<Content Remove="Areas\Planetology\Models\**" />
+		<EmbeddedResource Remove="Areas\Catalogs\Data\**" />
+		<EmbeddedResource Remove="Areas\Catalogs\Models\**" />
+		<EmbeddedResource Remove="Areas\Planetology\Data\**" />
+		<EmbeddedResource Remove="Areas\Planetology\Models\**" />
+		<None Remove="Areas\Catalogs\Data\**" />
+		<None Remove="Areas\Catalogs\Models\**" />
+		<None Remove="Areas\Planetology\Data\**" />
+		<None Remove="Areas\Planetology\Models\**" />
+		<TypeScriptCompile Remove="Areas\Catalogs\Data\**" />
+		<TypeScriptCompile Remove="Areas\Catalogs\Models\**" />
+		<TypeScriptCompile Remove="Areas\Planetology\Data\**" />
+		<TypeScriptCompile Remove="Areas\Planetology\Models\**" />
 		<TypeScriptCompile Remove="Scripts\ts\alertOfSwal.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\behavior.ts" />
 		<TypeScriptCompile Remove="Scripts\ts\calendarHandler.ts" />
@@ -74,10 +95,6 @@
 	
 	<ItemGroup>
 		<Folder Include="Areas\Admin\Data\" />
-		<Folder Include="Areas\Catalogs\Data\" />
-		<Folder Include="Areas\Catalogs\Models\" />
-		<Folder Include="Areas\Planetology\Data\" />
-		<Folder Include="Areas\Planetology\Models\" />
 		<Folder Include="Data\Migrations\" />
 	</ItemGroup>
 
