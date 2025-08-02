@@ -4,7 +4,7 @@
 ✨ Онлайн-деплой доступний тут: https://newastrocatalogs.azurewebsites.net   
 
 ⚖️ База даних розміщена на **Azure SQL Server**, а код підтримується на **Azure DevOps**, з **GitHub як дзеркалом лише для читання**:  
-*   Основне репозиторій *(активна розробка)*: https://dev.azure.com/voldmytcOrganization/_git/Astronomic%20Catalogs/  
+*   Основний репозиторій *(активна розробка)*: https://dev.azure.com/voldmytcOrganization/_git/Astronomic%20Catalogs/  
 *   Дошка проекту та конвеєр: https://dev.azure.com/voldmytcOrganization/Astronomic%20Catalogs    
 *   Дзеркало на GitHub *(тільки для читання)*: https://github.com/vdmytrk/Astronomic_Catalogs  
 
@@ -208,6 +208,6 @@ Git Flow (модель розгалуження)
 
 ## 📨 **Контакти**
 У разі бажання обговорити архітектурні рішення, структуру проєкту або питання щодо розгортання — звертайтесь:
-*   GitHub: [https://github.com/vdmytrk](https://github.com/vdmytrk)
-*   DOU: [https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile](https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile)
 *   Email: [voldmytc@gmail.com](mailto:voldmytc@gmail.com)
+*   DOU: [https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile](https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile)
+*   GitHub: [https://github.com/vdmytrk](https://github.com/vdmytrk)

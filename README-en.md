@@ -203,7 +203,8 @@ While this project is fully functional and complete in its core features, develo
 
 ## 📨 **Contact**
 Feel free to reach out if you'd like to discuss architectural decisions, project structure, or deployment questions:
-*   GitHub: [https://github.com/vdmytrk](https://github.com/vdmytrk)
-*   DOU: [https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile](https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile)
 *   Email: [voldmytc@gmail.com](mailto:voldmytc@gmail.com)
+*   DOU: [https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile](https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile)
+*   GitHub: [https://github.com/vdmytrk](https://github.com/vdmytrk)
+
 
