@@ -1,2 +1,0 @@
-# Astronomic Catalogs
-# Test commit

@@ -1,7 +1,6 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Models;
-using Astronomic_Catalogs.Results;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Dapper;

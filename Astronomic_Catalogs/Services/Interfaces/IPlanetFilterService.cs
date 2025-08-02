@@ -1,5 +1,4 @@
 ﻿using Astronomic_Catalogs.Models;
-using Astronomic_Catalogs.Results;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Astronomic_Catalogs.Services.Interfaces

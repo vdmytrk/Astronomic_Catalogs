@@ -262,7 +262,6 @@ public class Program
         {
             options.Email = authSettings.AuthMessageSenderOptions.Email;
             options.Password = authSettings.AuthMessageSenderOptions.Password;
-
         });
     }
 
@@ -310,13 +309,13 @@ public class Program
             options.GlobalLimiter = PartitionedRateLimiter.CreateChained(
             #region For registered users
                 CreateFixedWindowLimiter(),
-                CreateSlidingWindowLimiter(700, TimeSpan.FromMinutes(10), 8),
-                CreateSlidingWindowLimiter(3200, TimeSpan.FromHours(1), 12),
+                CreateSlidingWindowLimiter(300, TimeSpan.FromMinutes(10), 4),
+                CreateSlidingWindowLimiter(1500, TimeSpan.FromHours(1), 6),
             #endregion
             #region For unregistered useers
-                CreateTokenBucketLimiter(40, 4, TimeSpan.FromSeconds(10), 2),
-                CreateTokenBucketLimiter(120, 4, TimeSpan.FromMinutes(10), 4),
-                CreateTokenBucketLimiter(600, 4, TimeSpan.FromHours(1), 10)
+                CreateTokenBucketLimiter(20, 2, TimeSpan.FromSeconds(10), 1),
+                CreateTokenBucketLimiter(60, 2, TimeSpan.FromMinutes(10), 2),
+                CreateTokenBucketLimiter(300, 2, TimeSpan.FromHours(1), 15)
             #endregion
             );
         });
@@ -332,8 +331,8 @@ public class Program
                 string user = GetUserKey(context);
                 return RateLimitPartition.GetFixedWindowLimiter(user, _ => new FixedWindowRateLimiterOptions
                 {
-                    PermitLimit = 120,
-                    QueueLimit = 20,
+                    PermitLimit = 30,
+                    QueueLimit = 5,
                     Window = TimeSpan.FromSeconds(10)
                 });
             }
