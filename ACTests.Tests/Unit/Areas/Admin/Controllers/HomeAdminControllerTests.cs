@@ -1,4 +1,5 @@
-﻿using Astronomic_Catalogs.Data;
+﻿using Astronomic_Catalogs.Areas.Admin.Controllers;
+using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.Infrastructure.Interfaces;
 using Astronomic_Catalogs.Models.Connection;
 using FakeItEasy;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Astronomic_Catalogs.Areas.Admin.Controllers.Tests;
+namespace ACTests.Tests.Unit.Areas.Admin.Controllers;
 
 [TestFixture]
 public class HomeAdminControllerTests

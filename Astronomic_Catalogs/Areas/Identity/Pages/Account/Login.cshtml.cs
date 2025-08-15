@@ -75,12 +75,20 @@ public class LoginModel : PageModel
 
         if (ModelState.IsValid)
         {
-            // DV: Check if user exist
+            // DV: Checking if user exist
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
             {
                 _logger.LogWarning($"User with {Input.Email} email not found.");
                 ModelState.AddModelError(string.Empty, $"User with {Input.Email} email not found.");
+                return Page();
+            }
+
+            // DV: Checking if email is confirmed
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+            {
+                _logger.LogWarning($"User with email {Input.Email} has not confirmed their email.");
+                ModelState.AddModelError(string.Empty, "You need to confirm your email before logging in.");
                 return Page();
             }
 

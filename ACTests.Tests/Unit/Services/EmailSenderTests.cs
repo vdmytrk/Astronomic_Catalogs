@@ -1,21 +1,14 @@
-﻿using NUnit.Framework;
-using Astronomic_Catalogs.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Astronomic_Catalogs.Data;
+﻿using Astronomic_Catalogs.Data;
+using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Services;
+using Astronomic_Catalogs.Services;
 using FakeItEasy;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Astronomic_Catalogs.Models;
+using Microsoft.Extensions.Options;
 using System.Net.Mail;
 
-namespace Astronomic_Catalogs.Services.Tests;
+namespace ACTests.Tests.Unit.Services;
 
 [TestFixture]
 public class EmailSenderTests

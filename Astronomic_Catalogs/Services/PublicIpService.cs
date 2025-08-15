@@ -1,9 +1,10 @@
 ﻿using Astronomic_Catalogs.Infrastructure;
+using Astronomic_Catalogs.Services.Interfaces;
 using System.Net.Http;
 
 namespace Astronomic_Catalogs.Services;
 
-public class PublicIpService (HttpClient httpClient, ILogger<PublicIpService> logger)
+public class PublicIpService (HttpClient httpClient, ILogger<PublicIpService> logger) : IPublicIpService
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly ILogger<PublicIpService> _logger = logger;

@@ -1,9 +1,10 @@
-﻿using FakeItEasy;
+﻿using Astronomic_Catalogs.Controllers;
+using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
-namespace Astronomic_Catalogs.Controllers.Tests;
+namespace ACTests.Tests.Unit.Controllers;
 
 [TestFixture]
 public class HomeControllerTests

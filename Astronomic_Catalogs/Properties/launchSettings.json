@@ -7,7 +7,7 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5107",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development" // AzureDevelopment | Development
+        "ASPNETCORE_ENVIRONMENT": "Development" // AzureDevelopment | Development | Testing | Staging | Production
       }
     },
     "https": {

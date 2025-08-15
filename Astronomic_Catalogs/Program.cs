@@ -78,7 +78,7 @@ public class Program
             Formatting = Formatting.None
         });
 
-        builder.Services.AddTransient<PublicIpService>();
+        builder.Services.AddTransient<IPublicIpService, PublicIpService>();
         builder.Services.AddSingleton<IImportCancellationService, ImportCancellationService>();
         builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
         builder.Services.AddSingleton<INLogConfiguration, NLogConfiguration>();
@@ -272,7 +272,7 @@ public class Program
             options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("Department", "HQ"));
             options.AddPolicy("UsersAccessClaim", policy => policy.RequireClaim("CanUsersAccess", "true"));
             options.AddPolicy("RoleAccessClaim", policy => policy.RequireClaim("CanRoleAccess", "true"));
-            options.AddPolicy("RoleModifyClaim", policy => policy.RequireClaim("CanRoleModify", "true"));
+            options.AddPolicy("RoleModifyClaim", policy => policy.RequireClaim("CanRolelModify", "true"));
             options.AddPolicy("RoleWatchClaim", policy => policy.RequireClaim("CanRoleWatch", "true"));
             options.AddPolicy("OverAge", policy =>
                 policy.Requirements.Add(new MinimumAgeRequirement(authSettings.MinAgeRestriction)));
@@ -358,7 +358,7 @@ public class Program
             return RateLimitPartition.GetNoLimiter("Unauthenticated_user");
         });
     }
-
+    
     private static PartitionedRateLimiter<HttpContext> CreateTokenBucketLimiter(
         int tokenLimit, int queueLimit, TimeSpan replenishmentPeriod, int tokensPerPeriod)
     {
@@ -424,7 +424,7 @@ public class Program
             if (string.IsNullOrWhiteSpace(userAgent))
                 userAgent = "Unknown_user";
             var partitionKey = context.Connection.RemoteIpAddress?.ToString() ?? userAgent;
-            var publicIpService = context.RequestServices.GetRequiredService<PublicIpService>();
+            var publicIpService = context.RequestServices.GetRequiredService<IPublicIpService>();
             await publicIpService.GetPublicIpAsync(context, partitionKey);
             await next();
         });
@@ -452,7 +452,11 @@ public class Program
             }
         });
 
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsEnvironment("Testing"))
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseStaticFiles();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -472,7 +476,12 @@ public class Program
             },
             appBuilder => appBuilder.UseRateLimiter()
         );
-        app.UseMiddleware<UserLoggingMiddleware>();
+
+        if (!app.Environment.IsEnvironment("Testing"))
+        {
+            app.UseMiddleware<UserLoggingMiddleware>();
+        }
+
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<UserAccessMiddleware>();
     }
