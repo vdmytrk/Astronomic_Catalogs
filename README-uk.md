@@ -212,11 +212,11 @@ appsettings.json example:
 ---
 
 ## 🛠️ **Інструменти**
-Visual Studio 2022
-Azure DevOps (Repos, Boards, Pipelines)
-SQL Server Management Studio (Azure SQL DB)
-Git (GitHub + Azure DevOps)
-Git Flow (модель розгалуження)
+*   Visual Studio 2022
+*   Azure DevOps (Repos, Boards, Pipelines)
+*   SQL Server Management Studio (Azure SQL DB)
+*   Git (GitHub + Azure DevOps)
+*   Git Flow (модель розгалуження)
 
 ---
 
