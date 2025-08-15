@@ -18,6 +18,7 @@ This project is a demonstration of full-stack architectural and development skil
 - [🏗️ Architecture & Design](#🏗%EF%B8%8F-**architecture-%26-design**)
 - [🔐 Authentication & Authorization](#%F0%9F%94%90-**authentication-%26-authorization**)
   - [📧 Email Confirmation](#📧-**email-confirmation**)
+- [🧪 Testing](#🧪-**testing**)
 - [⚡ Developer Highlights](#⚡-**developer-highlights**)
 - [🚨 Deployment Note](#🚨-**deployment-note**)
 - [🛠️ Tooling](#🛠%EF%B8%8F-**tooling**)
@@ -40,7 +41,7 @@ This project is a demonstration of full-stack architectural and development skil
 | **Caching**          | `MemoryCache` with custom `ICacheService` (key tracking, expiration)         |
 | **Rate Limiting**    | ASP.NET built-in limiter with TokenBucket, SlidingWindow, FixedWindow        |
 | **DTO Handling**     | Manual mapping (AutoMapper demo included, not used in production)            |
-| **Testing**          | NUnit + FakeItEasy + EF Core (InMemory)                                      |
+| **Testing**          | Unit + Integration: NUnit, FakeItEasy, EF Core InMemory                      |
 | **CI/CD**            | Azure Pipelines (`azure-pipelines.yml`)                                      |
 
 ⚡ **AutoMapper note**: While the project includes AutoMapper setup as a demo of prior experience, manual mapping is used in production due to licensing restrictions.  
@@ -58,7 +59,7 @@ This project is a demonstration of full-stack architectural and development skil
     *   Catching
     *   UI theming with Bootstrap 5 and LESS (dark/light mode)
 *   🔐 **Identity Admin Area** — Razor Pages + MVC for managing users, roles, and claims with consistent layout and UX patterns.
-*   🧪 **Test Suite** — Unit tests using mocks and in-memory database.  
+*   🧪 **Test Suite** — Testing in real HTTP scenarios using an isolated environment and test doubles.  
 
 ---
        
@@ -118,8 +119,8 @@ This project uses SQL stored procedures as a core data transformation layer. The
     *   LESS compiled to CSS with runtime theme switching.
     *   SweetAlert2 alerts integrated via ES modules.
 *   **Testing**:
-    *   The tests are located in the `ACTests.Tests` and cover controller/service logic in isolation using mocks and in-memory EF.
-    *   Test project is illustrative and intentionally limited — focused on unit tests only (no integration or scenario coverage).
+    *   The tests are located in `ACTests.Tests`, contain unit tests that cover controller/service logic, as well as integration tests in isolation..
+    *   Integration testing: full HTTP pipeline via `WebApplicationFactory`; verification of policies/roles/claims, admin panel navigation, and login scenarios through standard Identity UI pages.
 
 ---
 
@@ -160,6 +161,32 @@ appsettings.json example:
     "ExpireMinutes": MINUTES
   }
 ```
+
+---
+
+## 🧪 **Testing**
+*   **Unit Tests**
+    *   **Controllers** (`HomeController`, `HomeAdminController`): verify view returns, redirects, and model correctness.
+    *   **Services** (`EmailSender`, caching, logging): validate business logic, error handling, and correct dependency calls.
+    *   **Test doubles**: use mocks and fake repositories to isolate components.
+*   **Integration infrastructure**
+    *   **`TestAuthWebApplicationFactory`**: replaces authentication with `TestAuth`; manages user claims/roles via `TestAuthHandlerOptions` and `TestUserBuilder`.
+    *   **`LoginViaUIWebApplicationFactory`**: runs full Identity UI on in-memory `ApplicationDbContext`.
+*   **Test Helpers**
+    *   **`TestIdentitySeeder`**: creates test users (admin/regular) and assigns roles/claims.
+    *   **`IntegrationTestAuthHelper`**: scenario-based UI login.
+    *   **`StaticOptionsMonitor<T>`**: stable DI options.
+    *   **`FakeHttpMessageHandler`**: replaces external HTTP calls.
+    *   **`TestAuthHandler`**: builds flexible `ClaimsPrincipal` with configurable claims.
+*   **Isolation & Stability**
+    *   *In-memory* database.
+    *   Replacement or disabling of external services.
+    *   Dedicated `Testing` environment and configuration overrides.
+*   **Integration Coverage**
+    *   **Authorization by claims/roles**: expected `200/403` or redirects to login.
+    *   **Identity UI**: failed login shows error; successful admin login allows access.
+    *   **Admin Area / `UsersController`**: admin access and presence of key links (`/Admin`, `/Admin/RoleClaims`, `/Admin/Roles`); non-admin access blocked.
+
 ---
 
 ## ⚡ **Developer Highlights**
@@ -193,7 +220,7 @@ Key requirements:
 ## 🚧 **Roadmap & Work In Progress**   
 While this project is fully functional and complete in its core features, development is ongoing to refine and expand the project. Upcoming improvements include:
 *   Two-factor authentication for admin access.
-*   Broader test coverage (integration + scenario-based).
+*   Broader test coverage; Scenario-based testing.
 *   Enhanced mobile responsiveness.
 *   Admin interface enhancements for bulk operations and better data management.
 *   Support for additional catalogs and features.
