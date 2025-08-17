@@ -12,6 +12,10 @@
     "inputFile": "wwwroot/less/site.less"
   },
   {
+    "outputFile": "wwwroot/less/pages.css",
+    "inputFile": "wwwroot/less/pages.less"
+  },
+  {
     "outputFile": "wwwroot/less/planetarySystemVisualization.css",
     "inputFile": "wwwroot/less/planetarySystemVisualization.less"
   }

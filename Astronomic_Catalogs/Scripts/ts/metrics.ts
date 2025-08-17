@@ -176,7 +176,7 @@ function distributeItemsIntoColumns(containerSelector: string, remInPixels: numb
 
     // Create a wrapper for the columns.
     const wrapper = document.createElement("div");
-    wrapper.className = "responsive-columns-wrapper";
+    wrapper.className = "responsiveColumnsWrapper";
 
     // Create the columns.
     const columns: HTMLDivElement[] = [];

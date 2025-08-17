@@ -117,14 +117,14 @@ export async function dataVisualization() {
         bottom: remInPixels,
         left: 3 * remInPixels
     };
-    const container = document.querySelector('.planetary-systems-visualization'); // Одержання   Б А З О В О Г О   Б Л О К У   В І З У А Л І З А Ц І Ї   в якому міститиметься вся решта візуалізації
+    const container = document.querySelector('.planetarySystemsVisualization'); // Одержання   Б А З О В О Г О   Б Л О К У   В І З У А Л І З А Ц І Ї   в якому міститиметься вся решта візуалізації
     if (!container) {
         console.warn("No container for planetary system background");
         return;
     }
 
-    svg = d3.select(container).select<SVGSVGElement>("svg.planetary-axis");
-    svgDesc = d3.select(container).select<SVGSVGElement>("svg.planetary-axis-description");
+    svg = d3.select(container).select<SVGSVGElement>("svg.planetaryAxis");
+    svgDesc = d3.select(container).select<SVGSVGElement>("svg.planetaryAxisDescription");
 
 
     addData();

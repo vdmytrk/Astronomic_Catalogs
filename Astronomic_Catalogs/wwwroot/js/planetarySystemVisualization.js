@@ -140,13 +140,13 @@ function dataVisualization() {
             bottom: remInPixels,
             left: 3 * remInPixels
         };
-        const container = document.querySelector('.planetary-systems-visualization');
+        const container = document.querySelector('.planetarySystemsVisualization');
         if (!container) {
             console.warn("No container for planetary system background");
             return;
         }
-        svg = d3.select(container).select("svg.planetary-axis");
-        svgDesc = d3.select(container).select("svg.planetary-axis-description");
+        svg = d3.select(container).select("svg.planetaryAxis");
+        svgDesc = d3.select(container).select("svg.planetaryAxisDescription");
         addData();
         calculateSystemsPosition();
         maximumOrder();
