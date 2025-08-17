@@ -362,3 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+/Astronomic_Catalogs/wwwroot/js/AstroTableFilters.js
+/Astronomic_Catalogs/wwwroot/js/deviceUtils.js
+/Astronomic_Catalogs/wwwroot/js/planetarySystemVisualization.js
+/Astronomic_Catalogs/wwwroot/js/switchTableType.js
+/Astronomic_Catalogs/wwwroot/js/theme.js
+/Astronomic_Catalogs/wwwroot/js/planetarySystemVisualization.js
