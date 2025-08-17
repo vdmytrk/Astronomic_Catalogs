@@ -1,76 +1,110 @@
-﻿@light-bg: white;
-@light-header-bg: #F5F5F5;
-@light-highlighting: #F9F9F9;
-@light-text: black;
-@light-border: #dee2e6;
-@light-text-light: #808080;
-@light-highlight: #258cfb;
-@light-check-box-unchecked: #F0F0F0;
-@light-check-box-checked: #A3A3A3;
-@light-currentPage-bg: #0D6EFD; // Blue from Bootstrap
+﻿// =============================================
+// Themes (Production Ready LESS)
+// Light theme = default styles
+// Dark theme = .dark-theme modifier
+// =============================================
 
+
+// ========= Light Theme =========
+@light-bg: #ffffff;
+@light-header-bg: #f5f5f5;
+@light-highlight-bg: #f9f9f9;
+@light-text: #000000;
+@light-text-light: #808080;
+@light-border: #dee2e6;
+@light-accent: #258cfb;
+@light-checkbox-unchecked: #f0f0f0;
+@light-checkbox-checked: #a3a3a3;
+@light-current-page-bg: #0d6efd;
+
+// Autofill (Light)
+@light-autofill-bg: #e8f0fe;
+
+// Spinner (Light)
+@light-spinner: #3498db;
+@light-spinner-bg: lightgray;
+@light-spinner-top: @light-current-page-bg;
+
+// Global spinner (Light)
+@light-global-spiner-top: @light-current-page-bg;
+@light-global-spiner: @light-bg; // #ccc
+
+// Slider (Light)
+@light-slider-button: #ffffff;
+@light-slider-bg-off: #e5e5ea;
+@light-slider-bg-on: #34c759;
+
+// ========= Dark Theme =========
 @dark-bg: #121212;
 @dark-header-bg: #252525;
-@dark-highlighting: #270000;
-@dark-text: red;
-@dark-border: #C00000; // Dark red
-@dark-border-light: #DEDEDE; // light gray
-@dark-text-light: #C00000;
-@dart-text-danger: white;
-@dark-top-border: white;
-@dark-highlight: white;
-@dark-highlight-a: #FF3E3E;
-@dark-form-background-dark: #2C2C2C;
-@dark-form-background-light: #414243;
-@dark-form-background-hover: #545454;
-@dark-currentPage-bg: #C00000;
+@dark-highlight-bg: #270000;
+@dark-text: #ff0000;
+@dark-text-light: #c00000;
+@dark-text-danger: #ffffff;
+@dark-border: #c00000; // dark red
+@dark-border-light: #dedede; // light gray
+@dark-top-border: #ffffff;
+@dark-accent: #ff3e3e;
 
+@dark-form-bg-dark: #2c2c2c;
+@dark-form-bg-light: #414243;
+@dark-form-bg-hover: #545454;
+@dark-current-page-bg: #c00000;
 
-@light-autofill-bg: #e8f0fe; // Autofill color in light theme
-@dark-autofill-bg: rgba(70, 90, 126, 0.4); // Autofill color in dark theme
-@autofill-text: #fff; // Text color in autofill
-@currentPage: white;
-// Table
-@fixed-rows: 1;
-@fixed-columns-1: 1;
-@fixed-columns-2: 2;
-@missed-columns-1: @fixed-columns-1+1;
-@missed-columns-2: @fixed-columns-2+1;
-@border-bottom-table-size: 0.03em;
-@border-bottom-table-px: 1px;
-// Spiner
-@light-spiner: #3498db;
-@light-spiner-bg: lightgray;
-@dark-spiner: @dark-border;
-@dark-spiner-bg: #3B3B3B;
-// Testig
-@for-test-kolor1: green;
-@for-test-kolor2: orange;
-@for-test-kolor2: #ffc107; // Dark yelow
-// Слайдер
-@light-slider-button: white;
-@light-slider-background-off: #E5E5EA;
-@light-slider-background-on: #34c759;
+// Autofill (Dark)
+@dark-autofill-bg: rgba(70, 90, 126, 0.4);
+
+// Spinner (Dark)
+@dark-spinner: @dark-border;
+@dark-spinner-bg: #3b3b3b;
+@dark-spinner-top: @dark-text;
+
+// Global spinner (Dark)
+@dark-global-spiner-top: @dark-text;
+@dark-global-spiner: @dark-form-bg-hover;
+
+// Slider (Dark)
 @dark-slider-button: #940000;
-/*@dark-slider-button-on: @dark-header-bg;
-@dark-slider-button-off: #BE0000;*/
 @dark-slider-button-on: #650000;
 @dark-slider-button-off: @dark-text-light;
-@dark-slider-background-off: #650000;
-@dark-slider-background-on: @dark-text-light;
-// Check-box
-@dark-check-box-unchecked: @dark-header-bg; // @dark-bg; // #F08080;
-@dark-check-box-checked: #8B0000;
-// Завантажувач (spinner) для глобального використання
-@light-spiner-top: @light-currentPage-bg; 
-@light-spiner: @autofill-text; // #ccc
-@dark-spiner-top: @dark-text;
-@dark-spiner: @dark-form-background-hover;
+@dark-slider-bg-off: #650000;
+@dark-slider-bg-on: @dark-text-light;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// General style
+// Checkboxes (Dark)
+@dark-checkbox-unchecked: @dark-header-bg;
+@dark-checkbox-checked: #8b0000;
+
+// Encoded stroke color for navbar toggler icon
+@dark-toggler-stroke: escape(@dark-text);
+
+// ========= Table Helpers =========
+@table-fixed-rows: 1;
+@table-fixed-columns-1: 1;
+@table-fixed-columns-2: 2;
+@table-missed-columns-1: @table-fixed-columns-1 + 1;
+@table-missed-columns-2: @table-fixed-columns-2 + 1;
+@table-border-bottom-size: 0.03em;
+@table-border-bottom-px: 1px;
+
+// ---------- Misc ----------
+@current-page-color: #fff;
+
+
+
+// =============================================
+// Utilities
+// =============================================
+.hidden {
+    display: none;
+}
+
 .disabled-container {
     opacity: 0.4;
+}
+
+#theme-toggle {
+    width: 2em;
+    height: 2em;
 }
 
 .spinner {
@@ -78,21 +112,17 @@
     height: 8rem;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin: 6rem auto !important; /* центроване розташування */
+    margin: 6rem auto !important;
 }
 
-.hidden {
-    display: none;
-}
+// =============================================
+// Light Theme (Default)
+// =============================================
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Theme style
-///////////////////////////////////////////////////////////
-// Light theme
-///////////////////////////////////////////////////////////
+// Autofill fix (Chromium)
 input:-webkit-autofill {
     animation-name: autofill-fix;
-    animation-duration: 5000s; // Keeps the style going for a long time
+    animation-duration: 5000s;
 }
 
 .form-control:-webkit-autofill {
@@ -105,14 +135,8 @@ input:-webkit-autofill {
 @keyframes autofill-fix {
     from {
         background-color: @light-autofill-bg !important;
-        color: black !important;
+        color: @light-text !important;
     }
-}
-
-
-#theme-toggle {
-    width: 2em;
-    height: 2em;
 }
 
 html, body {
@@ -130,42 +154,16 @@ h1.pHeader, h2.pHeader, h3.pHeader, h4.pHeader, h5.pHeader, h6.pHeader {
     background-color: @light-header-bg;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-/*a {
-    display: inline-block;
-    font-size: 1rem; // Трохи більший базовий розмір
-    opacity: 1;
-    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-    //transition: font-size 0.15s ease, opacity 0.2s ease;
-}*/
-
-/*a:hover {
-    color: inherit !important;
-    font-weight: bold !important;
-    font-size: 0.98rem; // Менший розмір, щоб компенсувати жирність
-    opacity: 0.85;
-    text-decoration: none;*/ /* (опціонально) прибрати підкреслення у <a> */
-/*}
-
-.btn:hover {
-    color: @light-highlighting !important;*/
-/*font-weight: bold !important;
-    font-size: 0.97rem;
-    opacity: 0.95;*/
-/*}*/
-///////////////////////////////////////////////////////////////////////////////////////////////
 input {
     border: 0.1em solid @light-border;
     border-radius: 0.3em;
 }
 
 .main-RenderBody-container {
-    /*padding-left: 5em;
-    padding-right: 5em;*/
     box-sizing: border-box;
 }
 
-//check-box
+// Checkboxes
 .check-box {
     appearance: none;
     -webkit-appearance: none;
@@ -174,52 +172,53 @@ input {
     height: 1.3em;
     border: 0.1em solid gray;
     border-radius: 0.3em;
-    background-color: @light-check-box-unchecked;
+    background-color: @light-checkbox-unchecked;
     position: relative;
+
+    &:checked {
+        background-color: @light-checkbox-checked;
+    }
 }
 
-.check-box:checked {
-    background-color: @light-check-box-checked;
-}
-
-// To solve problem with selected items in browser.
-select[multiple] option.selected-fix {
-    background-color: rgb(206, 206, 206) !important;
-    color: rgb(16, 16, 16) !important;
-}
+// Multi-select: selected fix
 select[multiple] {
-    width: 100%
+    width: 100%;
+
+    option.selected-fix {
+        background-color: rgb(206, 206, 206) !important;
+        color: rgb(16, 16, 16) !important;
+    }
 }
 
-.comparison-sign { // Перейменував клас в comparison-sign-on та тут і в темній темі вирішим залишити ці стилі.
+// Comparison marker
+.comparison-sign {
     color: @light-text-light;
 }
 
-// Table
+// Tables
 table,
 table thead,
 table tbody tr td,
 table thead tr th {
     background-color: @light-bg;
 }
-// Styles for fixed rows.
-//table.table-toFixRows-1 tbody tr:nth-child(-n+@{fixed-rows}) td, // Включає у вибірку рядки під заголовком
-table.table-toFixRows-1 thead tr:nth-child(-n+@{fixed-rows}) th {
-    background-color: @light-header-bg;
-}
-// Styles for fixed columns.
-table.table-toFixColumns-1 tbody tr td:nth-child(-n+@{fixed-columns-1}),
-table.table-toFixColumns-1 thead tr th:nth-child(-n+@{fixed-columns-1}) {
+
+table.table-toFixRows-1 thead tr:nth-child(-n+@{table-fixed-rows}) th {
     background-color: @light-header-bg;
 }
 
-table.table-toFixColumns-2 tbody tr td:nth-child(-n+@{fixed-columns-2}),
-table.table-toFixColumns-2 thead tr th:nth-child(-n+@{fixed-columns-2}) {
+table.table-toFixColumns-1 tbody tr td:nth-child(-n+@{table-fixed-columns-1}),
+table.table-toFixColumns-1 thead tr th:nth-child(-n+@{table-fixed-columns-1}) {
+    background-color: @light-header-bg;
+}
+
+table.table-toFixColumns-2 tbody tr td:nth-child(-n+@{table-fixed-columns-2}),
+table.table-toFixColumns-2 thead tr th:nth-child(-n+@{table-fixed-columns-2}) {
     background-color: @light-header-bg;
 }
 
 table tbody tr td {
-    border-bottom: max(@border-bottom-table-size, @border-bottom-table-px) solid @light-border;
+    border-bottom: max(@table-border-bottom-size, @table-border-bottom-px) solid @light-border;
 }
 
 // Page bar
@@ -227,34 +226,33 @@ table tbody tr td {
     color: @dark-text;
 }
 
-// Others
-.dropdown-menu, .dropdown-menu table thead tr th {
+// Dropdown
+.dropdown-menu,
+.dropdown-menu table thead tr th {
     color: @light-text;
 }
 
-
-/*.highlightRowClass {*/
-table tbody tr.highlightRowClass td, table thead tr.highlightRowClass th {
-    background-color: @light-highlighting;
+table tbody tr.highlightRowClass td,
+table thead tr.highlightRowClass th {
+    background-color: @light-highlight-bg;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ANIMATIONS
-// Highlighting of the Pole fields when their value is changed automatically by script.
+
+// Animations
 .pole-flash {
     animation: poleFlashLight 1s ease;
 }
 
+// Light spinner
 .spinner {
-    border: 0.25rem solid @light-spiner-bg;
-    border-top: 0.25rem solid @light-spiner; /* Slider */
+    border: 0.25rem solid @light-spinner-bg;
+    border-top: 0.25rem solid @light-spinner;
     background-color: @light-header-bg;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Access block - Обмеження для неавторизованих
+// Access block - restrictions
 .restrictedWrapper {
     position: relative;
-    display: block; /* inline-block або block, залежно від контенту */
+    display: block;
 }
 
 .restrictedMask {
@@ -264,7 +262,7 @@ table tbody tr.highlightRowClass td, table thead tr.highlightRowClass th {
     z-index: 10;
     width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.6);
+    background: rgba(255, 255, 255, 0.6);
     border-radius: .5rem;
 }
 
@@ -275,19 +273,18 @@ table tbody tr.highlightRowClass td, table thead tr.highlightRowClass th {
 .currentPage {
     padding: .1rem .5rem 0 .5rem;
     border-radius: .3rem;
-    color: @currentPage;
-    background-color: @light-currentPage-bg;
+    color: @current-page-color;
+    background-color: @light-current-page-bg;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//// Slider
+// Sliders (Light)
 // MonoColor
 input:checked + .sliderMonoColor {
-    background-color: @light-slider-background-on;
+    background-color: @light-slider-bg-on;
 }
 
 .sliderMonoColor {
-    background-color: @light-slider-background-on;
+    background-color: @light-slider-bg-on;
 }
 
 .sliderMonoColor::before {
@@ -296,27 +293,26 @@ input:checked + .sliderMonoColor {
 
 // DualColor
 input:checked + .sliderDualColor {
-    background-color: @light-slider-background-on;
+    background-color: @light-slider-bg-on;
 }
 
 .sliderDualColor {
-    background-color: @light-slider-background-off;
+    background-color: @light-slider-bg-off;
 }
 
 .sliderDualColor::before {
     background-color: @light-slider-button;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//// Завантажувач (spinner) для глобального використання
+// Global spinner (Light)
 #global-spinner {
-    border: .3rem solid @light-spiner;
-    border-top: .6rem solid @light-spiner-top; // Товстіший або тоньший border-top дає цікавий ефект різної товшини кола завантажувача
+    border: .3rem solid @light-global-spiner;
+    border-top: .6rem solid @light-global-spiner-top;
 }
 
-///////////////////////////////////////////////////////////
-// Dark theme
-///////////////////////////////////////////////////////////
+// =============================================
+// Dark Theme (Modifier)
+// =============================================
 .dark-theme {
     background-color: @dark-bg !important;
     color: @dark-text;
@@ -335,28 +331,17 @@ input:checked + .sliderDualColor {
     h1.pHeader, h2.pHeader, h3.pHeader, h4.pHeader, h5.pHeader, h6.pHeader {
         background-color: @dark-header-bg;
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     a {
-        color: @dark-highlight-a; // БУЛО
-        /*display: inline-block;
-        font-size: 1.03rem;
-        opacity: 1;
-        transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;*/
+        color: @dark-accent;
     }
 
     .btn {
-        color: @dark-highlight-a;
-        background-color: @dark-form-background-light;
-        border-color: @dark-highlight-a;
-        box-shadow: 0 0 5px @dark-highlight-a;
+        color: @dark-accent;
+        background-color: @dark-form-bg-light;
+        border-color: @dark-accent;
+        box-shadow: 0 0 5px @dark-accent;
     }
-    /*a:hover {
-        color: @dark-highlight-a !important;
-        font-weight: bold !important;
-        font-size: 0.98rem;
-        opacity: 0.85;
-        text-decoration: none;*/ /* (опціонально) прибрати підкреслення у <a> */
-    /*}*/
 
     .btn:hover {
         color: @dark-text !important;
@@ -366,27 +351,29 @@ input:checked + .sliderDualColor {
     .btn-primary {
         --bs-btn-color: @dark-text !important;
         --bs-btn-bg: transparent !important;
-        --bs-btn-border-color: red !important;
+        --bs-btn-border-color: @dark-border !important;
         --bs-btn-hover-color: inherit;
         --bs-btn-hover-bg: inherit;
         --bs-btn-hover-border-color: inherit;
         --bs-btn-active-color: inherit;
         --bs-btn-active-bg: inherit;
         --bs-btn-active-border-color: inherit;
-        /*--bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);*/
         --bs-btn-disabled-color: inherit;
         --bs-btn-disabled-bg: inherit;
         --bs-btn-disabled-border-color: inherit;
     }
 
-    .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-        box-shadow: @dark-bg;
+    .btn:focus,
+    .btn:active:focus,
+    .btn-link.nav-link:focus,
+    .form-control:focus,
+    .form-check-input:focus {
+        box-shadow: none;
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     input {
-        background-color: @dark-form-background-light;
-        border: 0.1em solid red;
+        background-color: @dark-form-bg-light;
+        border: 0.1em solid @dark-border;
         border-radius: 0.3em;
         color: @dark-text;
     }
@@ -395,43 +382,37 @@ input:checked + .sliderDualColor {
         border-color: @dark-border;
     }
 
-    header nav div ul li a {
-        color: @dark-text !important;
-    }
-
+    header nav div ul li a,
     footer {
         color: @dark-text !important;
     }
 
-    .text-dark {
-        color: inherit !important;
-    }
-
+    .text-dark,
     .text-muted {
         color: inherit !important;
     }
 
     .text-danger {
-        color: @dart-text-danger !important;
+        color: @dark-text-danger !important;
     }
-    /// Table ///
+    // Tables (Bootstrap overrides)
     .table {
         --bs-table-color: inherit;
         --bs-table-bg: @dark-bg;
-        --bs-table-border-color: red;
+        --bs-table-border-color: @dark-border;
     }
 
     .table-dark {
         --bs-table-color: @dark-text;
-        --bs-table-bg: @dark-form-background-light;
+        --bs-table-bg: @dark-form-bg-light;
     }
 
     .table-secondary {
         --bs-table-color: @dark-text;
-        --bs-table-bg: @dark-form-background-dark;
+        --bs-table-bg: @dark-form-bg-dark;
     }
 
-    .comparison-sign { // Перейменував клас в comparison-sign-on, але тут і в світлій темі вирішим залишити ці стилі.
+    .comparison-sign {
         color: @dark-text-light;
     }
 
@@ -442,116 +423,113 @@ input:checked + .sliderDualColor {
         background-color: @dark-bg;
         color: @dark-text;
     }
-    // Styles for fixed rows.
-    //table.table-toFixRows-1 tbody tr:nth-child(-n+@{fixed-rows}) td, // Включає у вибірку рядки під заголовком
-    table.table-toFixRows-1 thead tr:nth-child(-n+@{fixed-rows}) th {
-        background-color: @dark-header-bg;
-    }
-    // Styles for fixed columns.
-    table.table-toFixColumns-1 tbody tr td:nth-child(-n+@{fixed-columns-1}),
-    table.table-toFixColumns-1 thead tr th:nth-child(-n+@{fixed-columns-1}) {
+
+    table.table-toFixRows-1 thead tr:nth-child(-n+@{table-fixed-rows}) th {
         background-color: @dark-header-bg;
     }
 
-    table.table-toFixColumns-2 tbody tr td:nth-child(-n+@{fixed-columns-2}),
-    table.table-toFixColumns-2 thead tr th:nth-child(-n+@{fixed-columns-2}) {
+    table.table-toFixColumns-1 tbody tr td:nth-child(-n+@{table-fixed-columns-1}),
+    table.table-toFixColumns-1 thead tr th:nth-child(-n+@{table-fixed-columns-1}) {
         background-color: @dark-header-bg;
     }
-    /*tr {
-        border-top-color: @dark-top-border;
-        border-bottom-color: @dark-border;
-    }*/
-    table tbody tr.highlightRowClass td, table thead tr.highlightRowClass th {
-        background-color: @dark-highlighting;
+
+    table.table-toFixColumns-2 tbody tr td:nth-child(-n+@{table-fixed-columns-2}),
+    table.table-toFixColumns-2 thead tr th:nth-child(-n+@{table-fixed-columns-2}) {
+        background-color: @dark-header-bg;
+    }
+
+    table tbody tr.highlightRowClass td,
+    table thead tr.highlightRowClass th {
+        background-color: @dark-highlight-bg;
     }
 
     table tbody tr td {
-        border-bottom: max(@border-bottom-table-size, @border-bottom-table-px) solid @dark-border;
+        border-bottom: max(@table-border-bottom-size, @table-border-bottom-px) solid @dark-border;
     }
-    /*.highlightRowClass {*/
     // Page bar
     .borderBlock {
         color: @dark-border-light;
     }
-    /// navbar-toggler ///
+    // Navbar toggler
     .navbar-toggler {
-        border-color: red;
+        border-color: @dark-border;
     }
 
     .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml;charset=utf8,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='red' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        background-image: url("data:image/svg+xml;charset=utf8,%3csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3e%3cpath stroke='@{dark-toggler-stroke}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
-
-    /// Selection ///
-    .form-select[multiple], .form-select[size]:not([size="1"]) {
+    // Selects
+    .form-select[multiple],
+    .form-select[size]:not([size='1']) {
         padding-right: .75rem;
         background-image: none;
     }
 
     .form-select {
         color: @dark-text;
-        background-color: @dark-form-background-light;
-        border-color: @dark-highlight-a;
+        background-color: @dark-form-bg-light;
+        border-color: @dark-accent;
     }
 
-    .form-control, .form-select {
+    .form-control,
+    .form-select {
         color: inherit;
-        background-color: @dark-form-background-light;
-        border-color: @dark-highlight-a;
-        box-shadow: 0 0 5px @dark-highlight-a;
+        background-color: @dark-form-bg-light;
+        border-color: @dark-accent;
+        box-shadow: 0 0 5px @dark-accent;
         -webkit-text-fill-color: @dark-text !important;
     }
-    // Overriding styles for Chromium-based browsers.
-    input.form-control:-webkit-autofill, input.form-select:-webkit-autofill {
+    // Autofill (Chromium)
+    .form-control:-webkit-autofill,
+    .form-select:-webkit-autofill {
         background-color: @dark-bg !important;
         color: @dark-text;
         caret-color: @dark-text !important;
         animation-name: dark-autofill-fix;
+        animation-duration: 5000s;
     }
-    /// Check-box ///
+    // Checkboxes
     .check-box {
         appearance: none;
         -webkit-appearance: none;
         -moz-appearance: none;
         width: 1.3em;
         height: 1.3em;
-        border: 0.1em solid red;
+        border: 0.1em solid @dark-border;
         border-radius: 0.3em;
-        background-color: @dark-check-box-unchecked;
+        background-color: @dark-checkbox-unchecked;
         position: relative;
-    }
 
-    .check-box:checked {
-        background-color: @dark-check-box-checked;
+        &:checked {
+            background-color: @dark-checkbox-checked;
+        }
     }
-    // To solve problem with selected items in browser.
+    // Multi-select: selected fix
     select[multiple] option.selected-fix {
         background-color: rgb(84, 84, 84) !important;
         color: rgb(255, 255, 255) !important;
     }
-    /// Others
-    .dropdown-menu, .dropdown-menu table thead tr th {
+    // Dropdowns
+    .dropdown-menu,
+    .dropdown-menu table thead tr th {
         color: @dark-text;
-        background-color: @dark-form-background-light;
+        background-color: @dark-form-bg-light;
     }
 
     .dropdown-menu .dropdown-item:hover {
-        background-color: @dark-form-background-hover !important;
+        background-color: @dark-form-bg-hover !important;
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ANIMATIONS
-    // Highlighting of the Pole fields when their value is changed automatically by script.
+    // Animations
     .pole-flash {
         animation: poleFlashDark 1s ease;
     }
-    // Uploader
+    // Spinner (Dark)
     .spinner {
-        border: 0.25rem solid @dark-spiner-bg;
-        border-top: 0.25rem solid @dark-spiner; /* Slider */
+        border: 0.25rem solid @dark-spinner-bg;
+        border-top: 0.25rem solid @dark-spinner;
         background-color: @dark-header-bg;
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Access block - Обмеження для неавторизованих
+    // Access restrictions
     .restrictedMask {
         position: absolute;
         top: 0;
@@ -559,25 +537,24 @@ input:checked + .sliderDualColor {
         z-index: 10;
         width: 100%;
         height: 100%;
-        background-color: rgba(18,18,18,0.4);
+        background-color: rgba(18, 18, 18, 0.4);
         border-radius: .5rem;
     }
 
     .currentPage {
         padding: .1rem .5rem 0 .5rem;
         border-radius: .3rem;
-        color: @currentPage;
-        background-color: @dark-currentPage-bg;
+        color: @current-page-color;
+        background-color: @dark-current-page-bg;
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Slider
+    // Sliders (Dark)
     // MonoColor
     input:checked + .sliderMonoColor {
-        background-color: @dark-slider-background-on;
+        background-color: @dark-slider-bg-on;
     }
 
     .sliderMonoColor {
-        background-color: @dark-slider-background-on;
+        background-color: @dark-slider-bg-on;
     }
 
     .sliderMonoColor::before {
@@ -585,11 +562,11 @@ input:checked + .sliderDualColor {
     }
     // DualColor
     input:checked + .sliderDualColor {
-        background-color: @dark-slider-background-on;
+        background-color: @dark-slider-bg-on;
     }
 
     .sliderDualColor {
-        background-color: @dark-slider-background-off;
+        background-color: @dark-slider-bg-off;
     }
 
     .sliderDualColor::before {
@@ -599,24 +576,23 @@ input:checked + .sliderDualColor {
     input:checked + .sliderDualColor::before {
         background-color: @dark-slider-button-on;
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //// Завантажувач (spinner) для глобального використання
+    // Global spinner (Dark)
     #global-spinner {
-        border: .3rem solid @dark-spiner;
-        border-top: .6rem solid @dark-spiner-top; // Товстіший або тоньший border-top дає цікавий ефект різної товшини кола завантажувача
+        border: .3rem solid @dark-global-spiner;
+        border-top: .6rem solid @dark-global-spiner-top;
     }
 }
 
-
+// =============================================
+// Keyframes
+// =============================================
 @keyframes dark-autofill-fix {
     from {
         background-color: @dark-autofill-bg !important;
-        color: @autofill-text !important;
+        color: #ffffff !important;
     }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ANIMATIONS
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 @keyframes poleFlashDark {
     0% {
         background-color: inherit;

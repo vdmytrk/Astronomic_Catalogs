@@ -362,69 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# appsettings
-appsettings.Development.json
-appsettings.AzureDevelopment.json
- 
-# NLog local files
-nlog-internal*.xml
-NLog.config.Debug.xml
-NLogLocalConfigurations.cs
- 
-# Folders
-Astronomic_Catalogs/Database Scripts/Data
-Astronomic_Catalogs/Areas/Admin/Models
-Astronomic_Catalogs/wwwroot/Excel
-
-# SQL
-Astronomic_Catalogs/Database Scripts/Tables/RequestLog.sql
-Astronomic_Catalogs/Database Scripts/Tables/UsertLog.sql
-Astronomic_Catalogs/Database Scripts/Functions and procedures/DataBugFixes.sql
-
-
-# C#
-*_extended.cs
-
-# html
-_ActualDate.cshtml
-_ActualDateTable.cshtml
-
-# Style
-Astronomic_Catalogs/wwwroot/less/themes.css
-#Astronomic_Catalogs/wwwroot/less/themes.less
-Astronomic_Catalogs/wwwroot/less/site.css
-#Astronomic_Catalogs/wwwroot/less/site.less
-Astronomic_Catalogs/wwwroot/less/planetarySystemVisualization.css
-#Astronomic_Catalogs/wwwroot/less/planetarySystemVisualization.less
-
-# js + typescript
-Astronomic_Catalogs/wwwroot/js/*.js.map
-Astronomic_Catalogs/wwwroot/js/alertOfSwal.js
-#Astronomic_Catalogs/wwwroot/js/AstroTableFilters.js
-Astronomic_Catalogs/wwwroot/js/behavior.js
-Astronomic_Catalogs/wwwroot/js/formHandler.js
-Astronomic_Catalogs/wwwroot/js/main.js
-Astronomic_Catalogs/wwwroot/js/metrics.js
-Astronomic_Catalogs/wwwroot/js/progresImportBar.js
-Astronomic_Catalogs/wwwroot/js/scriptTS.js
-Astronomic_Catalogs/wwwroot/js/theme.js
-Astronomic_Catalogs/wwwroot/js/telescopeViewCalculator.js
-
-Astronomic_Catalogs/wwwroot/js/themeC.js
-Astronomic_Catalogs/Scripts/ts/themeC.ts
-
-Astronomic_Catalogs/wwwroot/js/development.js
-Astronomic_Catalogs/wwwroot/js/development.min.js
-Astronomic_Catalogs/Scripts/ts/development.ts
-Astronomic_Catalogs/wwwroot/js/scriptTSC.js
-Astronomic_Catalogs/wwwroot/js/scriptTSC.min.js
-Astronomic_Catalogs/Scripts/ts/scriptTSC.ts
-Astronomic_Catalogs/wwwroot/js/mainCO.js
-Astronomic_Catalogs/wwwroot/js/mainCO.min.js
-Astronomic_Catalogs/Scripts/ts/mainCO.ts
-
-Astronomic_Catalogs/wwwroot/js/scriptTS.min.js
-Astronomic_Catalogs/wwwroot/js/main.min.js
-Astronomic_Catalogs/wwwroot/js/scriptTS.min.js
-Astronomic_Catalogs/wwwroot/js/calendarHandler.js
-Astronomic_Catalogs/wwwroot/js/planetarySystemVisualization.js
+/Astronomic_Catalogs/wwwroot/js/AstroTableFilters.js
+/Astronomic_Catalogs/wwwroot/js/deviceUtils.js
+/Astronomic_Catalogs/wwwroot/js/planetarySystemVisualization.js
+/Astronomic_Catalogs/wwwroot/js/switchTableType.js
+/Astronomic_Catalogs/wwwroot/js/theme.js
+/Astronomic_Catalogs/wwwroot/js/planetarySystemVisualization.js

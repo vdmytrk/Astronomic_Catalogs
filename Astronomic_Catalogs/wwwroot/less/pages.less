@@ -1,0 +1,171 @@
+﻿
+/* ============================== PLANETS ============================== */
+.planetPropErr1 {
+    font-size: 1em;
+}
+
+.planetPropErr2 {
+    font-size: 0.6em;
+    line-height: 1;
+    margin-top: .1rem !important;
+}
+
+.comparison-sign-on,
+.comparison-sign-off,
+.comparison-main-intagers {
+    white-space: nowrap;
+    display: inline;
+}
+
+.comparison-sign-on {
+    margin-right: -0.3em;
+}
+
+.comparison-sign-off {
+    margin-right: 0.7em;
+}
+
+.exoplanetPlanetName,
+.exoplanetDiscoveryMethod,
+.planetarySystemNameBlock,
+.discoveredPlenetCountBlock,
+.discoveredDateBlock {
+    min-width: 20rem;
+}
+
+.planetarySystemLeftFilterBlock {
+    min-width: 35rem;
+    max-width: 50rem;
+}
+
+.exoplanetTelescope {
+    height: 20rem;
+    overflow-y: auto;
+}
+
+.planetTypeSelect {
+    height: 14rem;
+    font-family: 'JetBrains Mono', monospace;
+    width: 40rem;
+    overflow-y: auto;
+
+    select& {
+        max-width: 40rem;
+    }
+}
+
+.planetFilterSizeBlock {
+    min-width: 38rem;
+
+    span.label {
+        width: 100%;
+        max-width: 38rem;
+    }
+}
+
+/* ------------------------------ Import planet data block ------------------------------ */
+#stopImportingPlanetDataButton {
+    display: none;
+}
+
+#progressContainer {
+    height: 2.5em;
+    display: none;
+}
+
+#importProgress {
+    height: 2.5em;
+    width: 0%;
+}
+
+/* ============================== TELESCOPE CALCULATOR ============================== */
+.telescopeViewCalculatorInputs,
+.telescopeViewCalculatorOutputs,
+.viewProvidedEyepiece,
+.telescopeParameters,
+.typicalMagnifications,
+.otherTelescopParameters {
+    flex: 1 1 auto;
+}
+
+#telescopeViewCalculator.container > .row {
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 2rem;
+    column-gap: 2rem;
+}
+
+.container {
+    padding-inline: 2rem;
+}
+
+@media (max-width: 159.6rem) {
+    .fullWidthHeader {
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
+        z-index: 1;
+    }
+}
+
+@media (min-width: 768px) {
+    .telescopeViewCalculatorInputs {
+        min-width: 40rem;
+    }
+}
+
+/* ------------------------------ Min and Max width ------------------------------ */
+.telescopeViewCalculatorInputs input[type="text"] {
+    max-width: 6rem;
+}
+
+.telescopeCharacteristicsContent {
+    max-width: 35rem;
+}
+
+.telescopeViewCalculatorInputs {
+    max-width: 80rem;
+    width: auto;
+}
+
+.telescopeCharacteristics {
+    margin-left: 2rem;
+}
+
+.telescopeViewCalculatorOutputs {
+    max-width: 135rem;
+    width: auto;
+}
+
+.viewProvidedEyepiece {
+    min-width: 25rem;
+    width: auto;
+    margin-left: 2rem;
+}
+
+.viewProvidedEyepieceContent,
+.otherParametersContent {
+    max-width: 45rem;
+}
+
+.telescopeParameters {
+    margin-left: 2rem;
+}
+
+.otherTelescopParameters {
+    width: clamp(27rem, 100%, 35rem);
+}
+
+.typicalMagnifications {
+    width: clamp(35rem, 100%, 50rem);
+}
+
+#telescopeViewCalculator {
+    max-width: 180rem;
+    margin-inline: auto;
+}
+
+.telescopFilterSizeBlock {
+    min-width: 27rem;
+}

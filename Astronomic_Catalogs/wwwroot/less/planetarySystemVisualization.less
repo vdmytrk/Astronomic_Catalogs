@@ -1,47 +1,63 @@
-﻿@logarithmic-text: white;
+﻿
+// ================================
+// Planetary System Visualization
+// ================================
 
-//@planetary-system-text: #D01818;
-//@planetary-system-text-desc: #F61C1C;
-//@stars-text: white;
-@planet-text: #E4E4E4;
-//@planet-label-desc: #E4E4E4;
+/* ============================== VARIABLES ============================== */
+@color-logarithmic-text: #ffffff;
+@color-planet-text: #e4e4e4;
+@color-page-background: #121212;
+@color-system-visualization: #ffffff;
 
-@page-background: #121212;
-@planetary-system-visualization: #FFFFFF;
+@font-size-small: 0.8rem;
+@font-size-medium: 1.5rem;
 
-
+/* ============================== BASE STYLES ============================== */
 .planetarySystemVisualizationStyle {
-    color: @planetary-system-visualization;
+    color: @color-system-visualization;
 
     a, h1 {
-        color: @planetary-system-visualization;
+        color: @color-system-visualization;
     }
 }
 
-
 .planetMissingRadius {
-    fill: @planet-text;
-    font-size: .8rem;
+    fill: @color-planet-text;
+    font-size: @font-size-small;
 }
 
 .logarithmicScale {
-    fill: @logarithmic-text;
-    font-size: 1.5rem;
+    fill: @color-logarithmic-text;
+    font-size: @font-size-medium;
 }
 
 .planetaryAxisDescriptionWrapper {
     position: sticky;
     top: 0;
-    background: @page-background;
-}
-
-
-
-.planetary-axis-description-wrapper {
-    position: sticky;
-    top: 0;
-    background: @page-background;
+    background: @color-page-background;
     z-index: 10;
 }
 
+/* ============================== HABITABLE ZONE ============================== */
+.habitableZoneAllPalanetText,
+.habitableZoneTerrestrialPalanetText {
+    display: inline-block;
+    width: 100%;
+}
 
+.habitableZoneAllPalanetText {
+    padding-right: 1rem;
+}
+
+.habitableZoneTerrestrialPalanetText {
+    padding-left: 3rem;
+}
+
+.habitableZoneTextColuns {
+    min-width: 20rem;
+    max-width: 25rem;
+}
+
+.habitableZoneBlock {
+    min-width: 29rem;
+}
