@@ -380,11 +380,6 @@ function updateCatalogData(catalog: string, pageButton: HTMLElement | null, isVi
         return;
     }
 
-    //if (isVisualizationMode == null) {
-    //    console.error(`❌ isVisualizationMode is undefined`);
-    //    return;
-    //}
-
     const pageNumber = pageButton?.textContent?.trim() || '1';
     const form = document.querySelector('.topMenuFiltersCatalogs') as HTMLElement | null;
 

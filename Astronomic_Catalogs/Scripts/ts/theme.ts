@@ -44,7 +44,6 @@ function updateThemeBackground(inputs: NodeListOf<HTMLInputElement>, body: HTMLE
     }
 
     updateBodyBg();
-    //window.addEventListener("load", updateBodyBg); // For the planet-grphic page where the background changes after load.
 }
 
 

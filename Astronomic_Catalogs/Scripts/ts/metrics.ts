@@ -53,7 +53,6 @@ function handleTable(remInPixels: number): void {
     updateFixedColumnLeftOffset();
     adjustTableSize(remInPixels);
     distributeItemsIntoColumns(".responsiveColumnsContainer", remInPixels);
-    //updateTableHeaderOffset();
 }
 
 
