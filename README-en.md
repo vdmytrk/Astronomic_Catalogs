@@ -13,11 +13,11 @@ This project is a demonstration of full-stack architectural and development skil
 ## 📑 **Table of Contents**
 - [⚙️ Tech Stack](#⚙%EF%B8%8F-**tech-stack**)
 - [📂 Project Structure Overview](#📂-**project-structure-overview**)
-- [🧠 Stored Procedure Highlights](#🧠-**stored-procedure-highlights**)
-- [🧠 Key Stored Procedures & SQL Design](#🧠-**key-stored-procedures-%26-sql-design**)
 - [🏗️ Architecture & Design](#🏗%EF%B8%8F-**architecture-%26-design**)
 - [🔐 Authentication & Authorization](#%F0%9F%94%90-**authentication-%26-authorization**)
   - [📧 Email Confirmation](#📧-**email-confirmation**)
+- [🧠 Stored Procedure Highlights](#🧠-**stored-procedure-highlights**)
+- [🧠 Key Stored Procedures & SQL Design](#🧠-**key-stored-procedures-%26-sql-design**)
 - [🧪 Testing](#🧪-**testing**)
 - [⚡ Developer Highlights](#⚡-**developer-highlights**)
 - [🚨 Deployment Note](#🚨-**deployment-note**)
@@ -48,7 +48,7 @@ This project is a demonstration of full-stack architectural and development skil
 ⚡ **Mobile responsiveness** is partially implemented and remains incomplete at this stage.  
 
 ---
-      
+
 ## 📂 **Project Structure Overview**
 **Main Components**:
 *   🌌 **Astronomic Catalogs** — ASP.NET MVC application with:
@@ -60,33 +60,6 @@ This project is a demonstration of full-stack architectural and development skil
     *   UI theming with Bootstrap 5 and LESS (dark/light mode)
 *   🔐 **Identity Admin Area** — Razor Pages + MVC for managing users, roles, and claims with consistent layout and UX patterns.
 *   🧪 **Test Suite** — Testing in real HTTP scenarios using an isolated environment and test doubles.  
-
----
-       
-## 🧠 **Stored Procedure Highlights**
-This project uses SQL stored procedures as a core data transformation layer. They cover:
-*   **ETL & Data Normalization** — Transform raw datasets into structured relational formats.
-*   **Deduplication & Aggregation** — Select the most relevant values across grouped records using dynamic SQL.
-*   **Flexible Filtering** — Dynamic filters with ranges, optional conditions, JSON arrays, and pagination.
-*   **Transactional Safety** — Full use of transactions, rollback logic, and type-aware parsing.
-*   **Logging & Exception Handling** — Detailed logging and exception handling with informative error messages and rethrowing for upstream visibility.
-
-## 🧠 **Key Stored Procedures & SQL Design**      
-*   🔄 ****Data Processing & Normalization****
-    *   **CalculationPlanetarySystemData**: aggregates and transforms normalized catalog entries into structured relational data. Groups related records, extracts representative values, derives calculated fields by mathematical expressions, and populates boolean flags based on range conditions.
-    *   **FillNASAExoplanetCatalogUniquePlanets**: generates a deduplicated dataset by selecting the most recent non-null value for each attribute across grouped entities. Dynamically builds a query to extract prioritized values per column, based on data type–specific filtering logic and latest date ordering. Ensures consistency across heterogeneous data types, applies fallback defaults, and generates the final dataset for insertion. 
-    *   **InsertCollinderCatalog**: transforms raw catalog entries into a normalized structure. Handles parsing of positional data, extraction of numeric attributes, and general data cleanup to ensure consistency and integrity.
-    *   **InsertNGCICOpendatasoft**: processes structured components from input strings, resolves object classifications, and assigns metadata such as the source origin.
-    *   **MigrateNGCICOStoNGCICO_W**: performs a full migration and normalization. Detects duplicates and sub-objects, routes data accordingly, enriches records using data from supplemental tables.
-
-*   🔍 ****Flexible Filtering Procedures****
-    *   **GetFilteredNGCICData**, **GetFilteredPlanetarySystemsData**: apply dynamic filters using nullable conditions, ranges, and flexible matching logic.
-    *   **GetFilteredPlanetsData**: supports advanced filtering with JSON arrays, range-based filters, and paginated output.
-
-*   ⚙️ ****Performance & Extensibility****
-    *   Leverages indexed queries and optimized conditions for scalability.
-    *   Designed with parameterized filtering logic to ensure maintainability.
-    *   Includes centralized logging for consistent error handling and monitoring.
 
 ---
 
@@ -161,6 +134,33 @@ appsettings.json example:
     "ExpireMinutes": MINUTES
   }
 ```
+
+---
+       
+## 🧠 **Stored Procedure Highlights**
+This project uses SQL stored procedures as a core data transformation layer. They cover:
+*   **ETL & Data Normalization** — Transform raw datasets into structured relational formats.
+*   **Deduplication & Aggregation** — Select the most relevant values across grouped records using dynamic SQL.
+*   **Flexible Filtering** — Dynamic filters with ranges, optional conditions, JSON arrays, and pagination.
+*   **Transactional Safety** — Full use of transactions, rollback logic, and type-aware parsing.
+*   **Logging & Exception Handling** — Detailed logging and exception handling with informative error messages and rethrowing for upstream visibility.
+
+## 🧠 **Key Stored Procedures & SQL Design**      
+*   🔄 ****Data Processing & Normalization****
+    *   **CalculationPlanetarySystemData**: aggregates and transforms normalized catalog entries into structured relational data. Groups related records, extracts representative values, derives calculated fields by mathematical expressions, and populates boolean flags based on range conditions.
+    *   **FillNASAExoplanetCatalogUniquePlanets**: generates a deduplicated dataset by selecting the most recent non-null value for each attribute across grouped entities. Dynamically builds a query to extract prioritized values per column, based on data type–specific filtering logic and latest date ordering. Ensures consistency across heterogeneous data types, applies fallback defaults, and generates the final dataset for insertion. 
+    *   **InsertCollinderCatalog**: transforms raw catalog entries into a normalized structure. Handles parsing of positional data, extraction of numeric attributes, and general data cleanup to ensure consistency and integrity.
+    *   **InsertNGCICOpendatasoft**: processes structured components from input strings, resolves object classifications, and assigns metadata such as the source origin.
+    *   **MigrateNGCICOStoNGCICO_W**: performs a full migration and normalization. Detects duplicates and sub-objects, routes data accordingly, enriches records using data from supplemental tables.
+
+*   🔍 ****Flexible Filtering Procedures****
+    *   **GetFilteredNGCICData**, **GetFilteredPlanetarySystemsData**: apply dynamic filters using nullable conditions, ranges, and flexible matching logic.
+    *   **GetFilteredPlanetsData**: supports advanced filtering with JSON arrays, range-based filters, and paginated output.
+
+*   ⚙️ ****Performance & Extensibility****
+    *   Leverages indexed queries and optimized conditions for scalability.
+    *   Designed with parameterized filtering logic to ensure maintainability.
+    *   Includes centralized logging for consistent error handling and monitoring.
 
 ---
 
