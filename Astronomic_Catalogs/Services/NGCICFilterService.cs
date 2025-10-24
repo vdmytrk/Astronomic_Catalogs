@@ -1,8 +1,8 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
+using Astronomic_Catalogs.ViewModels;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -117,7 +117,7 @@ public class NGCICFilterService : INGCICFilterService
 
     }
 
-    public async Task<(int countNGCTask, int countNGCE_Task, List<ConstellationDto> constellations, List<NGCICOpendatasoft>? catalogItems)> GetNGCICOpendatasoftDataAsync()
+    public async Task<(int countNGCTask, int countNGCE_Task, List<ConstellationViewModel> constellations, List<NGCICOpendatasoft>? catalogItems)> GetNGCICOpendatasoftDataAsync()
     {
         try
         {
@@ -199,7 +199,7 @@ public class NGCICFilterService : INGCICFilterService
             using var multi = await conn.QueryMultipleAsync(sql);
             int countNGC = await multi.ReadFirstAsync<int>();
             var countNGCE = await multi.ReadFirstAsync<int>();
-            var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
+            var constellations = (await multi.ReadAsync<ConstellationViewModel>()).ToList();
             var catalogItems = (await multi.ReadAsync<NGCICOpendatasoft>()).ToList();
 
             return (countNGC, countNGCE, constellations, catalogItems);

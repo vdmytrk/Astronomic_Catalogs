@@ -13,7 +13,6 @@ namespace ACTests.Tests.Integration;
 public class LoginViaUIIntegrationTests : IDisposable
 {
     private LoginViaUIWebApplicationFactory<Program> _factory = null!;
-    //private HttpClient _client = null!;
 
     [SetUp]
     public async Task Setup()

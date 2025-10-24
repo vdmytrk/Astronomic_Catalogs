@@ -29,7 +29,7 @@ public class ExcelImportService_OpenXml : IExcelImport
         DatabaseInitializer databaseInitializer)
     {
         _contextFactory = contextFactory;
-        _filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Excel", "PS_2025.07.08_08.43.06 - Converted - Clear.xlsx");
+        _filePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Excel", "PS_2025.09.05_07.42.23 – Converted – Clear.xlsx");
         _logger = logger;
         _hub = hub;
         _importCancellationService = importCancellationService;

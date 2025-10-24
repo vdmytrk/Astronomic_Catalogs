@@ -18,16 +18,12 @@ stages:
     pool:
       name: SelfHostedPool20250103
     steps:
-    - task: NuGetToolInstaller@1
-    - task: NuGetCommand@2
-      inputs:
-        restoreSolution: '$(solution)'
-
     - script: |
         echo "Solution directory: $(solution)"
         echo "Project path: $(Build.SourcesDirectory)\$(projectPath)"
         echo "Working directory: $(workingDirectory)"
       displayName: 'Check Variables'
+
     - script: dir $(workingDirectory)
       displayName: 'List working_directory files'
 
@@ -72,6 +68,11 @@ stages:
         installationPath: $(Agent.ToolsDirectory)/dotnet
     - task: DotNetCoreCLI@2
       inputs:
+        command: 'restore'
+        projects: '$(solution)'
+
+    - task: DotNetCoreCLI@2
+      inputs:
         command: 'publish'
         projects: '$(Build.SourcesDirectory)/$(projectPath)'
         arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --self-contained true --runtime win-x86'
@@ -105,5 +106,5 @@ stages:
             inputs:
               azureSubscription: 'Azure subscription for voldmytc'
               appType: 'webApp'
-              appName: 'NewAstroCatalogs'
+              appName: 'astrocatalogs'
               package: "$(Pipeline.Workspace)/drop/Astronomic_Catalogs.zip"

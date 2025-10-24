@@ -1,5 +1,5 @@
 ﻿using Astronomic_Catalogs.DTO;
-using Astronomic_Catalogs.Entities;
+using Astronomic_Catalogs.ViewModels;
 using AutoMapper;
 
 namespace Astronomic_Catalogs.Profiles;

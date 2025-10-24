@@ -1,8 +1,8 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
+using Astronomic_Catalogs.ViewModels;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -107,7 +107,7 @@ public class CollinderFilterService : ICollinderFilterService
         }
     }
 
-    public async Task<(int count, List<CollinderCatalog> rawData, List<ConstellationDto> constellations)> GetCollinderCatalogDataAsync()
+    public async Task<(int count, List<CollinderCatalog> rawData, List<ConstellationViewModel> constellations)> GetCollinderCatalogDataAsync()
     {
         try
         {
@@ -153,7 +153,7 @@ public class CollinderFilterService : ICollinderFilterService
 
             int count = await multi.ReadFirstAsync<int>();
             var rawData = (await multi.ReadAsync<CollinderCatalog>()).ToList();
-            var constellations = (await multi.ReadAsync<ConstellationDto>()).ToList();
+            var constellations = (await multi.ReadAsync<ConstellationViewModel>()).ToList();
 
             return (count, rawData, constellations);
         }

@@ -1,4 +1,4 @@
-﻿namespace Astronomic_Catalogs.Entities;
+﻿namespace Astronomic_Catalogs.ViewModels;
 
 public class Exoplanet
 {

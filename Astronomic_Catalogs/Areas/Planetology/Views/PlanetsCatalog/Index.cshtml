@@ -387,10 +387,20 @@
                         <div class="col-6">
                             <div class="d-flex flex-wrap align-items-center">
                                 <h6 class="pe-2">Number of elements on the page:</h6>
-                                @Html.DropDownList(
-                                "RowOnPageCatalog",
-                                                                new SelectList(new string[] { "10", "20", "30", "50" }, "30"),
-                                                                new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30", @class = "form-select RowOnPageCatal" })
+                                @if (User.IsInRole("OwnerAdministratorPower"))
+                                {
+                                    @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30", "50" }, "30"),
+                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "30", @class = "form-select RowOnPageCatal" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30" }, "10"),
+                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "10", @class = "form-select RowOnPageCatal" })
+                                }
                             </div>
                         </div>
                         <div class="col-6">

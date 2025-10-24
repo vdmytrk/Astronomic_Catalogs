@@ -1,8 +1,8 @@
 ﻿using Astronomic_Catalogs.Data;
 using Astronomic_Catalogs.DTO;
-using Astronomic_Catalogs.Entities;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
+using Astronomic_Catalogs.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -79,6 +79,7 @@ public class PlanetarySystemFilterService : IPlanetarySystemFilterService
 
     }
 
+    // Not moved to a separate mapping profile class since it's used only for viewing data.
     public List<PlanetarySystem> MapToSystems(List<PlanetarySystemFlatRow> flatRows)
     {
         return flatRows

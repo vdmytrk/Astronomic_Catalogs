@@ -4,10 +4,10 @@ This project is a demonstration of full-stack architectural and development skil
 ✨ A live deployment is available here: https://newastrocatalogs.azurewebsites.net  
 
 ⚖️ The database is hosted on **Azure SQL Server**, and the codebase is managed on **Azure DevOps**, with **GitHub serving as a read-only mirror**:  
-*   Main repository *(active development)*: https://dev.azure.com/voldmytcOrganization/_git/Astronomic%20Catalogs/  
-*   Boards & Pipelines: https://dev.azure.com/voldmytcOrganization/Astronomic%20Catalogs  
-*   Mirror on GitHub *(read-only)* : https://github.com/vdmytrk/Astronomic_Catalogs  
-  
+*   [Main repository *(active development)*](https://dev.azure.com/voldmytcOrganization/_git/Astronomic%20Catalogs/)
+*   [Boards & Pipelines](https://dev.azure.com/voldmytcOrganization/Astronomic%20Catalogs/_dashboards/dashboard/afcb5290-0b24-4d15-b980-73f188b335be)
+*   [Mirror on GitHub *(read-only)*](https://github.com/vdmytrk/Astronomic_Catalogs)
+
 ---
 
 ## 📑 **Table of Contents**
@@ -165,6 +165,8 @@ This project uses SQL stored procedures as a core data transformation layer. The
 ---
 
 ## 🧪 **Testing**
+The test infrastructure includes creating users with roles/claims, simulating UI logins, providing stable DI configuration, replacing external HTTP calls, and constructing flexible `ClaimsPrincipal` objects with configurable claims.
+
 *   **Unit Tests**
     *   **Controllers** (`HomeController`, `HomeAdminController`): verify view returns, redirects, and model correctness.
     *   **Services** (`EmailSender`, caching, logging): validate business logic, error handling, and correct dependency calls.
@@ -172,20 +174,14 @@ This project uses SQL stored procedures as a core data transformation layer. The
 *   **Integration infrastructure**
     *   **`TestAuthWebApplicationFactory`**: replaces authentication with `TestAuth`; manages user claims/roles via `TestAuthHandlerOptions` and `TestUserBuilder`.
     *   **`LoginViaUIWebApplicationFactory`**: runs full Identity UI on in-memory `ApplicationDbContext`.
-*   **Test Helpers**
-    *   **`TestIdentitySeeder`**: creates test users (admin/regular) and assigns roles/claims.
-    *   **`IntegrationTestAuthHelper`**: scenario-based UI login.
-    *   **`StaticOptionsMonitor<T>`**: stable DI options.
-    *   **`FakeHttpMessageHandler`**: replaces external HTTP calls.
-    *   **`TestAuthHandler`**: builds flexible `ClaimsPrincipal` with configurable claims.
 *   **Isolation & Stability**
     *   *In-memory* database.
     *   Replacement or disabling of external services.
     *   Dedicated `Testing` environment and configuration overrides.
-*   **Integration Coverage**
+*   **Integration coverage**
     *   **Authorization by claims/roles**: expected `200/403` or redirects to login.
     *   **Identity UI**: failed login shows error; successful admin login allows access.
-    *   **Admin Area / `UsersController`**: admin access and presence of key links (`/Admin`, `/Admin/RoleClaims`, `/Admin/Roles`); non-admin access blocked.
+    *   **Admin Area / `UsersController`**: admin access and presence of key links; non-admin access blocked.
 
 ---
 
@@ -233,5 +229,4 @@ Feel free to reach out if you'd like to discuss architectural decisions, project
 *   Email: [voldmytc@gmail.com](mailto:voldmytc@gmail.com)
 *   DOU: [https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile](https://dou.ua/users/volodimir-dmiterko-1/?from=menu-profile)
 *   GitHub: [https://github.com/vdmytrk](https://github.com/vdmytrk)
-
-
+*   Azure: [Volodymyr Dmyterko](https://dev.azure.com/voldmytcOrganization/Profile/_wiki/wikis/Profile.wiki/2/About-me) 

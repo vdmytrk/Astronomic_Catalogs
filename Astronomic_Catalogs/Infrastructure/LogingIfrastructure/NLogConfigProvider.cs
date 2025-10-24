@@ -19,10 +19,9 @@ public class NLogConfigProvider : INLogConfigProvider
     {
         _nlogConfiguration = nlogConfiguration;
         _connectionStringProvider = connectionStringProvider;
-
-        _nlogConfigFile = Path.Combine(AppContext.BaseDirectory, environment.IsDevelopment()
-            ? "NLog.config.Debug.xml"
-            : "NLog.config.Release.xml");
+        _nlogConfigFile = Path.Combine(
+            AppContext.BaseDirectory, 
+            environment.IsDevelopment() ? "NLog.config.Debug.xml" : "NLog.config.Release.xml");
 
         FileLogService.WriteLogInFile("\n\nDEBUG", $"{FileLogService.GetKyivTime()} NLog config path: ", $"{_nlogConfigFile}\n\n");
     }

@@ -1,8 +1,9 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.Entities;
 using Astronomic_Catalogs.Exceptions;
+using Astronomic_Catalogs.Services.Constants;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
+using Astronomic_Catalogs.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
@@ -68,7 +69,9 @@ public class PlanetarySystemController : Controller
 #endif
         }
 
-        ViewBag.RowOnPageCatalog = "100";
+        int rowOnPage = GetRowOnPage();
+
+        ViewBag.RowOnPageCatalog = rowOnPage;
         ViewBag.PlanetNames = plLetters;
         ViewBag.TelescopNames = telescopes;
         ViewBag.DiscoveryMethod = discoveryMethods;
@@ -78,7 +81,7 @@ public class PlanetarySystemController : Controller
         try
         {
             // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
-            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberValue"] = 1, ["RowOnPageCatalog"] = 100 });
+            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberValue"] = 1, ["RowOnPageCatalog"] = rowOnPage });
             ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
         }
         catch (Exception ex)
@@ -111,7 +114,8 @@ public class PlanetarySystemController : Controller
     [HttpPost]
     public async Task<IActionResult> Index([FromBody] Dictionary<string, object> parameters)
     {
-        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "100";
+        int rowOnPage = GetRowOnPage();
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? rowOnPage.ToString();
         int? pageNumber = parameters.GetInt("PageNumberValue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<PlanetarySystem>? selectedList = new ();
@@ -184,7 +188,8 @@ public class PlanetarySystemController : Controller
     [HttpPost]
     public async Task<IActionResult> PlanetarySystemVisualization([FromBody] Dictionary<string, object> parameters)
     {
-        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "100";
+        int rowOnPage = GetRowOnPage();
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? rowOnPage.ToString();
         int? pageNumber = parameters.GetInt("PageNumberValue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<PlanetarySystem>? selectedList = new();
@@ -295,4 +300,9 @@ public class PlanetarySystemController : Controller
         }
     }
 
+
+    private int GetRowOnPage()
+    {
+        return User.IsInRole(RoleNames.Admin) ? 100 : 20;
+    }
 }

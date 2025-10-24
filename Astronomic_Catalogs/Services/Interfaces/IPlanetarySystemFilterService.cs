@@ -1,4 +1,4 @@
-﻿using Astronomic_Catalogs.Entities;
+﻿using Astronomic_Catalogs.ViewModels;
 
 namespace Astronomic_Catalogs.Services.Interfaces;
 

@@ -1,5 +1,4 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.DTO;
 using Astronomic_Catalogs.Exceptions;
 using Astronomic_Catalogs.Mappers;
 using Astronomic_Catalogs.Models;
@@ -39,7 +38,7 @@ public class NGCICOpendatasoftsController : Controller
     {
         int countNGC;
         int countNGCE;
-        List<ConstellationDto>? constellations;
+        List<ConstellationViewModel>? constellations;
         List<NGCICOpendatasoft>? catalogItems;
         List<NGCICViewModel> catalogViewModels;
 

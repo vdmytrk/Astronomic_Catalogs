@@ -1,6 +1,6 @@
-﻿namespace Astronomic_Catalogs.DTO;
+﻿namespace Astronomic_Catalogs.ViewModels;
 
-public class ConstellationDto
+public class ConstellationViewModel
 {
     public string ShortName { get; set; } = null!;
     public string LatineNameNominativeCase { get; set; } = null!;

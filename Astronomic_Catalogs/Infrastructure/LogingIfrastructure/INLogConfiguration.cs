@@ -1,7 +1,6 @@
-﻿namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure
+﻿namespace Astronomic_Catalogs.Infrastructure.NLogIfrastructure;
+
+public interface INLogConfiguration
 {
-    public interface INLogConfiguration
-    {
-        void ConfigureNLog(string configFilePath);
-    }
+    void ConfigureNLog(string configFilePath);
 }

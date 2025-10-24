@@ -1,7 +1,7 @@
 ﻿using Astronomic_Catalogs.Data;
-using Astronomic_Catalogs.Entities;
 using Astronomic_Catalogs.Exceptions;
 using Astronomic_Catalogs.Models;
+using Astronomic_Catalogs.Services.Constants;
 using Astronomic_Catalogs.Services.Interfaces;
 using Astronomic_Catalogs.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -74,7 +74,9 @@ public class PlanetsCatalogController : Controller
 #endif
         }
 
-        ViewBag.RowOnPageCatalog = "30";
+        int rowOnPage = GetRowOnPage();
+
+        ViewBag.RowOnPageCatalog = rowOnPage;
         ViewBag.PlanetNames = plLetters;
         ViewBag.TelescopNames = telescopes;
         ViewBag.DiscoveryMethod = discoveryMethods;
@@ -84,7 +86,7 @@ public class PlanetsCatalogController : Controller
         try
         {
             // Since the stored procedure GetFilteredPlanetsData returns a result from multiple tables and not all fields
-            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberValue"] = 1, ["RowOnPageCatalog"] = 30 });
+            result = await _filterService.GetFilteredDataAsync(new() { ["PageNumberValue"] = 1, ["RowOnPageCatalog"] = rowOnPage });
             ViewBag.AmountRowsResult = result?.FirstOrDefault()?.RowOnPage ?? 1;
         }
         catch (Exception ex)
@@ -120,7 +122,8 @@ public class PlanetsCatalogController : Controller
         if (parameters is null)
             throw new ArgumentNullException("Not given value into the parameters parameter.");
 
-        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? "30";
+        int rowOnPage = GetRowOnPage();
+        ViewBag.RowOnPageCatalog = parameters.GetString("RowOnPageCatalog") ?? rowOnPage.ToString();
         int? pageNumber = parameters.GetInt("PageNumberValue");
         ViewBag.PageNumber = pageNumber == 0 || pageNumber == null ? 1 : pageNumber;
         List<NASAExoplanetCatalog>? selectedList = new();
@@ -531,5 +534,9 @@ public class PlanetsCatalogController : Controller
         return Ok();
     }
 
+    private int GetRowOnPage()
+    {
+        return User.IsInRole(RoleNames.Admin) ? 30 : 10;
+    }
 
 }

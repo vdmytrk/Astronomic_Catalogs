@@ -1,5 +1,6 @@
-﻿@using Newtonsoft.Json
-@model IEnumerable<Astronomic_Catalogs.Entities.PlanetarySystem>
+﻿@using Astronomic_Catalogs.ViewModels
+@using Newtonsoft.Json
+@model IEnumerable<PlanetarySystem>
 @inject Newtonsoft.Json.JsonSerializerSettings JsonSettings
 
 @{
@@ -252,10 +253,20 @@
                         <div class="col">
                             <div class="d-flex flex-wrap align-items-center">
                                 <h6 class="pe-2">Number of elements on the page:</h6>
-                                @Html.DropDownList(
-                                "RowOnPageCatalog",
-                                                                new SelectList(new string[] { "10", "20", "30", "50", "100" }, "100"),
-                                                                new { @id = "RowOnPageCatalog", @required = "true", @data_default = "100", @class = "form-select RowOnPageCatal" })
+                                @if (User.IsInRole("OwnerAdministratorPower"))
+                                {
+                                    @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30", "50", "100" }, "100"),
+                                             new { @id = "RowOnPageCatalog", @required = "true", @data_default = "100", @class = "form-select RowOnPageCatal" })
+                                }
+                                else
+                                {
+                                    @Html.DropDownList(
+                                    "RowOnPageCatalog",
+                                    new SelectList(new string[] { "10", "20", "30" }, "20"),
+                                    new { @id = "RowOnPageCatalog", @required = "true", @data_default = "20", @class = "form-select RowOnPageCatal" })
+                                }
                             </div>
                         </div>
                         @if (User.IsInRole("OwnerAdministratorPower"))

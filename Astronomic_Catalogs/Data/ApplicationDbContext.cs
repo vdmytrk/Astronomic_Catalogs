@@ -1,5 +1,4 @@
 ﻿using Astronomic_Catalogs.DTO;
-using Astronomic_Catalogs.Entities;
 using Astronomic_Catalogs.Infrastructure;
 using Astronomic_Catalogs.Models;
 using Astronomic_Catalogs.Models.Configuration;
