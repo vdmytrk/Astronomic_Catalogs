@@ -12,7 +12,7 @@ public class PublicIpService (HttpClient httpClient, ILogger<PublicIpService> lo
 
     public async Task GetPublicIpAsync(HttpContext context, string ip)
     {
-        if (ip == "::1" || ip == "127.0.0.1")
+        if (context.Items["PublicIp"] is null && (ip == "::1" || ip == "127.0.0.1"))
         {
             try
             {
@@ -21,7 +21,7 @@ public class PublicIpService (HttpClient httpClient, ILogger<PublicIpService> lo
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching public IP");
-                PublicIp =  "Unknown_ip";
+                context.Items["PublicIp"] = PublicIp =  "Unknown_ip";
             }
         }
         else
