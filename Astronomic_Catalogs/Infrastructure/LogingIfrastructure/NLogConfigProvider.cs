@@ -23,7 +23,7 @@ public class NLogConfigProvider : INLogConfigProvider
             AppContext.BaseDirectory, 
             environment.IsDevelopment() ? "NLog.config.Debug.xml" : "NLog.config.Release.xml");
 
-        FileLogService.WriteLogInFile("\n\nDEBUG", $"{FileLogService.GetKyivTime()} NLog config path: ", $"{_nlogConfigFile}\n\n");
+        FileLogService.WriteLogInFile("DEBUG", $"{FileLogService.GetKyivTime()} NLog config path: ", $"{_nlogConfigFile}\n\n\n");
     }
 
     public void ConfigureLogger()

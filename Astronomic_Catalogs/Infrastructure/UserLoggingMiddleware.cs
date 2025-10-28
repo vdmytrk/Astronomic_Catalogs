@@ -3,6 +3,7 @@ using Astronomic_Catalogs.Models.Configuration.Services;
 using Astronomic_Catalogs.Models.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using System.Net;
 using System.Text.Json;
 
 namespace Astronomic_Catalogs.Infrastructure;
@@ -129,6 +130,9 @@ public class UserLoggingMiddleware(
 
         try
         {
+            if (!IPAddress.TryParse(log.IpAddress, out _))
+                return;
+
             var response = await _httpClient.GetStringAsync($"https://ipapi.co/{log.IpAddress}/json/");
             var geoData = JsonSerializer.Deserialize<JsonElement>(response);
 
