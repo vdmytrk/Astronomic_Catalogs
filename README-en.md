@@ -11,20 +11,20 @@ This project is a demonstration of full-stack architectural and development skil
 ---
 
 ## 📑 **Table of Contents**
-- [⚙️ Tech Stack](#⚙%EF%B8%8F-**tech-stack**)
-- [📂 Project Structure Overview](#📂-**project-structure-overview**)
-- [🏗️ Architecture & Design](#🏗%EF%B8%8F-**architecture-%26-design**)
-- [🔐 Authentication & Authorization](#%F0%9F%94%90-**authentication-%26-authorization**)
-  - [📧 Email Confirmation](#📧-**email-confirmation**)
-- [🧠 SQL Design & Stored Procedures](#🧠-**sql-design-%26-stored-procedures**)
-  - [🗂 Overview](#🗂-**overview**)
-  - [🧩 Key Implementations & Design](#🧩-**key-implementations-%26-design**)
-- [🧪 Testing](#🧪-**testing**)
-- [⚡ Developer Highlights](#⚡-**developer-highlights**)
-- [🚨 Deployment Note](#🚨-**deployment-note**)
-- [🛠️ Tooling](#🛠%EF%B8%8F-**tooling**)
-- [🚧 Roadmap & Work in Progress](#🚧-**roadmap-%26-work-in-progress**)
-- [📨 Contact](#📨-**contact**)
+- [⚙️ Tech Stack](#%EF%B8%8F-tech-stack)
+- [📂 Project Structure Overview](#-project-structure-overview)
+- [🏗️ Architecture & Design](#%EF%B8%8F-architecture--design)
+- [🔐 Authentication & Authorization](#-authentication--authorization)
+  - [📧 Email Confirmation](#-email-confirmation)
+- [🧠 SQL Design & Stored Procedures](#-sql-design--stored-procedures)
+  - [🗂 Overview](#-overview)
+  - [🧩 Key Implementations & Design](#-key-implementations--design)
+- [🧪 Testing](#-testing)
+- [⚡ Developer Highlights](#-developer-highlights)
+- [🚨 Deployment Note](#-deployment-note)
+- [🛠️ Tooling](#%EF%B8%8F-tooling)
+- [🚧 Roadmap & Work in Progress](#-roadmap--work-in-progress)
+- [📨 Contact](#-contact)  
 
 ---
 
