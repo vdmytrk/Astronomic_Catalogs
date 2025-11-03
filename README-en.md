@@ -29,21 +29,21 @@ This project is a demonstration of full-stack architectural and development skil
 ---
 
 ## ⚙️ **Tech Stack**
-| **Area**             | **Technology / Approach**                                                    |
-|----------------------|------------------------------------------------------------------------------|
-| **Framework**        | ASP.NET Core 9 – MVC & Razor Pages                                           |
-| **Frontend**         | TypeScript, LESS, Bootstrap 5, SweetAlert2, SignalR (real-time UI updates)   |
-| **Bundling & Build** | Webpack, compilerconfig.json                                                 |
-| **Database**         | Azure SQL Server + EF Core 9 (model-first + stored procedures + raw SQL)     |
-| **Authentication**   | ASP.NET Identity + OAuth2 (Google, Microsoft), claims & role policies        |
-| **Authorization**    | Policy-based, per-catalog & role-scoped UI and route protection              |
-| **Email Delivery**   | SMTP (Gmail) + `ICustomEmailSender` with tokenized confirmation workflow     |
-| **Logging**          | NLog (`NLog.config.<environment>`) + custom middleware                       |
-| **Caching**          | `MemoryCache` with custom `ICacheService` (key tracking, expiration)         |
-| **Rate Limiting**    | ASP.NET built-in limiter with TokenBucket, SlidingWindow, FixedWindow        |
-| **DTO Handling**     | Manual mapping (AutoMapper demo included, not used in production)            |
-| **Testing**          | Unit + Integration: NUnit, FakeItEasy, EF Core InMemory                      |
-| **CI/CD**            | Azure Pipelines (`azure-pipelines.yml`)                                      |
+| **Area**             | **Technology / Approach**                                                        |
+|----------------------|----------------------------------------------------------------------------------|
+| **Framework**        | ASP.NET Core 9 – MVC & Razor Pages                                               |
+| **Frontend**         | TypeScript, LESS, Bootstrap 5, SweetAlert2, SignalR (real-time UI updates)       |
+| **Bundling & Build** | Webpack, compilerconfig.json                                                     |
+| **Database**         | Azure SQL Server + EF Core 9 (model-first + stored procedures + raw SQL)         |
+| **Authentication**   | ASP.NET Identity + OAuth2 (Google, Microsoft), claims & role policies            |
+| **Authorization**    | Policy-based, per-catalog & role-scoped UI and route protection                  |
+| **Email Delivery**   | SMTP (Gmail) + `ICustomEmailSender` with tokenized confirmation workflow         |
+| **Logging**          | NLog (`NLog.config.<environment>`) + custom middleware + early-stage file logger |
+| **Caching**          | `MemoryCache` with custom `ICacheService` (key tracking, expiration)             |
+| **Rate Limiting**    | ASP.NET built-in limiter with TokenBucket, SlidingWindow, FixedWindow            |
+| **DTO Handling**     | Manual mapping (AutoMapper demo included, not used in production)                |
+| **Testing**          | Unit + Integration: NUnit, FakeItEasy, EF Core InMemory                          |
+| **CI/CD**            | Azure Pipelines (`azure-pipelines.yml`)                                          |
 
 ⚡ **AutoMapper note**: While the project includes AutoMapper setup as a demo of prior experience, manual mapping is used in production due to licensing restrictions.  
 ⚡ **Mobile responsiveness** is partially implemented and remains incomplete at this stage.  
@@ -99,7 +99,7 @@ This project is a demonstration of full-stack architectural and development skil
 ---
 
 ## 🔐 **Authentication & Authorization**
-This project supports both local and external login methods:
+This project supports both local and external methods:
 *   Local accounts via **ASP.NET Identity** (with cookie-based auth), includes email confirmation via Gmail SMTP with detailed logging of delivery attempts.
 *   External logins via **OAuth2** (Google and Microsoft personal accounts) including claim mapping.
 
@@ -209,9 +209,9 @@ Key requirements:
 
 ## 🛠️ **Tooling**
 *   Visual Studio 2022
-*   Azure DevOps (Repos, Boards, Pipelines)
+*   Azure DevOps (Repos, Pipelines)
 *   SQL Server Management Studio (Azure SQL DB)
-*   Git (GitHub & Azure DevOps)
+*   Git (Azure Repos & GitHub)
 *   Git Flow branching model
 
 ---
