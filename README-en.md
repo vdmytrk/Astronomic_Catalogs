@@ -1,11 +1,11 @@
 ﻿# 🌌 **Astronomic Catalogs**
 This project is a demonstration of full-stack architectural and development skills using ASP.NET technologies. It is fully developed by me and is not intended for deployment on third-party systems, but rather as a portfolio-ready showcase of structured backend development, Identity customization, and advanced web UI integration with alerting, theming, and dynamic client scripting. 
 
-✨ A live deployment is available here: https://newastrocatalogs.azurewebsites.net  
+✨ A live deployment is available here: https://astrocatalogs.azurewebsites.net/  (*Initial load may be delayed due to database cold start.*)   
 
 ⚖️ The database is hosted on **Azure SQL Server**, and the codebase is managed on **Azure DevOps**, with **GitHub serving as a read-only mirror**:  
-*   [Main repository *(active development)*](https://dev.azure.com/voldmytcOrganization/_git/Astronomic%20Catalogs/)
-*   [Boards & Pipelines](https://dev.azure.com/voldmytcOrganization/Astronomic%20Catalogs/_dashboards/dashboard/afcb5290-0b24-4d15-b980-73f188b335be)
+*   [Main repository *(active development)*](https://dev.azure.com/voldmytcOrganization2025-08/Astronomic%20Catalogs/_git/Astornomic_Solution)
+*   [Boards & Pipelines](https://dev.azure.com/voldmytcOrganization2025-08/Astronomic%20Catalogs/_dashboards/dashboard/6804f651-e2a5-41ff-959d-6a732b8d369e)
 *   [Mirror on GitHub *(read-only)*](https://github.com/vdmytrk/Astronomic_Catalogs)
 
 ---
@@ -16,8 +16,8 @@ This project is a demonstration of full-stack architectural and development skil
 - [🏗️ Architecture & Design](#🏗%EF%B8%8F-**architecture-%26-design**)
 - [🔐 Authentication & Authorization](#%F0%9F%94%90-**authentication-%26-authorization**)
   - [📧 Email Confirmation](#📧-**email-confirmation**)
-- [🧠 SQL Design & Stored Procedures](#🧠-**stored-procedure-highlights**)
-  - [🗂 Overview](#🗂-**Overview**)
+- [🧠 SQL Design & Stored Procedures](#🧠-**sql-design-%26-stored-procedures**)
+  - [🗂 Overview](#🗂-**overview**)
   - [🧩 Key Implementations & Design](#🧩-**key-implementations-%26-design**)
 - [🧪 Testing](#🧪-**testing**)
 - [⚡ Developer Highlights](#⚡-**developer-highlights**)
